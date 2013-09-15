@@ -136,7 +136,6 @@ def UpdateStatus(request, MchID, NewStatus):
     Comp.Status = NewStatus
     Comp.save()
 
-
     result['success'] = True
 
     return HttpResponse(json.dumps(result), mimetype="application/json")

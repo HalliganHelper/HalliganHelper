@@ -27,14 +27,13 @@ admin.site.register(Computer)
 
 
 class Lab(models.Model):
-    ClassName = models.CharField(max_length=10)
-    ClassSemester = models.CharField(max_length=20)
-    LabLeader = models.CharField(max_length=200)
+    ClassName = models.CharField(max_length=30)
     RoomNumber = models.IntegerField()
     StartTime = models.TimeField()
     EndTime = models.TimeField()
     StartDate = models.DateField()
     EndDate = models.DateField()
+    DayOfWeek = models.IntegerField(max_length=1)
 
     def is_lab_in_session(self):
         CurrTime = datetime.now().time()
