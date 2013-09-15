@@ -10,7 +10,7 @@ class Computer(models.Model):
     AVAILABLE = 'AVAILABLE'
     ERROR = 'ERROR'
 
-    CHOICES = [OFF, INUSE, AVAILABLE]
+    CHOICES = [OFF, INUSE, AVAILABLE, ERROR]
 
     STATUS_CHOICES = (
         (OFF, 'Powered Off'),
