@@ -8,13 +8,15 @@ class Computer(models.Model):
     OFF = 'OFF'
     INUSE = 'INUSE'
     AVAILABLE = 'AVAILABLE'
+    ERROR = 'ERROR'
 
     CHOICES = [OFF, INUSE, AVAILABLE]
 
     STATUS_CHOICES = (
         (OFF, 'Powered Off'),
         (INUSE, 'In Use'),
-        (AVAILABLE, 'Currently Available')
+        (AVAILABLE, 'Currently Available'),
+        (ERROR, 'Error')
     )
     ComputerNumber = models.CharField(max_length=7,
                                       primary_key=True)#Primary Key
