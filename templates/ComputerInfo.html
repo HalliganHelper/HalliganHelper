@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block header %}
+    {% load staticfiles %}
+    {% comment %}<script src="{% static "js/ComputerInfo.js" %}"></script>{% endcomment %}
+    <style>
+        .RoomList {
+            display:none;
+        }
+    </style>
+    <script>
+        function loaded(){
+            console.log('onload running');
+            $.get('/api/all', function(data){
+                var MachineListDiv = document.getElementById('MachineList');
+                if (data.success == true) {
+                    for (rm in data.rooms) {
+                        var listContainer = $('<div id="Room' + rm + '" class="RoomDiv">' + rm + '</div>').appendTo('#MachineList');
+                        var list = $('<ul/>').appendTo(listContainer);
+                        list.className = '.RoomList';
+                        list.id = "Room" + rm;
+                        var mchns = data.rooms[rm].machines;
+                        var keys = Object.keys(mchns);
+
+                        keys.sort();
+                        var len = keys.length;
+                        for (var i = 0; i < len; i++) {
+                            var k = keys[i];
+                            var item = $('<li>' + k + ': ' + mchns[k] + '</li>').appendTo(list);
+                        }
+
+                    }
+                } else {
+                    MachineListDiv.innerText = "Error Loading";
+                }
+
+                $('.RoomDiv').click(function(elem){
+                    $('#Room'+elem.id).slideToggle('slow', function(){
+                        //Animation Complete
+                    })
+                });
+
+            }
+        )}
+        $(document).ready(loaded)
+
+    </script>
+{% endblock %}
+
+{% block content %}
+<div id="MachineList">
+</div>
+{% endblock %}
