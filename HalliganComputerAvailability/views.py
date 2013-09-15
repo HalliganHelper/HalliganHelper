@@ -2,7 +2,7 @@
 from django.http import HttpResponse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from models import Lab, Computer
 import json
 from django.template import RequestContext
@@ -151,5 +151,40 @@ def UpdateStatus(request, MchID, NewStatus):
 
 
 def HomePage(request):
-    print request
-    return render_to_response('ComputerInfo.html', context_instance=RequestContext(request))
+
+    TemplateParams = {}
+
+    try:
+        Labs = Lab.objects.all()
+    except Lab.DoesNotExist:
+        Labs = None
+
+    LabsInSession = {}
+    comps = {}
+
+    rooms = Computer.objects.values_list('RoomNumber', flat=True)
+    TemplateParams['allRooms'] = sorted(list(set(rooms)))
+    print rooms
+
+    if Labs is not None:
+        for lab in Labs:
+            if lab.is_lab_in_session():
+                if LabsInSession[lab.RoomNumber] is None:
+                    LabsInSession[lab.RoomNumber] = []
+                LabsInSession[lab.RoomNumber].append(lab)
+
+
+    Room116 = Computer.objects.filter(RoomNumber=116)
+    Room118 = Computer.objects.filter(RoomNumber=118)
+    Room120 = Computer.objects.filter(RoomNumber=120)
+
+    TemplateParams['Room116'] = Room116
+    TemplateParams['Room118'] = Room118
+    TemplateParams['Room120'] = Room120
+
+    TemplateParams['comps'] = comps
+    TemplateParams['labs'] = LabsInSession
+
+
+
+    return render(request, 'ComputerInfo.html', TemplateParams)

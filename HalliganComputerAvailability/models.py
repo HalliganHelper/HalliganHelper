@@ -24,6 +24,7 @@ class Computer(models.Model):
     Status = models.CharField(max_length=9,
                               choices=STATUS_CHOICES,
                               default=AVAILABLE)
+    LastUpdate = models.DateTimeField(auto_now=True)
 
 admin.site.register(Computer)
 

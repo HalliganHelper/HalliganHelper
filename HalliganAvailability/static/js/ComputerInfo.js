@@ -13,7 +13,18 @@ function loaded(){
                     var len = keys.length;
                     for (var i = 0; i < len; i++) {
                         var k = keys[i];
+                        var className = '';
+
                         var item = $('<li>' + k + ': ' + mchns[k] + '</li>').appendTo(list);
+
+                        if (mchns[k] == 'INUSE') {
+                            className = 'InUse';
+                        } else if (mchns[k] == 'AVAILABLE'){
+                            className = 'Available';
+                        } else if (mchns[k] == 'ERROR') {
+                            className = 'Error';
+                        }
+                        item.addClass(className);
                     }
 
                 }

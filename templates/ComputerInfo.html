@@ -2,55 +2,143 @@
 
 {% block header %}
     {% load staticfiles %}
-    <script src="{% static "js/ComputerInfo.js" %}"></script>
-    {% comment %}
-    <style>
-        .RoomList {
-            display:none;
-        }
-    </style>
-    <script>
-        function loaded(){
-            console.log('onload running');
-            $.get('/api/all', function(data){
-                var MachineListDiv = document.getElementById('MachineList');
-                if (data.success == true) {
-                    for (rm in data.rooms) {
-                        var listContainer = $('<div id="Room' + rm + '" class="RoomDiv">' + rm + '</div>').appendTo('#MachineList');
-                        var list = $('<ul/>').appendTo(listContainer);
-                        list.className = '.RoomList';
-                        list.id = "Room" + rm;
-                        var mchns = data.rooms[rm].machines;
-                        var keys = Object.keys(mchns);
+    {% comment %}<script src="{% static "js/ComputerInfo.js" %}"></script>{% endcomment %}
 
-                        keys.sort();
-                        var len = keys.length;
-                        for (var i = 0; i < len; i++) {
-                            var k = keys[i];
-                            var item = $('<li>' + k + ': ' + mchns[k] + '</li>').appendTo(list);
-                        }
-
-                    }
-                } else {
-                    MachineListDiv.innerText = "Error Loading";
-                }
-
-                $('.RoomDiv').click(function(elem){
-                    $('#Room'+elem.id).slideToggle('slow', function(){
-                        //Animation Complete
-                    })
-                });
-
-            }
-        )}
-        $(document).ready(loaded)
-
-    </script>
-    {% endcomment %}
 {% endblock %}
 
 {% block content %}
+{% comment %}
 <div id="MachineList">
-Nothing loaded yet
+    <div id="AvailableMachines" class="Available">
+        {% for comp in comps.AVAILABLE %}
+            {{ comp.ComputerNumber }}
+        {% endfor %}
+    </div>
+    <div id="InUseMachines" class="InUse">
+        {% for comp in comps.INUSE %}
+            {{ comp.ComputerNumber }}
+        {% endfor %}
+    </div>
+
+    <div id="ErrorMachines" class="Error">
+        {% for comp in comps.ERROR %}
+            {{ comp.ComputerNumber }}
+        {% endfor %}
+    </div>
+    <div id="Labs" class="Available">
+        {% for room in labs %}
+            {% for lab in room %}
+                {{ lab }}
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+</div>
+{% endcomment %}
+<div class="row">
+    <div class="twelve columns">
+        <section class="pill tabs">
+            <ul class="tab-nav">
+                {% for room in allRooms %}
+                    {% if forloop.first %}
+                        <li class="active"><a href="#">{{ room }}</a></li>
+                    {% else %}
+                        <li><a href="#">{{ room }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <div class="tab-content active">
+                <table class="rounded">
+                    <thead>
+                        <tr>
+                            <td>Computer Number</td>
+                            <td>Status</td>
+                            <td>Last Updated</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comp in Room116 %}
+
+                            {% if comp.Status == "AVAILABLE" %}
+                                <tr class="Available">
+                            {% elif comp.Status == "INUSE" %}
+                                <tr class="InUse">
+                            {% elif comp.Status == "OFF" %}
+                                <tr class="Off">
+                            {% elif comp.Status == "ERROR" %}
+                                <tr class="Error">
+                            {% endif %}
+                                    <td>{{ comp.ComputerNumber }}</td>
+                                    <td>{{ comp.Status }}</td>
+                                    <td>{{ comp.LastUpdate }}</td>
+                                </tr>
+
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+            <div class="tab-content">
+                <table class="rounded">
+                    <thead>
+                        <tr>
+                            <td>Computer Number</td>
+                            <td>Status</td>
+                            <td>Last Updated</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comp in Room118 %}
+
+                            {% if comp.Status == "AVAILABLE" %}
+                                <tr class="Available">
+                            {% elif comp.Status == "INUSE" %}
+                                <tr class="InUse">
+                            {% elif comp.Status == "OFF" %}
+                                <tr class="Off">
+                            {% elif comp.Status == "ERROR" %}
+                                <tr class="Error">
+                            {% endif %}
+                                    <td>{{ comp.ComputerNumber }}</td>
+                                    <td>{{ comp.Status }}</td>
+                                    <td>{{ comp.LastUpdate }}</td>
+                                </tr>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        <div class="tab-content">
+                <table class="rounded">
+                    <thead>
+                        <tr>
+                            <td>Computer Number</td>
+                            <td>Status</td>
+                            <td>Last Updated</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comp in Room120 %}
+
+                            {% if comp.Status == "AVAILABLE" %}
+                                <tr class="Available">
+                            {% elif comp.Status == "INUSE" %}
+                                <tr class="InUse">
+                            {% elif comp.Status == "OFF" %}
+                                <tr class="Off">
+                            {% elif comp.Status == "ERROR" %}
+                                <tr class="Error">
+                            {% endif %}
+                                    <td>{{ comp.ComputerNumber }}</td>
+                                    <td>{{ comp.Status }}</td>
+                                    <td>{{ comp.LastUpdate }}</td>
+                                </tr>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+    </div>
 </div>
 {% endblock %}
