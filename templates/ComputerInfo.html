@@ -57,7 +57,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for comp in Room116 %}
+                        {% for comp in Room116|dictsort:'ComputerNumber' %}
 
                             {% if comp.Status == "AVAILABLE" %}
                                 <tr class="Available">
@@ -87,7 +87,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for comp in Room118 %}
+                        {% for comp in Room118|dictsort:'ComputerNumber' %}
 
                             {% if comp.Status == "AVAILABLE" %}
                                 <tr class="Available">
@@ -117,7 +117,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for comp in Room120 %}
+                        {% for comp in Room120|dictsort:'ComputerNumber' %}
 
                             {% if comp.Status == "AVAILABLE" %}
                                 <tr class="Available">
