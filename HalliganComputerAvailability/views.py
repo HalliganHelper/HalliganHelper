@@ -14,13 +14,21 @@ def ApiDocs(request):
 
 @require_GET
 def AllComps(request):
+
+    def SerializeHandler(obj):
+        if hasattr(obj, 'isoformat'):
+            return obj.isoformat()
+        else:
+            raise TypeError, 'Object of type %s with value of %s is not JSON serializable' %(type(obj), repr(obj))
+
+
     response = {}
 
     try:
         Comps = Computer.objects.all()
     except Computer.DoesNotExist:
         response['success'] = False
-        return HttpResponse(json.dumps(response), mimetype="application/json")
+        return HttpResponse(json.dumps(response, default=SerializeHandler), mimetype="application/json")
 
     try:
         Labs = Lab.objects.all()
@@ -47,7 +55,7 @@ def AllComps(request):
             }
 
     response['success'] = True
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return HttpResponse(json.dumps(response, default=SerializeHandler), mimetype="application/json")
 
 
 @require_GET
