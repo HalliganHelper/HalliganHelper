@@ -164,7 +164,6 @@ def HomePage(request):
 
     rooms = Computer.objects.values_list('RoomNumber', flat=True)
     TemplateParams['allRooms'] = sorted(list(set(rooms)))
-    print rooms
 
     if Labs is not None:
         for lab in Labs:
@@ -175,8 +174,11 @@ def HomePage(request):
 
 
     Room116 = Computer.objects.filter(RoomNumber=116)
+    Room116.order_by('ComputerNumber')
     Room118 = Computer.objects.filter(RoomNumber=118)
+    Room118.order_by('ComputerNumber')
     Room120 = Computer.objects.filter(RoomNumber=120)
+    Room120.order_by('ComputerNumber')
 
     TemplateParams['Room116'] = Room116
     TemplateParams['Room118'] = Room118
