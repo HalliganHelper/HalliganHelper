@@ -40,9 +40,13 @@ class Lab(models.Model):
     def is_lab_in_session(self):
         CurrTime = datetime.now().time()
         CurrDate = datetime.now().date()
+        CurrDay = datetime.now().weekday()
+        #print "CUrrentDay", CurrDay
+        #print "LAB DAY", self.DayOfWeek
 
         if(self.StartDate < CurrDate < self.EndDate
-           and self.StartTime < CurrTime < self.EndTime):
+           and self.StartTime < CurrTime < self.EndTime
+           and self.DayOfWeek == CurrDay):
             return True
 
         return False

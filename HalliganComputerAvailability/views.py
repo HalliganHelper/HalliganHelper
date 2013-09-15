@@ -47,6 +47,7 @@ def AllComps(request):
 
     for lab in Labs:
         if lab.is_lab_in_session() and lab.RoomNumber in response['rooms']:
+            #print lab.DayOfWeek
             response['rooms'][lab.RoomNumber]['inLab'] = True
             response['rooms'][lab.RoomNumber]['labInfo'] = {
                 'class': lab.ClassName,

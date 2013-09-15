@@ -2,7 +2,8 @@
 
 {% block header %}
     {% load staticfiles %}
-    {% comment %}<script src="{% static "js/ComputerInfo.js" %}"></script>{% endcomment %}
+    <script src="{% static "js/ComputerInfo.js" %}"></script>
+    {% comment %}
     <style>
         .RoomList {
             display:none;
@@ -45,9 +46,11 @@
         $(document).ready(loaded)
 
     </script>
+    {% endcomment %}
 {% endblock %}
 
 {% block content %}
 <div id="MachineList">
+Nothing loaded yet
 </div>
 {% endblock %}
