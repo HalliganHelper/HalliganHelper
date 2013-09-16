@@ -185,7 +185,11 @@
                     </thead>
                     <tbody>
                         {% for lab in allLabs %}
-                            <tr>
+                            {% if lab.is_lab_in_session %}
+                                <tr class="InSession">
+                            {% else %}
+                                <tr>
+                            {% endif %}
                                 <td>{{ lab.RoomNumber }}</td>
                                 <td>
                                     {% if lab.DayOfWeek == 6 %}
