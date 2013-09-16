@@ -14,7 +14,7 @@ class Command(BaseCommand):
         cache.delete('HOMEPAGE')
         StartDate = raw_input("Enter Start Date of Labs in format dd/mm/yyyy: ")
         StartDate = StartDate.split('/')
-        print StartDate
+
         StartDate = datetime.date(int(StartDate[2]), int(StartDate[1]), int(StartDate[0]))
         EndDate = raw_input("Enter End Date of Labs in format dd/mm/yyyy: ")
         EndDate = EndDate.split('/')
@@ -69,7 +69,7 @@ class Command(BaseCommand):
                     'Sat': 5,
                     'Sun': 6,
                 }.get(x, 0)
-            #print RmNum, course, StartTimeElement, EndTimeElement, StartDate, EndDate, DayToInt(DayOfWeek)
+
             l = Lab(RoomNumber=RmNum, ClassName=course, StartTime=StartTimeElement, EndTime=EndTimeElement,
                     StartDate=StartDate, EndDate=EndDate, DayOfWeek=DayToInt(DayOfWeek))
             l.save()

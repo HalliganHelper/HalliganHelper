@@ -1,6 +1,14 @@
 # Django settings for HalliganAvailability project.
+import os
 
-DEBUG = True
+DEBUG = False
+try:
+    os.environ['ON_HEROKU']
+    DEBUG = False
+except KeyError:
+    print "KEYERROR"
+    DEBUG = True
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
