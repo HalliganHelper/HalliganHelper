@@ -154,23 +154,35 @@ def HomePage(request):
 
     TemplateParams = {}
 
-    try:
-        Labs = Lab.objects.all()
-    except Lab.DoesNotExist:
-        Labs = None
+
 
     LabsInSession = {}
     comps = {}
+    rooms = {}
+    roomNums = Computer.objects.values_list('RoomNumber', flat=True)
+    roomNums = sorted(list(set(roomNums)))
+    print roomNums
 
-    rooms = Computer.objects.values_list('RoomNumber', flat=True)
-    TemplateParams['allRooms'] = sorted(list(set(rooms)))
+    for roomNum in roomNums:
+        index = "Room" + str(roomNum)
+        rooms[index] = {}
+        rooms[index]['inSession'] = False
+        labs = Lab.objects.filter(RoomNumber=int(roomNum))
+        if not labs.count() == 0:
+            for lab in labs:
+                if lab.is_lab_in_session():
+                    rooms[index]['inSession'] = True
+                    rooms[index]['lab'] = lab
 
-    if Labs is not None:
-        for lab in Labs:
-            if lab.is_lab_in_session():
-                if LabsInSession[lab.RoomNumber] is None:
-                    LabsInSession[lab.RoomNumber] = []
-                LabsInSession[lab.RoomNumber].append(lab)
+
+    rooms['Room116']['inSession'] = True
+    rooms['Room116']['lab'] = Lab.objects.get(pk=35)
+    print rooms['Room116']['inSession'], rooms['Room116']['lab'].ClassName
+    TemplateParams['labInfo'] = rooms
+    TemplateParams['allRooms'] = roomNums
+
+
+
 
 
     Room116 = Computer.objects.filter(RoomNumber=116)

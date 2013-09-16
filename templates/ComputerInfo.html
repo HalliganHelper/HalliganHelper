@@ -7,38 +7,11 @@
 {% endblock %}
 
 {% block content %}
-{% comment %}
-<div id="MachineList">
-    <div id="AvailableMachines" class="Available">
-        {% for comp in comps.AVAILABLE %}
-            {{ comp.ComputerNumber }}
-        {% endfor %}
-    </div>
-    <div id="InUseMachines" class="InUse">
-        {% for comp in comps.INUSE %}
-            {{ comp.ComputerNumber }}
-        {% endfor %}
-    </div>
-
-    <div id="ErrorMachines" class="Error">
-        {% for comp in comps.ERROR %}
-            {{ comp.ComputerNumber }}
-        {% endfor %}
-    </div>
-    <div id="Labs" class="Available">
-        {% for room in labs %}
-            {% for lab in room %}
-                {{ lab }}
-            {% endfor %}
-        {% endfor %}
-    </div>
-
-</div>
-{% endcomment %}
 <div class="row">
     <div class="twelve columns">
         <section class="pill tabs">
             <ul class="tab-nav">
+                {% comment %}
                 {% for room in allRooms %}
                     {% if forloop.first %}
                         <li class="active"><a href="#">{{ room }}</a></li>
@@ -46,8 +19,40 @@
                         <li><a href="#">{{ room }}</a></li>
                     {% endif %}
                 {% endfor %}
+                {% endcomment %}
+                <li class="active">
+                    <a href="#">
+                        116
+                        <span class="danger badge">L</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="#">
+                        118
+                        <span class="danger badge">L</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="#">
+                        120
+                        <span class="danger badge">L</span>
+                    </a>
+                </li>
             </ul>
             <div class="tab-content active">
+
+
+                {% if labInfo.Room116.inSession %}
+                    <div class="row">
+                        <div class="centered five columns">
+                            <span class="danger alert">
+                                {{ labInfo.Room116.lab.ClassName }} has a lab from {{ labInfo.Room116.lab.StartTime }} to {{ labInfo.Room116.lab.EndTime }}
+                            </span>
+                        </div>
+                    </div>
+                {% endif %}
+
+
                 <table class="rounded">
                     <thead>
                         <tr>
@@ -78,6 +83,16 @@
                 </table>
             </div>
             <div class="tab-content">
+
+
+                {% if labInfo.Room118.inSession %}
+
+                    <span class="danger alert">
+                        {{ labInfo.Room118.lab.ClassName }} has a lab from {{ labInfo.Room118.lab.StartTime }} to {{ labInfo.Room118.lab.EndTime }}
+                    </span>
+                {% endif %}
+
+
                 <table class="rounded">
                     <thead>
                         <tr>
@@ -108,6 +123,15 @@
                 </table>
             </div>
         <div class="tab-content">
+
+
+                {% if labInfo.Room120.inSession %}
+                    <span class="danger alert">
+                        {{ labInfo.Room120.lab.ClassName }} has a lab from {{ labInfo.Room120.lab.StartTime }} to {{ labInfo.Room120.lab.EndTime }}
+                    </span>
+                {% endif %}
+
+
                 <table class="rounded">
                     <thead>
                         <tr>
