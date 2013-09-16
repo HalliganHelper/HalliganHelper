@@ -154,7 +154,7 @@ def UpdateStatus(request, MchID, NewStatus):
 def HomePage(request):
 
     retVal = cache.get("HOMEPAGE")
-    if not retVal:
+    if not retVal or retVal:
         print "Not Cached"
         TemplateParams = {}
         LabsInSession = {}
@@ -197,7 +197,5 @@ def HomePage(request):
         TemplateParams['labs'] = LabsInSession
         retVal = render(request, 'ComputerInfo.html', TemplateParams)
         cache.set("HOMEPAGE", retVal)
-
-
 
     return retVal
