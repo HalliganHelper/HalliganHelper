@@ -2,6 +2,7 @@ __author__ = 'tyler'
 from django.core.management.base import BaseCommand, CommandError
 import urllib2, csv, StringIO, datetime
 from HalliganComputerAvailability.models import Lab
+from django.core.cache import cache
 
 
 
@@ -10,6 +11,7 @@ class Command(BaseCommand):
     help = 'Add semesters labs from Bruce Molays online log'
 
     def handle(self, *args, **options):
+        cache.delete('HOMEPAGE')
         StartDate = raw_input("Enter Start Date of Labs in format dd/mm/yyyy: ")
         StartDate = StartDate.split('/')
         print StartDate
@@ -18,6 +20,8 @@ class Command(BaseCommand):
         EndDate = EndDate.split('/')
         EndDate = datetime.date(int(EndDate[2]), int(EndDate[1]), int(EndDate[0]))
 
+        OldLabs = Lab.objects.filter(StartDate=StartDate, EndDate=EndDate)
+        OldLabs.delete()
 
         infile = urllib2.urlopen('http://www.cs.tufts.edu/~molay/labs/times.cgi').read()
         infile = StringIO.StringIO(infile)
@@ -45,9 +49,13 @@ class Command(BaseCommand):
             if StartHour < 8:
                 StartHour += 12
                 EndHour += 12
+            if StartHour == 12:
+                EndHour += 12
 
             StartTimeElement = datetime.time(StartHour, int(StartTime.split(':')[1]))
             EndTimeElement = datetime.time(EndHour, int(EndTime.split(':')[1]))
+
+
             #print StartTimeElement, EndTimeElement
             #print StartDate, EndDate
 
@@ -61,7 +69,7 @@ class Command(BaseCommand):
                     'Fri': 5,
                     'Sat': 6
                 }.get(x, 0)
-            print RmNum, course, StartTimeElement, EndTimeElement, StartDate, EndDate, DayToInt(DayOfWeek)
+            #print RmNum, course, StartTimeElement, EndTimeElement, StartDate, EndDate, DayToInt(DayOfWeek)
             l = Lab(RoomNumber=RmNum, ClassName=course, StartTime=StartTimeElement, EndTime=EndTimeElement,
                     StartDate=StartDate, EndDate=EndDate, DayOfWeek=DayToInt(DayOfWeek))
             l.save()
