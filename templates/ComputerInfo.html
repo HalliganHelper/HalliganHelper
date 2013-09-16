@@ -52,7 +52,7 @@
             </ul>
             <div class="tab-content active">
 
-
+                                        {{ labInfo }}
                 {% if labInfo.Room116.inSession %}
                     <div class="row">
                         <div class="centered five columns">
@@ -188,19 +188,19 @@
                             <tr>
                                 <td>{{ lab.RoomNumber }}</td>
                                 <td>
-                                    {% if lab.DayOfWeek == 0 %}
+                                    {% if lab.DayOfWeek == 6 %}
                                         Sunday
-                                    {% elif lab.DayOfWeek == 1 %}
+                                    {% elif lab.DayOfWeek == 0 %}
                                         Monday
-                                    {% elif lab.DayOfWeek == 2 %}
+                                    {% elif lab.DayOfWeek == 1 %}
                                         Tuesday
-                                    {% elif lab.DayOfWeek == 3 %}
+                                    {% elif lab.DayOfWeek == 2 %}
                                         Wednesday
-                                    {% elif lab.DayOfWeek == 4 %}
+                                    {% elif lab.DayOfWeek == 3 %}
                                         Thursday
-                                    {% elif lab.DayOfWeek == 5 %}
+                                    {% elif lab.DayOfWeek == 4 %}
                                         Friday
-                                    {% elif lab.DayOfWeek == 6 %}
+                                    {% elif lab.DayOfWeek == 5 %}
                                         Saturday
                                     {% endif %}
                                     {% comment %}{{ lab.DayOfWeek|date: "D" }{% endcomment %}

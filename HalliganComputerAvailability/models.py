@@ -44,7 +44,8 @@ class Lab(models.Model):
         CurrDay = datetime.now().weekday()
         #print "CUrrentDay", CurrDay
         #print "LAB DAY", self.DayOfWeek
-
+        print "CURRTIME", CurrTime, "CURRDATE", CurrDate, "CURRDAY", CurrDay
+        print "STARTTIME", self.StartTime, "ENDTIME", self.EndTime, "DAYOFWEEK", self.DayOfWeek
         if(self.StartDate < CurrDate < self.EndDate
            and self.StartTime < CurrTime < self.EndTime
            and self.DayOfWeek == CurrDay):

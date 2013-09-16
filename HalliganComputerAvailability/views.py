@@ -166,11 +166,14 @@ def HomePage(request):
 
         for roomNum in roomNums:
             index = "Room" + str(roomNum)
+            print index
             rooms[index] = {}
             rooms[index]['inSession'] = False
             labs = Lab.objects.filter(RoomNumber=int(roomNum))
+
             if not labs.count() == 0:
                 for lab in labs:
+                    print "ROOMNUM: ", lab.ClassName, " IN SESSION: ", lab.is_lab_in_session()
                     if lab.is_lab_in_session():
                         rooms[index]['inSession'] = True
                         rooms[index]['lab'] = lab
