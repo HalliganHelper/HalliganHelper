@@ -182,10 +182,6 @@ def HomePage(request):
         TemplateParams['allRooms'] = roomNums
         TemplateParams['allLabs'] = Lab.objects.all()
 
-
-
-
-
         Room116 = Computer.objects.filter(RoomNumber=116)
         Room116.order_by('ComputerNumber')
         Room118 = Computer.objects.filter(RoomNumber=118)
