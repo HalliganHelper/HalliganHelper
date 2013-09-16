@@ -170,13 +170,19 @@ def HomePage(request):
             rooms[index] = {}
             rooms[index]['inSession'] = False
             labs = Lab.objects.filter(RoomNumber=int(roomNum))
-
+            rooms[index]['UpcomingLabs'] = []
             if not labs.count() == 0:
                 for lab in labs:
-                    print "ROOMNUM: ", lab.ClassName, " IN SESSION: ", lab.is_lab_in_session()
+                    #print "ROOMNUM: ", lab.ClassName, " IN SESSION: ", lab.is_lab_in_session()
+
                     if lab.is_lab_in_session():
                         rooms[index]['inSession'] = True
                         rooms[index]['lab'] = lab
+                    if lab.is_lab_coming_up():
+                        print "COMING LAB VIEW"
+                        print lab
+                        rooms[index]['UpcomingLabs'].append(lab)
+
 
         TemplateParams['labInfo'] = rooms
         TemplateParams['allRooms'] = roomNums

@@ -26,6 +26,10 @@
                         {% if labInfo.Room116.inSession%}
                         <span class="danger badge">L</span>
                         {% endif %}
+                        {% if labInfo.Room116.UpcomingLabs %}
+                        <span class="warning badge">UL</span>
+                        {% endif %}
+
                     </a>
                 </li>
                 <li>
@@ -34,6 +38,9 @@
                         {% if labInfo.Room118.inSession %}
                         <span class="danger badge">L</span>
                         {% endif %}
+                        {% if labInfo.Room118.UpcomingLabs %}
+                        <span class="warning badge">UL</span>
+                        {% endif %}
                     </a>
                 </li>
                 <li>
@@ -41,6 +48,9 @@
                         120
                         {% if labInfo.Room120.inSession %}
                         <span class="danger badge">L</span>
+                        {% endif %}
+                        {% if labInfo.Room120.UpcomingLabs %}
+                        <span class="warning badge">UL</span>
                         {% endif %}
                     </a>
                 </li>
@@ -62,9 +72,18 @@
                         </div>
                     </div>
                 {% endif %}
+                {% for ComingLab in labInfo.Room116.UpcomingLabs %}
+                    <div class="row">
+                        <div class="centered five columns">
+                            <span class="warning alert">
+                                {{ ComingLab.ClassName }} has a lab starting at {{ ComingLab.StartTime }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
 
 
-                <table class="rounded">
+                <table class="striped rounded">
                     <thead>
                         <tr>
                             <td>Computer Number</td>
@@ -102,9 +121,18 @@
                         {{ labInfo.Room118.lab.ClassName }} has a lab from {{ labInfo.Room118.lab.StartTime }} to {{ labInfo.Room118.lab.EndTime }}
                     </span>
                 {% endif %}
+                {% for ComingLab in labInfo.Room118.UpcomingLabs %}
+                    <div class="row">
+                        <div class="centered five columns">
+                            <span class="warning alert">
+                                {{ ComingLab.ClassName }} has a lab starting at {{ ComingLab.StartTime }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
 
 
-                <table class="rounded">
+                <table class="striped rounded">
                     <thead>
                         <tr>
                             <td>Computer Number</td>
@@ -141,9 +169,18 @@
                         {{ labInfo.Room120.lab.ClassName }} has a lab from {{ labInfo.Room120.lab.StartTime }} to {{ labInfo.Room120.lab.EndTime }}
                     </span>
                 {% endif %}
+                {% for ComingLab in labInfo.Room120.UpcomingLabs %}
+                    <div class="row">
+                        <div class="centered five columns">
+                            <span class="warning alert">
+                                {{ ComingLab.ClassName }} has a lab starting at {{ ComingLab.StartTime }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
 
 
-                <table class="rounded">
+                <table class="striped rounded">
                     <thead>
                         <tr>
                             <td>Computer Number</td>
@@ -207,9 +244,6 @@
                                     {% elif lab.DayOfWeek == 5 %}
                                         Saturday
                                     {% endif %}
-
-                                    {% comment %}{{ lab.DayOfWeek|date: "D" }{% endcomment %}
-
                                  </td>
                                 <td>{{ lab.StartTime }}</td>
                                 <td>{{ lab.EndTime }}</td>
