@@ -176,17 +176,16 @@
                 <table class="striped rounded">
                     <thead>
                         <tr>
-                            <th>Class</th>
                             <th>Room</th>
                             <th>Day</th>
                             <th>Start Time</th>
                             <th>End Time</th>
+                            <th>Class</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for lab in allLabs %}
                             <tr>
-                                <td>{{ lab.ClassName }}</td>
                                 <td>{{ lab.RoomNumber }}</td>
                                 <td>
                                     {% if lab.DayOfWeek == 0 %}
@@ -209,6 +208,7 @@
                                  </td>
                                 <td>{{ lab.StartTime }}</td>
                                 <td>{{ lab.EndTime }}</td>
+                                <td>{{ lab.ClassName }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
