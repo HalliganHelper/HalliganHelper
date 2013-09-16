@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response, render
 from models import Lab, Computer
 import json
+from django.core.cache import cache
 from django.template import RequestContext
 
 
@@ -146,56 +147,58 @@ def UpdateStatus(request, MchID, NewStatus):
     Comp.save()
 
     result['success'] = True
-
+    cache.delete("HOMEPAGE")
     return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
 def HomePage(request):
 
-    TemplateParams = {}
+    retVal = cache.get("HOMEPAGE")
+    if not retVal:
+        print "Not Cached"
+        TemplateParams = {}
+        LabsInSession = {}
+        comps = {}
+        rooms = {}
+        roomNums = Computer.objects.values_list('RoomNumber', flat=True)
+        roomNums = sorted(list(set(roomNums)))
+        print roomNums
+
+        for roomNum in roomNums:
+            index = "Room" + str(roomNum)
+            rooms[index] = {}
+            rooms[index]['inSession'] = False
+            labs = Lab.objects.filter(RoomNumber=int(roomNum))
+            if not labs.count() == 0:
+                for lab in labs:
+                    if lab.is_lab_in_session():
+                        rooms[index]['inSession'] = True
+                        rooms[index]['lab'] = lab
+
+        TemplateParams['labInfo'] = rooms
+        TemplateParams['allRooms'] = roomNums
+        TemplateParams['allLabs'] = Lab.objects.all()
 
 
 
-    LabsInSession = {}
-    comps = {}
-    rooms = {}
-    roomNums = Computer.objects.values_list('RoomNumber', flat=True)
-    roomNums = sorted(list(set(roomNums)))
-    print roomNums
 
-    for roomNum in roomNums:
-        index = "Room" + str(roomNum)
-        rooms[index] = {}
-        rooms[index]['inSession'] = False
-        labs = Lab.objects.filter(RoomNumber=int(roomNum))
-        if not labs.count() == 0:
-            for lab in labs:
-                if lab.is_lab_in_session():
-                    rooms[index]['inSession'] = True
-                    rooms[index]['lab'] = lab
 
-    TemplateParams['labInfo'] = rooms
-    TemplateParams['allRooms'] = roomNums
-    TemplateParams['allLabs'] = Lab.objects.all()
+        Room116 = Computer.objects.filter(RoomNumber=116)
+        Room116.order_by('ComputerNumber')
+        Room118 = Computer.objects.filter(RoomNumber=118)
+        Room118.order_by('ComputerNumber')
+        Room120 = Computer.objects.filter(RoomNumber=120)
+        Room120.order_by('ComputerNumber')
+
+        TemplateParams['Room116'] = Room116
+        TemplateParams['Room118'] = Room118
+        TemplateParams['Room120'] = Room120
+
+        TemplateParams['comps'] = comps
+        TemplateParams['labs'] = LabsInSession
+        retVal = render(request, 'ComputerInfo.html', TemplateParams)
+        cache.set("HOMEPAGE", retVal)
 
 
 
-
-
-    Room116 = Computer.objects.filter(RoomNumber=116)
-    Room116.order_by('ComputerNumber')
-    Room118 = Computer.objects.filter(RoomNumber=118)
-    Room118.order_by('ComputerNumber')
-    Room120 = Computer.objects.filter(RoomNumber=120)
-    Room120.order_by('ComputerNumber')
-
-    TemplateParams['Room116'] = Room116
-    TemplateParams['Room118'] = Room118
-    TemplateParams['Room120'] = Room120
-
-    TemplateParams['comps'] = comps
-    TemplateParams['labs'] = LabsInSession
-
-
-
-    return render(request, 'ComputerInfo.html', TemplateParams)
+    return retVal
