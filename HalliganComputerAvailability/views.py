@@ -174,12 +174,9 @@ def HomePage(request):
                     rooms[index]['inSession'] = True
                     rooms[index]['lab'] = lab
 
-
-    rooms['Room116']['inSession'] = True
-    rooms['Room116']['lab'] = Lab.objects.get(pk=35)
-    print rooms['Room116']['inSession'], rooms['Room116']['lab'].ClassName
     TemplateParams['labInfo'] = rooms
     TemplateParams['allRooms'] = roomNums
+    TemplateParams['allLabs'] = Lab.objects.all()
 
 
 

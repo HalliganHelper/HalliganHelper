@@ -23,19 +23,30 @@
                 <li class="active">
                     <a href="#">
                         116
+                        {% if labInfo.Room116.inSession%}
                         <span class="danger badge">L</span>
+                        {% endif %}
                     </a>
                 </li>
-                <li class="active">
+                <li>
                     <a href="#">
                         118
+                        {% if labInfo.Room118.inSession %}
                         <span class="danger badge">L</span>
+                        {% endif %}
                     </a>
                 </li>
-                <li class="active">
+                <li>
                     <a href="#">
                         120
+                        {% if labInfo.Room120.inSession %}
                         <span class="danger badge">L</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Labs
                     </a>
                 </li>
             </ul>
@@ -122,7 +133,7 @@
                     </tbody>
                 </table>
             </div>
-        <div class="tab-content">
+            <div class="tab-content">
 
 
                 {% if labInfo.Room120.inSession %}
@@ -161,6 +172,29 @@
                     </tbody>
                 </table>
             </div>
+            <div class="tab-content">
+                <table class="striped rounded">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Room</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lab in allLabs %}
+                            <tr>
+                                <td>{{ lab.ClassName }}</td>
+                                <td>{{ lab.RoomNumber }}</td>
+                                <td>{{ lab.StartTime }}</td>
+                                <td>{{ lab.EndTime }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
 
         </section>
     </div>
