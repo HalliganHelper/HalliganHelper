@@ -178,6 +178,7 @@
                         <tr>
                             <th>Class</th>
                             <th>Room</th>
+                            <th>Day</th>
                             <th>Start Time</th>
                             <th>End Time</th>
                         </tr>
@@ -187,6 +188,25 @@
                             <tr>
                                 <td>{{ lab.ClassName }}</td>
                                 <td>{{ lab.RoomNumber }}</td>
+                                <td>
+                                    {% if lab.DayOfWeek == 0 %}
+                                        Sunday
+                                    {% elif lab.DayOfWeek == 1 %}
+                                        Monday
+                                    {% elif lab.DayOfWeek == 2 %}
+                                        Tuesday
+                                    {% elif lab.DayOfWeek == 3 %}
+                                        Wednesday
+                                    {% elif lab.DayOfWeek == 4 %}
+                                        Thursday
+                                    {% elif lab.DayOfWeek == 5 %}
+                                        Friday
+                                    {% elif lab.DayOfWeek == 6 %}
+                                        Saturday
+                                    {% endif %}
+                                    {% comment %}{{ lab.DayOfWeek|date: "D" }{% endcomment %}
+
+                                 </td>
                                 <td>{{ lab.StartTime }}</td>
                                 <td>{{ lab.EndTime }}</td>
                             </tr>
