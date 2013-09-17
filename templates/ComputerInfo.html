@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block header %}
-    {% load staticfiles %}
 
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    {% load staticfiles %}
+    <script type="text/javascript" src="https://www.google.com/jsap"></script>
     <script src="{% static "js/CreateGraph.js" %}"></script>
 {% endblock %}
 
@@ -12,15 +12,6 @@
     <div class="twelve columns">
         <section class="pill tabs">
             <ul class="tab-nav">
-                {% comment %}
-                {% for room in allRooms %}
-                    {% if forloop.first %}
-                        <li class="active"><a href="#">{{ room }}</a></li>
-                    {% else %}
-                        <li><a href="#">{{ room }}</a></li>
-                    {% endif %}
-                {% endfor %}
-                {% endcomment %}
                 <li class="active">
                     <a>
                         116
@@ -122,10 +113,13 @@
 
 
                 {% if labInfo.Room118.inSession %}
-
-                    <span class="danger alert">
-                        {{ labInfo.Room118.lab.ClassName }} has a lab from {{ labInfo.Room118.lab.StartTime }} to {{ labInfo.Room118.lab.EndTime }}
-                    </span>
+                    <div class="row">
+                        <div class="centered five columns">
+                            <span class="danger alert">
+                                {{ labInfo.Room118.lab.ClassName }} has a lab from {{ labInfo.Room118.lab.StartTime }} to {{ labInfo.Room118.lab.EndTime }}
+                            </span>
+                        </div>
+                    </div>
                 {% endif %}
                 {% for ComingLab in labInfo.Room118.UpcomingLabs %}
                     <div class="row">
