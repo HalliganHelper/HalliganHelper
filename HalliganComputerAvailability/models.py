@@ -84,6 +84,7 @@ class ServerInfo(models.Model):
     Updated = models.DateTimeField(auto_now=True)
     NumUsers = models.IntegerField()
 
+
 class Lab(models.Model):
     ClassName = models.CharField(max_length=30)
     RoomNumber = models.IntegerField()

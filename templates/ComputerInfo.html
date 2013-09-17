@@ -2,8 +2,9 @@
 
 {% block header %}
     {% load staticfiles %}
-    {% comment %}<script src="{% static "js/ComputerInfo.js" %}"></script>{% endcomment %}
 
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script src="{% static "js/CreateGraph.js" %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -279,7 +280,7 @@
                             <tr class="ServerError">
                             {% endif %}
 
-                                <td>{{ server.ComputerName }}</td>
+                                <td><a href="#" class="switch" gumby-trigger="#modal_{{ server.ComputerName }}">{{ server.ComputerName }}</a></td>
                                 <td>{{ server.NumUsers }}</td>
                                 <td>{{ server.Status }}</td>
                                 <td>{{ server.LastUpdated }}</td>
@@ -287,6 +288,18 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                {% for server in servers|dictsort:'ComputerName' %}
+                    <div class="modal" id="modal_{{ server.ComputerName }}">
+                        <div class="content">
+                            <a class="close switch" gumby-trigger="|#modal_{{ server.ComputerName }}"><i class="icon-cancel"></i></a>
+                            <div class="row">
+                                <div class="ten columns centered text-center">
+                                    <div id="ChartFor{{ server.ComputerName }}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
 
 

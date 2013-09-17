@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response, render
 from models import Lab, Computer, Server, ServerInfo, ComputerInfo
 import json
 from django.core.cache import cache
+from django.core import serializers
 from django.template import RequestContext
 
 
@@ -187,6 +188,24 @@ def UpdateServer(request, MchID, NewStatus, NumUsers):
     result['success'] = True
     return HttpResponse(json.dumps(result), mimetype="application/json")
 
+@require_GET
+def ServerInfoView(request):
+    #roomNums = Computer.objects.values_list('RoomNumber', flat=True)
+    servers = ServerInfo.objects.values_list('ComputerName', flat=True)
+    result = {}
+    NumDataPoints = request.GET.get('NumDataPoints', 10)
+    for server in servers:
+        result[server] = serializers.serialize('json', ServerInfo.objects.filter(ComputerName=server)[0:NumDataPoints])
+    print result
+
+    #create json dump and then clean it up
+    jsonStr = json.dumps(result)
+    jsonStr = jsonStr.replace('\\', '')
+    jsonStr = jsonStr.replace('"[', '[')
+    jsonStr = jsonStr.replace(']"', ']')
+    return HttpResponse(jsonStr, mimetype="application/json")
+
+
 def HomePage(request):
 
     retVal = cache.get("HOMEPAGE")
@@ -243,4 +262,5 @@ def HomePage(request):
         cache.set("HOMEPAGE", retVal)
 
     return retVal
+
 
