@@ -121,14 +121,12 @@ class Lab(models.Model):
         delta = dt.timedelta(hours=3)
 
         ModdedStartTime = (datetime.combine(dt.date(1, 1, 1), self.StartTime) - delta).time()
-        print "LAB: ", self.ClassName, ", DAY: ", self.DayOfWeek, ",ORIGINAL: ,", self.StartTime, ", MODDED: ", ModdedStartTime, ", CURR:", CurrTime
+
         if(self.StartDate < CurrDate < self.EndDate
             and self.DayOfWeek == CurrDay
             and self.EndTime > CurrTime > ModdedStartTime
             and not self.is_lab_in_session()):
-
-                print "COMING LAB"
-
+            
                 return True
 
         return False

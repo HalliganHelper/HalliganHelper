@@ -193,9 +193,16 @@ def ServerInfoView(request):
     #roomNums = Computer.objects.values_list('RoomNumber', flat=True)
     servers = ServerInfo.objects.values_list('ComputerName', flat=True)
     result = {}
-    NumDataPoints = request.GET.get('NumDataPoints', 10)
+    NumDataPoints = request.GET.get('NumDataPoints', '10')
+    NumDataPoints = int(NumDataPoints)
     for server in servers:
-        result[server] = serializers.serialize('json', ServerInfo.objects.filter(ComputerName=server)[0:NumDataPoints])
+        DataPoints = ServerInfo.objects.filter(ComputerName=server)
+        TotalDataPoints = DataPoints.count()
+        StartingFrom = TotalDataPoints - NumDataPoints
+        if StartingFrom < 0:
+            StartingFrom = 0
+        DataPoints = DataPoints[StartingFrom:]
+        result[server] = serializers.serialize('json', DataPoints)
     print result
 
     #create json dump and then clean it up
