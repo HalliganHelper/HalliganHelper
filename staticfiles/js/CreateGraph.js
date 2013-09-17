@@ -22,7 +22,9 @@ function drawCharts(){
             ChartData = google.visualization.arrayToDataTable(ChartData);
             var options = {
                 title: server,
+                titleTextStyle: {fontSize: 18, bold: true},
                 legend: {position: 'none'},
+                vAxis: {title: 'Number of Users'},
                 width: 800,
                 height: 500
             };
