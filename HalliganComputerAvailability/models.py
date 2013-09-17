@@ -126,7 +126,7 @@ class Lab(models.Model):
             and self.DayOfWeek == CurrDay
             and self.EndTime > CurrTime > ModdedStartTime
             and not self.is_lab_in_session()):
-            
+
                 return True
 
         return False
