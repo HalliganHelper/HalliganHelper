@@ -65,17 +65,14 @@ def AllComps(request):
 def SpecificRoom(request, RmNum):
     Comps = Computer.objects.filter(RoomNumber=RmNum)
     response = {}
-    print Comps.count()
     if Comps.count() is 0:
         response['success'] = False
-        print "DUMP"
-        print json.dumps(response)
+
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
     Labs = Lab.objects.filter(RoomNumber=RmNum)
     Labs = list(Labs)
     Labs = [x for x in Labs if x.is_lab_in_session() is True]
-    print Labs
 
     if len(Labs) is 0:
         response['inLab'] = False
@@ -203,7 +200,6 @@ def ServerInfoView(request):
             StartingFrom = 0
         DataPoints = DataPoints[StartingFrom:]
         result[server] = serializers.serialize('json', DataPoints)
-    print result
 
     #create json dump and then clean it up
     jsonStr = json.dumps(result)
@@ -224,25 +220,20 @@ def HomePage(request):
         rooms = {}
         roomNums = Computer.objects.values_list('RoomNumber', flat=True)
         roomNums = sorted(list(set(roomNums)))
-        print roomNums
 
         for roomNum in roomNums:
             index = "Room" + str(roomNum)
-            print index
             rooms[index] = {}
             rooms[index]['inSession'] = False
             labs = Lab.objects.filter(RoomNumber=int(roomNum))
             rooms[index]['UpcomingLabs'] = []
             if not labs.count() == 0:
                 for lab in labs:
-                    #print "ROOMNUM: ", lab.ClassName, " IN SESSION: ", lab.is_lab_in_session()
 
                     if lab.is_lab_in_session():
                         rooms[index]['inSession'] = True
                         rooms[index]['lab'] = lab
                     if lab.is_lab_coming_up():
-                        print "COMING LAB VIEW"
-                        print lab
                         rooms[index]['UpcomingLabs'].append(lab)
 
 
