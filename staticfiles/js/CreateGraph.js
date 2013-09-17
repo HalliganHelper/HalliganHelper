@@ -29,18 +29,9 @@ function drawCharts(){
                 height: 500
             };
 
-            //2013-09-17T05:40:31.515
-
             var chart = new google.visualization.LineChart(document.getElementById('ChartFor' + server));
             chart.draw(ChartData, options);
         }
-        /*
-        for (server in data){
-            for (update in server){
-                ChartData.push([''])
-            }
-        }
-        */
 
     });
 }

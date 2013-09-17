@@ -228,6 +228,8 @@
                         {% for lab in allLabs %}
                             {% if lab.is_lab_in_session %}
                                 <tr class="InSession">
+                            {% elif lab.is_lab_coming_up %}
+                                <tr class="ComingUp">
                             {% else %}
                                 <tr>
                             {% endif %}
