@@ -23,6 +23,17 @@ However, this blank file is available if you prefer
     color: red;
 }
 
+.ServerOn {
+
+}
+
+.ServerOff {
+    color: red;
+}
+
+.ServerError {
+    color: yellow;
+}
 .Header {
     color: dodgerblue;
     text-shadow: 0px 2px 3px white;

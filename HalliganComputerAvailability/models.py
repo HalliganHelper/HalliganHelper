@@ -30,12 +30,59 @@ class Computer(models.Model):
 
 admin.site.register(Computer)
 
+
+class ComputerInfo(models.Model):
+    OFF = 'OFF'
+    INUSE = 'INUSE'
+    AVAILABLE = 'AVAILABLE'
+    ERROR = 'ERROR'
+
+    CHOICES = [OFF, INUSE, AVAILABLE, ERROR]
+
+    STATUS_CHOICES = (
+        (OFF, 'Off'),
+        (INUSE, 'In Use'),
+        (AVAILABLE, 'Available'),
+        (ERROR, 'Error')
+    )
+
+    RoomNumber = models.IntegerField()
+    ComputerNumber = models.CharField(max_length=7)
+    Updated = models.DateTimeField(auto_now=True)
+    ComputerStatus = models.CharField(max_length=10,
+                                      choices=STATUS_CHOICES,
+                                      default=AVAILABLE)
+
+
 class Server(models.Model):
+    OFF = 'OFF'
+    ON = 'ON'
+    ERROR = 'ERROR'
+
+    CHOICES = [OFF, ON, ERROR]
+
+    STATUS_CHOICES = (
+        (OFF, 'Off'),
+        (ON, 'On'),
+        (ERROR, 'Error')
+    )
     ComputerName = models.CharField(max_length=20,
                                     primary_key=True)
     NumUsers = models.IntegerField()
 
+    Status = models.CharField(max_length=40,
+                              choices=STATUS_CHOICES,
+                              default=ON)
 
+    LastUpdated = models.DateTimeField(auto_now=True)
+
+admin.site.register(Server)
+
+
+class ServerInfo(models.Model):
+    ComputerName = models.CharField(max_length=20)
+    Updated = models.DateTimeField(auto_now=True)
+    NumUsers = models.IntegerField()
 
 class Lab(models.Model):
     ClassName = models.CharField(max_length=30)

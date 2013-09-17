@@ -7,4 +7,5 @@ urlpatterns = patterns('HalliganComputerAvailability.views',
     url(r'^room/(?P<RmNum>.+)/$', 'SpecificRoom', name='SpecificRoom'),
     url(r'^machine$', 'SpecificMachine', name='SpecificMachine'),
     url(r'^update/(?P<MchID>.+)/(?P<NewStatus>.+)', 'UpdateStatus', name='UpdateStatus'),
+    url(r'^updateServer/(?P<MchID>.+)/(?P<NewStatus>.+)/(?P<NumUsers>\d+)', 'UpdateServer', name='UpdateServer'),
 )

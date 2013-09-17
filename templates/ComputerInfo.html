@@ -59,6 +59,11 @@
                         Labs
                     </a>
                 </li>
+                <li>
+                    <a href="#">
+                        Servers
+                    </a>
+                </li>
             </ul>
             <div class="tab-content active">
 
@@ -249,6 +254,35 @@
                                 <td>{{ lab.StartTime }}</td>
                                 <td>{{ lab.EndTime }}</td>
                                 <td>{{ lab.ClassName }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-content">
+                <table class="striped rounded">
+                    <thead>
+                        <tr>
+                            <td>Server Name</td>
+                            <td>Number of Users</td>
+                            <td>Status</td>
+                            <td>Last Updated</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for server in servers|dictsort:'ComputerName'  %}
+                            {% if server.Status == "ON" %}
+                            <tr class="ServerOn">
+                            {% elif server.Status == "OFF" %}
+                            <tr class="ServerOff">
+                            {% elif server.Status == "ERROR" %}
+                            <tr class="ServerError">
+                            {% endif %}
+
+                                <td>{{ server.ComputerName }}</td>
+                                <td>{{ server.NumUsers }}</td>
+                                <td>{{ server.Status }}</td>
+                                <td>{{ server.LastUpdated }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

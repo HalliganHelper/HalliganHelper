@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response, render
-from models import Lab, Computer
+from models import Lab, Computer, Server, ServerInfo, ComputerInfo
 import json
 from django.core.cache import cache
 from django.template import RequestContext
@@ -127,12 +127,12 @@ def UpdateStatus(request, MchID, NewStatus):
 
     if not AuthCode == 'OnlyTylerGetsAccessToThis':
         result['success'] = False
-        result['Error'] = 'You do not have the permissions to update machine status'
+        result['error'] = 'You do not have the permissions to update machine status'
         return HttpResponse(json.dumps(result), mimetype="application/json")
 
     if NewStatus not in Computer.CHOICES:
         result['success'] = False
-        result['Error'] = 'Failure. You set status to ' + NewStatus + '. Use one of: ' + str(Computer.CHOICES)
+        result['error'] = 'Failure. You set status to ' + NewStatus + '. Use one of: ' + str(Computer.CHOICES)
         return HttpResponse(json.dumps(result), mimetype="application/json")
 
     try:
@@ -146,10 +146,46 @@ def UpdateStatus(request, MchID, NewStatus):
     Comp.Status = NewStatus
     Comp.save()
 
+    CompInfo = ComputerInfo(ComputerNumber=MchID, ComputerStatus=NewStatus, RoomNumber=RoomNum)
+    CompInfo.save()
+
+
     result['success'] = True
     cache.delete("HOMEPAGE")
     return HttpResponse(json.dumps(result), mimetype="application/json")
 
+@require_POST
+@csrf_exempt
+def UpdateServer(request, MchID, NewStatus, NumUsers):
+    result = {}
+    MchID = MchID.lower()
+
+    AuthCode = request.POST.get('AuthKey', default='')
+
+    if not AuthCode == 'OnlyTylerGetsAccessToThis':
+        result['success'] = False
+        result['error'] = 'You do not have the permissions to update server status'
+        return HttpResponse(json.dumps(result), mimetype="application/json")
+
+    if NewStatus not in Server.CHOICES:
+        result['success'] = False
+        result['error'] = 'Failure, You set status to ' + NewStatus + '. Use one of: ' + str(Server.CHOICES)
+        return HttpResponse(json.dumps(result), mimetype="application/json")
+
+    try:
+        Serv = Server.objects.get(ComputerName=MchID)
+        Serv.NumUsers = int(NumUsers)
+        Serv.Status = NewStatus
+        Serv.save()
+    except Server.DoesNotExist:
+        Serv = Server(ComputerName=MchID, NumUsers=int(NumUsers), Status=NewStatus)
+        Serv.save()
+
+    ServInfo = ServerInfo(ComputerName=MchID, NumUsers=int(NumUsers))
+    ServInfo.save()
+
+    result['success'] = True
+    return HttpResponse(json.dumps(result), mimetype="application/json")
 
 def HomePage(request):
 
@@ -188,6 +224,8 @@ def HomePage(request):
         TemplateParams['allRooms'] = roomNums
         TemplateParams['allLabs'] = Lab.objects.all()
 
+        TemplateParams['servers'] = Server.objects.all()
+
         Room116 = Computer.objects.filter(RoomNumber=116)
         Room116.order_by('ComputerNumber')
         Room118 = Computer.objects.filter(RoomNumber=118)
@@ -205,3 +243,4 @@ def HomePage(request):
         cache.set("HOMEPAGE", retVal)
 
     return retVal
+
