@@ -27,8 +27,14 @@
             <span class="Header"> HalliganHelper </span>
         </h1>
     </div>
-    {% block content %}{% endblock %}
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
 
+    <div id="footer">
+        <span id="name">Created By <a href="mailto:tyler@tylerlubeck.com">Tyler Lubeck</a></span>
+        <span id="feedback">Please send feedback to <a href="halliganhelper@tylerlubeck.com">Support</a></span>
+    </div>
     <script src="{% static "js/modernizer.js"%} "></script>
     <script src="{% static "Gumby/js/libs/gumby.min.js" %}"></script>
 </body>
