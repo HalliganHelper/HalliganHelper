@@ -48,6 +48,14 @@ However, this blank file is available if you prefer
     height: 80%;
 }
 
+/*
+footer {
+    width: 100%;
+    bottom: 0;
+    position: fixed;
+}
+*/
+
 #name {
     float: left;
 
@@ -56,3 +64,4 @@ However, this blank file is available if you prefer
 #feedback {
     float: right;
 }
+

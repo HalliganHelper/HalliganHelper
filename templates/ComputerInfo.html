@@ -290,7 +290,11 @@
                 {% for server in servers|dictsort:'ComputerName' %}
                     <div class="modal" id="modal_{{ server.ComputerName }}">
                         <div class="content">
-                            <a class="close switch" gumby-trigger="|#modal_{{ server.ComputerName }}"><i class="icon-cancel"></i></a>
+                            <div id="ChartFor{{ server.ComputerName }}"></div>
+                            <p class="btn primary small">
+                                <a href="#" class="switch" gumby-trigger="|#modal_{{ server.ComputerName }}">Close</a>
+                            </p>
+                            {% comment %}
                             <div class="row">
                                 <div class="ten columns centered text-center">
                                     <div id="ChartFor{{ server.ComputerName }}"></div>
@@ -299,6 +303,7 @@
                                     </p>
                                 </div>
                             </div>
+                            {% endcomment %}
                         </div>
                     </div>
                 {% endfor %}
@@ -307,5 +312,9 @@
 
         </section>
     </div>
+    {% include "footer.html" %}
 </div>
+
+
+
 {% endblock %}
