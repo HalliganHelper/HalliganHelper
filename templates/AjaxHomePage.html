@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block header %}
+
+    {% load staticfiles %}
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script src="{% static "js/CreateGraph.js" %}"></script>
+    <script src="{% static "js/GetComputerInfo.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="twelve columns">
+        <section class="pill tabs">
+            <ul class="tab-nav">
+                {% for room in Rooms %}
+                    {% if forloop.first %}
+                        <li class="active RoomTab" data-Room_Header="{{ room }}"><a href="#">{{ room }}</a></li>
+                    {% else %}
+                        <li class="RoomTab" data-Room_Header="{{ room }}"><a href="#">{{ room }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                <li>
+                    <a href="#">
+                        Labs
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Servers
+                    </a>
+                </li>
+            </ul>
+            {% for room in Rooms %}
+                {% if forloop.first %}
+                    <div class="tab-content active RoomBody" data-Room_Tab="{{ room }}"></div>
+                {% else %}
+                    <div class="tab-content RoomBody" data-Room_Tab="{{ room }}"></div>
+                {% endif %}
+            {% endfor %}
+            <div class="tab-content">
+                <table class="striped rounded">
+                    <thead>
+                        <tr>
+                            <th>Room</th>
+                            <th>Day</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Class</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lab in allLabs %}
+                            {% if lab.is_lab_in_session %}
+                                <tr class="InSession">
+                            {% elif lab.is_lab_coming_up %}
+                                <tr class="ComingUp">
+                            {% else %}
+                                <tr>
+                            {% endif %}
+                                <td>{{ lab.RoomNumber }}</td>
+                                <td>
+                                    {% if lab.DayOfWeek == 6 %}
+                                        Sunday
+                                    {% elif lab.DayOfWeek == 0 %}
+                                        Monday
+                                    {% elif lab.DayOfWeek == 1 %}
+                                        Tuesday
+                                    {% elif lab.DayOfWeek == 2 %}
+                                        Wednesday
+                                    {% elif lab.DayOfWeek == 3 %}
+                                        Thursday
+                                    {% elif lab.DayOfWeek == 4 %}
+                                        Friday
+                                    {% elif lab.DayOfWeek == 5 %}
+                                        Saturday
+                                    {% endif %}
+                                 </td>
+                                <td>{{ lab.StartTime }}</td>
+                                <td>{{ lab.EndTime }}</td>
+                                <td>{{ lab.ClassName }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-content">
+                <table class="striped rounded">
+                    <thead>
+                        <tr>
+                            <td>Server Name</td>
+                            <td>Number of Users</td>
+                            <td>Status</td>
+                            <td>Last Updated</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for server in servers|dictsort:'ComputerName'  %}
+                            {% if server.Status == "ON" %}
+                            <tr class="ServerOn">
+                            {% elif server.Status == "OFF" %}
+                            <tr class="ServerOff">
+                            {% elif server.Status == "ERROR" %}
+                            <tr class="ServerError">
+                            {% endif %}
+
+                                <td><a href="#" class="switch" gumby-trigger="#modal_{{ server.ComputerName }}">{{ server.ComputerName }}</a></td>
+                                <td>{{ server.NumUsers }}</td>
+                                <td>{{ server.Status }}</td>
+                                <td>{{ server.LastUpdated }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% for server in servers|dictsort:'ComputerName' %}
+                    <div class="modal" id="modal_{{ server.ComputerName }}">
+                        <div class="content">
+                            <div id="ChartFor{{ server.ComputerName }}"></div>
+                            <p class="btn primary small">
+                                <a href="#" class="switch" gumby-trigger="|#modal_{{ server.ComputerName }}">Close</a>
+                            </p>
+                            {% comment %}
+                            <div class="row">
+                                <div class="ten columns centered text-center">
+                                    <div id="ChartFor{{ server.ComputerName }}"></div>
+                                    <p class="btn primary medium">
+                                        <a href="#" class="switch" gumby-trigger="|#modal_{{ server.ComputerName }}">Close</a>
+                                    </p>
+                                </div>
+                            </div>
+                            {% endcomment %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+
+        </section>
+    </div>
+    {% include "footer.html" %}
+</div>
+
+
+
+{% endblock %}

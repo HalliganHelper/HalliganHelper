@@ -80,12 +80,14 @@ def SpecificRoom(request, RmNum):
         response['inLab'] = False
         response['labInfo'] = {}
         response['labInfo']['class'] = Labs[0].ClassName
-        response['labInfo']['startTime'] = Labs[0].StartTime
-        response['labInfo']['endTime'] = Labs[0].EndTime
+        response['labInfo']['startTime'] = Labs[0].StartTime.strftime("%I:%M")
+        response['labInfo']['endTime'] = Labs[0].EndTime.strftime("%I:%M")
 
     response['machines'] = {}
     for c in Comps:
-        response['machines'][c.ComputerNumber] = c.Status
+        response['machines'][c.ComputerNumber] = {}
+        response['machines'][c.ComputerNumber]['Status'] = c.Status
+        response['machines'][c.ComputerNumber]['LastUpdated'] = c.LastUpdate.strftime('%m/%d/%y %I:%M')
     response['success'] = True
     response['classRoom'] = RmNum
 
@@ -262,3 +264,18 @@ def HomePage(request):
     return retVal
 
 
+ROOMS_CACHE_KEY = "ROOMS_CACHE_KEY"
+LABS_CACHE_KEY = "LABS_CACHE_KEY"
+def ModularHomePage(request):
+    TemplateParams = {}
+
+    Rooms = cache.get(ROOMS_CACHE_KEY)
+    if not Rooms or Rooms:
+        Rooms = Computer.objects.values_list('RoomNumber', flat=True)
+        Rooms = sorted(list(set(Rooms)))
+        cache.set(ROOMS_CACHE_KEY, Rooms)
+
+    TemplateParams['Rooms'] = Rooms
+
+
+    return render(request, 'AjaxHomePage.html', TemplateParams)

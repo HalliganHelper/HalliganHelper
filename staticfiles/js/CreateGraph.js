@@ -25,8 +25,7 @@ function drawCharts(){
                 titleTextStyle: {fontSize: 18, bold: true},
                 legend: {position: 'none'},
                 vAxis: {title: 'Number of Users'},
-                width: 800,
-                height: 500
+                chartArea: {width:"100%", height: "100%"}
             };
 
             var chart = new google.visualization.LineChart(document.getElementById('ChartFor' + server));

@@ -95,13 +95,13 @@ class Lab(models.Model):
     DayOfWeek = models.IntegerField(max_length=1)
 
     def is_lab_in_session(self):
+        """
+        Returns whether a lab is currently in session
+        """
         CurrTime = datetime.now().time()
         CurrDate = datetime.now().date()
         CurrDay = datetime.now().weekday()
-        #print "CUrrentDay", CurrDay
-        #print "LAB DAY", self.DayOfWeek
-        #print "CURRTIME", CurrTime, "CURRDATE", CurrDate, "CURRDAY", CurrDay
-        #print "STARTTIME", self.StartTime, "ENDTIME", self.EndTime, "DAYOFWEEK", self.DayOfWeek
+
         if(self.StartDate < CurrDate < self.EndDate
            and self.StartTime < CurrTime < self.EndTime
            and self.DayOfWeek == CurrDay):
@@ -111,7 +111,7 @@ class Lab(models.Model):
 
     def is_lab_coming_up(self):
         """
-         Returns whether the lab occurs within an hour
+         Returns whether the lab occurs within the next 3 hours
         """
 
         CurrTime = datetime.now().time()
