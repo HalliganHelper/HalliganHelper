@@ -3,6 +3,14 @@ We highly recommend you use SASS and write your custom styles in sass/_custom.sc
 However, this blank file is available if you prefer
 */
 
+.Hidden {
+    display: none;
+}
+
+.Shown {
+
+}
+
 .Available {
     color: green;
 }

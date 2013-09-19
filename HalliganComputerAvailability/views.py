@@ -8,6 +8,7 @@ import json
 from django.core.cache import cache
 from django.core import serializers
 from django.template import RequestContext
+import operator
 
 
 def ApiDocs(request):
@@ -61,6 +62,43 @@ def AllComps(request):
     return HttpResponse(json.dumps(response, default=SerializeHandler), mimetype="application/json")
 
 
+
+
+
+@require_GET
+def labInformation(request):
+    room = request.GET.get('room', None)
+    current = request.GET.get('current', False)
+    upcoming = request.GET.get('upcoming', False)
+    response = []
+
+    if room and current == 'true' and upcoming == 'true':
+        labs = Lab.objects.filter(RoomNumber=room)
+        response = []
+        for lab in labs:
+            if lab.is_lab_coming_up() or lab.is_lab_in_session():
+                response.append(lab.for_response())
+
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+
+    if not room:
+        labs = Lab.objects.all()
+        for lab in labs:
+            response.append(lab.for_response())
+
+    else:
+        labs = Lab.objects.filter(RoomNumber=room)
+        for lab in labs:
+            data = lab.for_response()
+            response.append(data)
+
+    response.sort(key=operator.itemgetter('RoomNumber', 'DayOfWeek_AsNum', 'StartTime'))
+
+    return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 @require_GET
 def SpecificRoom(request, RmNum):
     Comps = Computer.objects.filter(RoomNumber=RmNum)
@@ -86,8 +124,9 @@ def SpecificRoom(request, RmNum):
     response['machines'] = {}
     for c in Comps:
         response['machines'][c.ComputerNumber] = {}
-        response['machines'][c.ComputerNumber]['Status'] = c.Status
+        response['machines'][c.ComputerNumber]['Status'] = c.get_Status_display()
         response['machines'][c.ComputerNumber]['LastUpdated'] = c.LastUpdate.strftime('%m/%d/%y %I:%M')
+        response['machines'][c.ComputerNumber]['ComputerName'] = c.ComputerNumber
     response['success'] = True
     response['classRoom'] = RmNum
 
@@ -145,6 +184,13 @@ def UpdateStatus(request, MchID, NewStatus):
     Comp, created = Computer.objects.get_or_create(pk=MchID, RoomNumber=RoomNum)
     Comp.Status = NewStatus
     Comp.save()
+
+    AllCompInfo = ComputerInfo.objects.all()
+    AllCompInfoSize = AllCompInfo.count()
+    if AllCompInfoSize > 2000:
+        RemoveCount = AllCompInfoSize
+
+
 
     CompInfo = ComputerInfo(ComputerNumber=MchID, ComputerStatus=NewStatus, RoomNumber=RoomNum)
     CompInfo.save()
@@ -209,7 +255,6 @@ def ServerInfoView(request):
     jsonStr = jsonStr.replace('"[', '[')
     jsonStr = jsonStr.replace(']"', ']')
     return HttpResponse(jsonStr, mimetype="application/json")
-
 
 def HomePage(request):
 
@@ -279,3 +324,5 @@ def ModularHomePage(request):
 
 
     return render(request, 'AjaxHomePage.html', TemplateParams)
+
+

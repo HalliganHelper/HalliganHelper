@@ -6,6 +6,8 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script src="{% static "js/CreateGraph.js" %}"></script>
     <script src="{% static "js/GetComputerInfo.js" %}"></script>
+    <script src="{% static "js/GetLabInfo.js" %}"></script>
+    <script src="{% static "js/GetCurrentUpcomingLabInfo.js" %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -15,9 +17,9 @@
             <ul class="tab-nav">
                 {% for room in Rooms %}
                     {% if forloop.first %}
-                        <li class="active RoomTab" data-Room_Header="{{ room }}"><a href="#">{{ room }}</a></li>
+                        <li class="active RoomTab" data-Room_Header="{{ room }}"><a href="#">{{ room }}  <i class="warning badge Hidden" id="{{ room }}_warning_badge">L</i> <i class="danger badge Hidden" id="{{ room }}_danger_badge">UL</i></a></li>
                     {% else %}
-                        <li class="RoomTab" data-Room_Header="{{ room }}"><a href="#">{{ room }}</a></li>
+                        <li class="RoomTab" data-Room_Header="{{ room }}"><a href="#">{{ room }}   <i class="warning badge Hidden" id="{{ room }}_warning_badge">L</i> <i class="danger badge Hidden" id="{{ room }}_danger_badge">UL</i></a></li>
                     {% endif %}
                 {% endfor %}
                 <li>
@@ -33,56 +35,13 @@
             </ul>
             {% for room in Rooms %}
                 {% if forloop.first %}
-                    <div class="tab-content active RoomBody" data-Room_Tab="{{ room }}"></div>
+                    <div class="tab-content active RoomBody" data-Room_Tab="{{ room }}"><div id="danger_div_{{ room }}"></div><div id="warning_div_{{ room }}"></div><div id="content_div_{{ room }}"></div></div>
                 {% else %}
-                    <div class="tab-content RoomBody" data-Room_Tab="{{ room }}"></div>
+                    <div class="tab-content RoomBody" data-Room_Tab="{{ room }}"><div id="danger_div_{{ room }}"></div><div id="warning_div_{{ room }}"></div><div id="content_div_{{ room }}"></div>
                 {% endif %}
             {% endfor %}
             <div class="tab-content">
-                <table class="striped rounded">
-                    <thead>
-                        <tr>
-                            <th>Room</th>
-                            <th>Day</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Class</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for lab in allLabs %}
-                            {% if lab.is_lab_in_session %}
-                                <tr class="InSession">
-                            {% elif lab.is_lab_coming_up %}
-                                <tr class="ComingUp">
-                            {% else %}
-                                <tr>
-                            {% endif %}
-                                <td>{{ lab.RoomNumber }}</td>
-                                <td>
-                                    {% if lab.DayOfWeek == 6 %}
-                                        Sunday
-                                    {% elif lab.DayOfWeek == 0 %}
-                                        Monday
-                                    {% elif lab.DayOfWeek == 1 %}
-                                        Tuesday
-                                    {% elif lab.DayOfWeek == 2 %}
-                                        Wednesday
-                                    {% elif lab.DayOfWeek == 3 %}
-                                        Thursday
-                                    {% elif lab.DayOfWeek == 4 %}
-                                        Friday
-                                    {% elif lab.DayOfWeek == 5 %}
-                                        Saturday
-                                    {% endif %}
-                                 </td>
-                                <td>{{ lab.StartTime }}</td>
-                                <td>{{ lab.EndTime }}</td>
-                                <td>{{ lab.ClassName }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div id="LabContainer"></div>
             </div>
             <div class="tab-content">
                 <table class="striped rounded">
@@ -119,16 +78,6 @@
                             <p class="btn primary small">
                                 <a href="#" class="switch" gumby-trigger="|#modal_{{ server.ComputerName }}">Close</a>
                             </p>
-                            {% comment %}
-                            <div class="row">
-                                <div class="ten columns centered text-center">
-                                    <div id="ChartFor{{ server.ComputerName }}"></div>
-                                    <p class="btn primary medium">
-                                        <a href="#" class="switch" gumby-trigger="|#modal_{{ server.ComputerName }}">Close</a>
-                                    </p>
-                                </div>
-                            </div>
-                            {% endcomment %}
                         </div>
                     </div>
                 {% endfor %}

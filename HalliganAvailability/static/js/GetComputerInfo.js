@@ -32,6 +32,8 @@ function GetComputerInfo(room) {
             }
         }
 
+        DataDiv = $('#content_div_' + room);
+
 
         if (data.success == true){
             $('#FailureDiv').remove();
@@ -69,16 +71,16 @@ function GetComputerInfo(room) {
                 var machine = MachinesArray[mch];
                 row = $('<tr></tr>');
                 switch (machine.Status) {
-                    case "INUSE":
+                    case "In Use":
                         $(row).addClass('InUse');
                         break;
-                    case "AVAILABLE":
+                    case "Available":
                         $(row).addClass('Available');
                         break;
-                    case "OFF":
+                    case "Off":
                         $(row).addClass('Off');
                         break;
-                    case "ERROR":
+                    case "Error":
                         $(row).addClass('Error');
                         break;
                 }
@@ -113,7 +115,6 @@ function GetComputerInfo(room) {
 function QueueRooms(){
     var Rooms = $(".RoomTab")
     var RoomLength = Rooms.length;
-    console.log(RoomLength)
     for (var i = 0; i < RoomLength; i++) {
         var roomNum = Rooms[i].dataset.room_header;
         GetComputerInfo(roomNum);

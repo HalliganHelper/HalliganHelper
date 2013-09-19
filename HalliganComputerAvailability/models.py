@@ -94,6 +94,36 @@ class Lab(models.Model):
     EndDate = models.DateField()
     DayOfWeek = models.IntegerField(max_length=1)
 
+    def for_response(self):
+        response = {
+            'ClassName': self.ClassName,
+            'RoomNumber': self.RoomNumber,
+            'StartTime': self.StartTime.strftime('%I:%M'),
+            'EndTime': self.EndTime.strftime('%I:%M'),
+            'DayOfWeek': self.day_of_week(),
+            'InSession': self.is_lab_in_session(),
+            'ComingUp': self.is_lab_coming_up(),
+            'DayOfWeek_AsNum': self.DayOfWeek
+        }
+        return response
+
+    def day_of_week(self, short_name=False):
+        def long(x):
+            return {
+                0: 'Monday',
+                1: 'Tuesday',
+                2: 'Wednesday',
+                3: 'Thursday',
+                4: 'Friday',
+                5: 'Saturday',
+                6: 'Sunday'
+            }[x]
+
+        if short_name:
+            return long(self.DayOfWeek)[0:3]
+        else:
+            return long(self.DayOfWeek)
+
     def is_lab_in_session(self):
         """
         Returns whether a lab is currently in session
@@ -120,7 +150,7 @@ class Lab(models.Model):
         StartTime = self.StartTime
         delta = dt.timedelta(hours=3)
 
-        ModdedStartTime = (datetime.combine(dt.date(1, 1, 1), self.StartTime) - delta).time()
+        ModdedStartTime = (datetime.combine(dt.date(10, 10, 10), self.StartTime) - delta).time()
 
         if(self.StartDate < CurrDate < self.EndDate
             and self.DayOfWeek == CurrDay
