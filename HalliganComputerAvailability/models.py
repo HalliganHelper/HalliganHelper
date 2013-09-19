@@ -98,8 +98,8 @@ class Lab(models.Model):
         response = {
             'ClassName': self.ClassName,
             'RoomNumber': self.RoomNumber,
-            'StartTime': self.StartTime.strftime('%I:%M'),
-            'EndTime': self.EndTime.strftime('%I:%M'),
+            'StartTime': self.StartTime.strftime('%I:%M %p'),
+            'EndTime': self.EndTime.strftime('%I:%M %p'),
             'DayOfWeek': self.day_of_week(),
             'InSession': self.is_lab_in_session(),
             'ComingUp': self.is_lab_coming_up(),
