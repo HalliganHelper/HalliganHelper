@@ -19,7 +19,6 @@ function CompareComputers(a, b){
 
 function GetComputerInfo(room) {
     var jqxhr = $.get('/api/room/' + room, function(data) {
-        console.log(data)
         window.clearInterval(ScheduledHandle)
         ScheduledHandle =  window.setInterval(QueueRooms, 900000);
 
@@ -123,6 +122,8 @@ function QueueRooms(){
         var roomNum = Rooms[i].dataset.room_header;
         GetComputerInfo(roomNum);
     }
+
+    QueueRoomsForLabInfo();
 
     //ScheduledHandle =  window.setInterval(QueueRooms, 900000);
 }

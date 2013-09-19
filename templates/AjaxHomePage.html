@@ -27,22 +27,41 @@
                         Labs
                     </a>
                 </li>
+            {% comment %}
                 <li>
                     <a href="#">
                         Servers
                     </a>
                 </li>
+            {% endcomment %}
             </ul>
             {% for room in Rooms %}
                 {% if forloop.first %}
-                    <div class="tab-content active RoomBody" data-Room_Tab="{{ room }}"><div id="danger_div_{{ room }}"></div><div id="warning_div_{{ room }}"></div><div id="content_div_{{ room }}"></div></div>
+                    <div class="tab-content active RoomBody" data-Room_Tab="{{ room }}">
+                        <div id="notifications_{{ room }}">
+                            {% comment %}
+                            <div id="danger_div_{{ room }}"></div>
+                            <div id="warning_div_{{ room }}"></div>
+                            {% endcomment %}
+                        </div>
+                        <div id="content_div_{{ room }}"></div>
+                    </div>
                 {% else %}
-                    <div class="tab-content RoomBody" data-Room_Tab="{{ room }}"><div id="danger_div_{{ room }}"></div><div id="warning_div_{{ room }}"></div><div id="content_div_{{ room }}"></div></div>
+                    <div class="tab-content RoomBody" data-Room_Tab="{{ room }}">
+                        <div id="notifications_{{ room }}">
+                            {% comment %}
+                            <div id="danger_div_{{ room }}"></div>
+                            <div id="warning_div_{{ room }}"></div>
+                            {% endcomment %}
+                        </div>
+                        <div id="content_div_{{ room }}"></div>
+                    </div>
                 {% endif %}
             {% endfor %}
             <div class="tab-content">
                 <div id="LabContainer"></div>
             </div>
+            {% comment %}
             <div class="tab-content">
                 <table class="striped rounded">
                     <thead>
@@ -50,7 +69,7 @@
                             <td>Server Name</td>
                             <td>Number of Users</td>
                             <td>Status</td>
-                            <td>Last Uhttp://halliganhelper-dev.herokuapp.com/ajaxPage#pdated</td>
+                            <td>Last Updated</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,6 +101,7 @@
                     </div>
                 {% endfor %}
             </div>
+            {% endcomment %}
 
 
         </section>
