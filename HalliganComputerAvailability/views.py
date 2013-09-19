@@ -321,6 +321,7 @@ def ModularHomePage(request):
         cache.set(ROOMS_CACHE_KEY, Rooms)
 
     TemplateParams['Rooms'] = Rooms
+    print Rooms
 
 
     return render(request, 'AjaxHomePage.html', TemplateParams)

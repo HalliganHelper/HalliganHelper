@@ -19,9 +19,11 @@ function CompareComputers(a, b){
 
 function GetComputerInfo(room) {
     var jqxhr = $.get('/api/room/' + room, function(data) {
+        console.log(data)
         window.clearInterval(ScheduledHandle)
         ScheduledHandle =  window.setInterval(QueueRooms, 900000);
 
+        /*
         PotentialDivs = $('.RoomBody');
         var DataDiv = null;
         length = PotentialDivs.length;
@@ -31,6 +33,7 @@ function GetComputerInfo(room) {
                 break;
             }
         }
+        */
 
         DataDiv = $('#content_div_' + room);
 
@@ -62,7 +65,7 @@ function GetComputerInfo(room) {
 
             var MachinesArray = [];
             for (mch in data.machines) {
-                
+
                 MachinesArray.push(data.machines[mch]);
             }
 
