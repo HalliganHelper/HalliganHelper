@@ -8,6 +8,15 @@
 
 var ScheduledHandle = null;
 
+function CompareComputers(a, b){
+    if (a.ComputerName < b.ComputerName)
+        return -1;
+    if (a.ComputerName > b.ComputerName)
+        return 1;
+
+    return 0;
+}
+
 function GetComputerInfo(room) {
     var jqxhr = $.get('/api/room/' + room, function(data) {
         window.clearInterval(ScheduledHandle)
@@ -42,13 +51,22 @@ function GetComputerInfo(room) {
             $(refreshLink).click(function() {
                 QueueRooms();
             })
-            $(lastUpdatedTD).append(refreshLink)
-            $(row).append(lastUpdatedTD)
+            $(lastUpdatedTD).append(refreshLink);
+            $(row).append(lastUpdatedTD);
             $(head).append(row);
 
             var body = $('<tbody></tbody>');
+
+
+            var MachinesArray = [];
             for (mch in data.machines) {
-                var machine = data.machines[mch];
+                MachinesArray.push(data.machines[mch]);
+            }
+
+            MachinesArray.sort(CompareComputers);
+
+            for (mch in MachinesArray) {
+                var machine = MachinesArray[mch];
                 row = $('<tr></tr>');
                 switch (machine.Status) {
                     case "INUSE":
@@ -64,7 +82,7 @@ function GetComputerInfo(room) {
                         $(row).addClass('Error');
                         break;
                 }
-                $(row).append($('<td></td>').text(mch));
+                $(row).append($('<td></td>').text(machine.ComputerName));
                 $(row).append($('<td></td>').text(machine.Status));
                 $(row).append($('<td></td>').text(machine.LastUpdated))
                 $(body).append(row);
