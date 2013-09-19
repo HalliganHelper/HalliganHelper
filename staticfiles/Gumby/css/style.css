@@ -3,6 +3,14 @@ We highly recommend you use SASS and write your custom styles in sass/_custom.sc
 However, this blank file is available if you prefer
 */
 
+.Hidden {
+    display: none;
+}
+
+.Shown {
+
+}
+
 .Available {
     color: green;
 }
@@ -48,14 +56,6 @@ However, this blank file is available if you prefer
     height: 80%;
 }
 
-/*
-footer {
-    width: 100%;
-    bottom: 0;
-    position: fixed;
-}
-*/
-
 #name {
     float: left;
 
@@ -65,3 +65,42 @@ footer {
     float: right;
 }
 
+#FailureDiv {
+    cursor: pointer;
+}
+
+.Refresh {
+    float:right;
+    color: white;
+}
+
+.Refresh:hover {
+    color: orange;
+}
+
+
+/*ToolTip Stuff Begins Here */
+.hasTooltip {
+    position:relative;
+}
+.hasTooltip span {
+    display:none;
+}
+
+.hasTooltip:hover span {
+    display:inline-block;
+    background-color:dodgerblue;
+    border-radius:10px;
+    color:white;
+    box-shadow:2px 2px 6px gray;
+    position:absolute;
+    padding:5px;
+    top:0em;
+
+
+    right:40px;
+    max-height:250px;
+    white-space: nowrap;
+
+}
+/*Tooltip Stuff Ends Here */

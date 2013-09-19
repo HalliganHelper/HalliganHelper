@@ -62,6 +62,7 @@ function GetComputerInfo(room) {
 
             var MachinesArray = [];
             for (mch in data.machines) {
+                
                 MachinesArray.push(data.machines[mch]);
             }
 
