@@ -19,8 +19,8 @@ urlpatterns = patterns('',
     #url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('HalliganComputerAvailability.urls')),
     url(r'^ta/', include('HalliganTAAvailability.urls')),
-    url(r'^$', 'HalliganComputerAvailability.views.HomePage'),
-    url(r'^ajaxPage', 'HalliganComputerAvailability.views.ModularHomePage', name='ModularHomePage'),
+    #url(r'^$', 'HalliganComputerAvailability.views.HomePage'),
+    url(r'^$', 'HalliganComputerAvailability.views.ModularHomePage', name='ModularHomePage'),
 )
 
 urlpatterns += staticfiles_urlpatterns()
