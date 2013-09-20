@@ -22,6 +22,7 @@ function GetComputerInfo(room) {
         window.clearInterval(ScheduledHandle)
         ScheduledHandle =  window.setInterval(QueueRooms, 900000);
 
+        /*
         PotentialDivs = $('.RoomBody');
         var DataDiv = null;
         length = PotentialDivs.length;
@@ -31,8 +32,10 @@ function GetComputerInfo(room) {
                 break;
             }
         }
+        */
 
         DataDiv = $('#content_div_' + room);
+        $(DataDiv).empty();
 
 
         if (data.success == true){
@@ -62,7 +65,7 @@ function GetComputerInfo(room) {
 
             var MachinesArray = [];
             for (mch in data.machines) {
-                
+
                 MachinesArray.push(data.machines[mch]);
             }
 
@@ -120,6 +123,8 @@ function QueueRooms(){
         var roomNum = Rooms[i].dataset.room_header;
         GetComputerInfo(roomNum);
     }
+
+    QueueRoomsForLabInfo();
 
     //ScheduledHandle =  window.setInterval(QueueRooms, 900000);
 }
