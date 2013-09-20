@@ -124,9 +124,10 @@ def SpecificRoom(request, RmNum):
 
     response['machines'] = {}
     for c in Comps:
+        time  = c.LastUpdate.astimezone(tz.gettz('America/New_York'))
         response['machines'][c.ComputerNumber] = {}
         response['machines'][c.ComputerNumber]['Status'] = c.get_Status_display()
-        response['machines'][c.ComputerNumber]['LastUpdated'] = c.LastUpdate.strftime('%m/%d/%y %I:%M %p')
+        response['machines'][c.ComputerNumber]['LastUpdated'] = time.strftime('%m/%d/%y %I:%M %p')
         response['machines'][c.ComputerNumber]['ComputerName'] = c.ComputerNumber
     response['success'] = True
     response['classRoom'] = RmNum
