@@ -327,3 +327,21 @@ def ModularHomePage(request):
     return render(request, 'AjaxHomePage.html', TemplateParams)
 
 
+@require_GET
+def ServerList(request):
+    servers = Server.objects.all()
+    response = []
+    for serv in servers:
+        data = {
+            'ComputerName': serv.ComputerName,
+            'LastUpdated': serv.LastUpdated.strftime('%m/%d/%y %I:%M %p'),
+            'NumUsers': serv.NumUsers,
+            'Status': serv.Status
+        }
+
+        response.append(data)
+
+    response.sort(key=operator.itemgetter('ComputerName'))
+
+    return HttpResponse(json.dumps(response), mimetype="application/json")
+

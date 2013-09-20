@@ -10,5 +10,6 @@ urlpatterns = patterns('HalliganComputerAvailability.views',
     url(r'^updateServer/(?P<MchID>.+)/(?P<NewStatus>.+)/(?P<NumUsers>\d+)', 'UpdateServer', name='UpdateServer'),
     url(r'^serverInfo', 'ServerInfoView', name='ServerInfo'),
     url(r'^labInformation', 'labInformation', name='labInformation'),
+    url(r'^ServerList', 'ServerList', name='ServerList'),
 
 )

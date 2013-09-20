@@ -8,6 +8,7 @@
     <script src="{% static "js/GetComputerInfo.js" %}"></script>
     <script src="{% static "js/GetLabInfo.js" %}"></script>
     <script src="{% static "js/GetCurrentUpcomingLabInfo.js" %}"></script>
+    <script src="{% static "js/GetServerInfo.js" %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -17,9 +18,9 @@
             <ul class="tab-nav">
                 {% for room in Rooms %}
                     {% if forloop.first %}
-                        <li class="active RoomTab" data-Room_Header="{{ room }}"><a href="#">{{ room }}  <i class="warning badge Hidden" id="{{ room }}_warning_badge">L</i> <i class="danger badge Hidden" id="{{ room }}_danger_badge">UL</i></a></li>
+                        <li class="active RoomTab" data-Room_Header="{{ room }}"><a href="#">{{ room }}  <i class="warning badge Hidden" id="{{ room }}_warning_badge">UL</i> <i class="danger badge Hidden" id="{{ room }}_danger_badge">L</i></a></li>
                     {% else %}
-                        <li class="RoomTab" data-Room_Header="{{ room }}"><a href="#">{{ room }}   <i class="warning badge Hidden" id="{{ room }}_warning_badge">L</i> <i class="danger badge Hidden" id="{{ room }}_danger_badge">UL</i></a></li>
+                        <li class="RoomTab" data-Room_Header="{{ room }}"><a href="#">{{ room }}   <i class="warning badge Hidden" id="{{ room }}_warning_badge">UL</i> <i class="danger badge Hidden" id="{{ room }}_danger_badge">L</i></a></li>
                     {% endif %}
                 {% endfor %}
                 <li>
@@ -27,13 +28,11 @@
                         Labs
                     </a>
                 </li>
-            {% comment %}
                 <li>
                     <a href="#">
                         Servers
                     </a>
                 </li>
-            {% endcomment %}
             </ul>
             {% for room in Rooms %}
                 {% if forloop.first %}
@@ -78,6 +77,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="tab-content">
+                <div id="ServerContainer"></div>
             </div>
             {% comment %}
             <div class="tab-content">
