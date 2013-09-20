@@ -9,6 +9,7 @@ from django.core.cache import cache
 from django.core import serializers
 from django.template import RequestContext
 import operator
+from dateutil import tz
 
 
 def ApiDocs(request):
@@ -332,15 +333,16 @@ def ServerList(request):
     servers = Server.objects.all()
     response = []
     for serv in servers:
+        time = serv.LastUpdated.astimezone(tz.gettz('America/New_York'))
         data = {
             'ComputerName': serv.ComputerName,
-            'LastUpdated': serv.LastUpdated.strftime('%m/%d/%y %I:%M %p'),
+            'LastUpdated': time.strftime('%m/%d/%y %I:%M %p'),
             'NumUsers': serv.NumUsers,
             'Status': serv.Status
         }
 
         response.append(data)
-
+        print serv.LastUpdated.astimezone(tz.gettz('America/New_York'))
     response.sort(key=operator.itemgetter('ComputerName'))
 
     return HttpResponse(json.dumps(response), mimetype="application/json")
