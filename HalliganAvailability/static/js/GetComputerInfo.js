@@ -35,6 +35,7 @@ function GetComputerInfo(room) {
         */
 
         DataDiv = $('#content_div_' + room);
+        $(DataDiv).empty();
 
 
         if (data.success == true){

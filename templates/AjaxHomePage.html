@@ -44,7 +44,13 @@
                             <div id="warning_div_{{ room }}"></div>
                             {% endcomment %}
                         </div>
-                        <div id="content_div_{{ room }}"></div>
+                        <div id="content_div_{{ room }}">
+                            <div class="row">
+                                <div class="centered three columns">
+                                    <span class="primary alert">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 {% else %}
                     <div class="tab-content RoomBody" data-Room_Tab="{{ room }}">
@@ -54,12 +60,24 @@
                             <div id="warning_div_{{ room }}"></div>
                             {% endcomment %}
                         </div>
-                        <div id="content_div_{{ room }}"></div>
+                        <div id="content_div_{{ room }}">
+                            <div class="row">
+                                <div class="centered five columns">
+                                    <span class="primary alert">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 {% endif %}
             {% endfor %}
             <div class="tab-content">
-                <div id="LabContainer"></div>
+                <div id="LabContainer">
+                    <div class="row">
+                        <div class="centered five columns">
+                            <span class="primary alert">Loading...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             {% comment %}
             <div class="tab-content">
