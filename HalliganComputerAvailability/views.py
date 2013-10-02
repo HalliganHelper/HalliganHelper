@@ -194,8 +194,8 @@ def UpdateStatus(request, MchID, NewStatus):
 
 
 
-    CompInfo = ComputerInfo(ComputerNumber=MchID, ComputerStatus=NewStatus, RoomNumber=RoomNum)
-    CompInfo.save()
+    #CompInfo = ComputerInfo(ComputerNumber=MchID, ComputerStatus=NewStatus, RoomNumber=RoomNum)
+    #CompInfo.save()
 
 
     result['success'] = True
@@ -229,8 +229,8 @@ def UpdateServer(request, MchID, NewStatus, NumUsers):
         Serv = Server(ComputerName=MchID, NumUsers=int(NumUsers), Status=NewStatus)
         Serv.save()
 
-    ServInfo = ServerInfo(ComputerName=MchID, NumUsers=int(NumUsers))
-    ServInfo.save()
+    #ServInfo = ServerInfo(ComputerName=MchID, NumUsers=int(NumUsers))
+    #ServInfo.save()
 
     result['success'] = True
     return HttpResponse(json.dumps(result), mimetype="application/json")
@@ -348,3 +348,6 @@ def ServerList(request):
 
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
+
+def GridPage(request):
+    return render_to_response('GridPage.html')
