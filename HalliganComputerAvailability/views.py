@@ -183,7 +183,7 @@ def UpdateStatus(request, MchID, NewStatus):
         result['error'] = 'Failure. RoomNumber in incorrect form. Needs to be lab[num][letter]'
         return HttpResponse(json.dumps(result), mimetype="application/json")
 
-    Comp, created = Computer.objects.get_or_create(pk=MchID, RoomNumber=RoomNum)
+    Comp, created = Compu   ter.objects.get_or_create(pk=MchID, RoomNumber=RoomNum)
     Comp.Status = NewStatus
     Comp.save()
 
