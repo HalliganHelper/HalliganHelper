@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     url(r'^ta/', include('HalliganTAAvailability.urls')),
     #url(r'^$', 'HalliganComputerAvailability.views.HomePage'),
     url(r'^$', 'HalliganComputerAvailability.views.ModularHomePage', name='ModularHomePage'),
+    url(r'^grid$', 'HalliganComputerAvailability.views.GridPage', name='GridPage'),
 )
 
 urlpatterns += staticfiles_urlpatterns()

@@ -1,10 +1,14 @@
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>{% block title %}Halligan Helper{% endblock %}</title>
     {% load staticfiles %}
 
+    {% comment %}
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>
+    {% endcomment %}
+    <script src="{% static "Gumby/js/libs/jquery-2.0.2.min.js" %}"></script>
     <script src="{% static "Gumby/js/libs/jquery.mobile.custom.min.js"%} "></script>
     <link rel="stylesheet" href="{% static "Gumby/css/gumby.css" %}">
     <link rel="stylesheet" href="{% static "Gumby/css/style.css" %}">
@@ -23,9 +27,16 @@
     </script>
 
     <div class="row navbar pretty">
-        <h1 class="four columns logo">
+        <h1 class="two columns logo">
             <span class="Header"> HalliganHelper </span>
         </h1>
+        <ul class="push_fifteen one columns">
+        {% if request.user %}
+            <li><a href="#">{{ request.user.name }}</a></li>
+        {% else %}
+            <li><a href="#">Login</a></li>
+        {% endif %}
+        </ul>
     </div>
     <div id="content">
         {% block content %}{% endblock %}
