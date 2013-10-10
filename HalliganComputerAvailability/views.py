@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response, render
-from models import Lab, Computer, Server, ServerInfo, ComputerInfo
+from models import Lab, Computer, Server, ServerInfo, ComputerInfo, RoomInfo
 import json
 from django.core.cache import cache
 from django.core import serializers
@@ -183,16 +183,9 @@ def UpdateStatus(request, MchID, NewStatus):
         result['error'] = 'Failure. RoomNumber in incorrect form. Needs to be lab[num][letter]'
         return HttpResponse(json.dumps(result), mimetype="application/json")
 
-    Comp, created = Compu   ter.objects.get_or_create(pk=MchID, RoomNumber=RoomNum)
+    Comp, created = Computer.objects.get_or_create(pk=MchID, RoomNumber=RoomNum)
     Comp.Status = NewStatus
     Comp.save()
-
-    AllCompInfo = ComputerInfo.objects.all()
-    AllCompInfoSize = AllCompInfo.count()
-    if AllCompInfoSize > 2000:
-        RemoveCount = AllCompInfoSize
-
-
 
     CompInfo = ComputerInfo(ComputerNumber=MchID, ComputerStatus=NewStatus, RoomNumber=RoomNum)
     CompInfo.save()
@@ -201,6 +194,20 @@ def UpdateStatus(request, MchID, NewStatus):
     result['success'] = True
     cache.delete("HOMEPAGE")
     return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+@require_POST
+@csrf_exempt
+def UpdateLab(request):
+    lab = request.POST.get('lab', default='')
+    numReporting = request.POST.get('numReporting', default=0)
+    numReporting = int(numReporting)
+    avgCpu = request.POST.get('avgCPU', default=0.0)
+    avgCpu = float(avgCpu)
+
+    rm = RoomInfo(lab=lab, numReporting=numReporting, avgCpu=avgCpu)
+    rm.save()
+
 
 @require_POST
 @csrf_exempt
@@ -351,3 +358,4 @@ def ServerList(request):
 
 def GridPage(request):
     return render_to_response('GridPage.html')
+

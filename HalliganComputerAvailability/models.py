@@ -31,6 +31,14 @@ class Computer(models.Model):
 admin.site.register(Computer)
 
 
+class RoomInfo(models.Model):
+    lab = models.CharField(max_length=10)
+    numReporting = models.IntegerField()
+    avgCpu = models.FloatField()
+
+admin.site.register(RoomInfo)
+
+
 class ComputerInfo(models.Model):
     OFF = 'OFF'
     INUSE = 'INUSE'

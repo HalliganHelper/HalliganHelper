@@ -18,12 +18,12 @@ function GetUpcomingLabInfo(roomNum) {
         for (index in data) {
             var item = data[index];
             if (item.ComingUp) {
-                var warn = $('<row></row>').append($('<div></div>').addClass('centered five columns').append($('<span></span>').addClass('warning alert').text(item.ClassName + ' has a lab from ' + item.StartTime + ' to ' + item.EndTime)));
+                var warn = $('<row></row>').append($('<div></div>').addClass('centered seven columns').append($('<span></span>').addClass('warning alert').text(item.ClassName + ' has a lab from ' + item.StartTime + ' to ' + item.EndTime)));
                 ComingUpMarker = true;
                 $(warningDiv).prepend(warn);
             }
             if (item.InSession){
-                var danger = $('<row></row>').append($('<div></div>').addClass('centered five columns').append($('<span></span>').addClass('danger alert').text(item.ClassName + ' has a lab from ' + item.StartTime + ' to ' + item.EndTime)));
+                var danger = $('<row></row>').append($('<div></div>').addClass('centered seven columns').append($('<span></span>').addClass('danger alert').text(item.ClassName + ' has a lab from ' + item.StartTime + ' to ' + item.EndTime)));
                 InSessionMarker = true;
                 $(dangerDiv).prepend(danger);
             }
