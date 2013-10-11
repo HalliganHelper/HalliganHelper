@@ -208,6 +208,8 @@ def UpdateLab(request):
     rm = RoomInfo(lab=lab, numReporting=numReporting, avgCpu=avgCpu)
     rm.save()
 
+    return HttpResponse(status=200)
+
 
 @require_POST
 @csrf_exempt
