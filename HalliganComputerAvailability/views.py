@@ -211,6 +211,23 @@ def UpdateLab(request):
     return HttpResponse(status=200)
 
 
+@require_GET
+def GetRoomInfo(request):
+    labName = request.GET.get('lab', default=None)
+    if labName is None:
+        return HttpResponse(status=400)
+
+    try:
+        labs = RoomInfo.objects.filter(lab=labName)
+        data = serializers.serialize('json', labs, fields=('lab', 'numReporting', 'avgCpu', 'updateTime'))
+    except RoomInfo.DoesNotExist:
+        return HttpResponse(status=400)
+
+    return HttpResponse(data, mimetype="application/json")
+
+
+
+
 @require_POST
 @csrf_exempt
 def UpdateServer(request, MchID, NewStatus, NumUsers):

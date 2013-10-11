@@ -21,7 +21,7 @@ function ListServers() {
         $(row).append($('<td></td>').text('Users'));
 
         var LastTD = $('<td></td>').text('Last Updated');
-        var RefreshButton = $('<i></i>').addClass('icon-arrows-ccw ttip');
+        var RefreshButton = $('<i></i>').addClass('icon-arrows-ccw');
         var UpdateTime = new Date();
         var RefreshText = $('<span></span>').html("Updates are received from computers every 15 minutes.<br/> This table will refresh automatically every 15 minutes. <br/> This table was last refreshed at " + UpdateTime.toLocaleTimeString())
         var refreshLink = $('<a href="#"></a>').append(RefreshButton).append(RefreshText).addClass('Refresh hasTooltip');

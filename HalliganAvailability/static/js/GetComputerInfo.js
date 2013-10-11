@@ -35,6 +35,7 @@ function GetComputerInfo(room) {
         */
 
         DataDiv = $('#content_div_' + room);
+
         $(DataDiv).empty();
 
 
@@ -102,6 +103,11 @@ function GetComputerInfo(room) {
             $(table).append(body);
 
             $(DataDiv).empty().append(table);
+            var id = 'lab' + room + '_graph';
+            var graph = $("<div id='" + id + "'/>");
+            $(DataDiv).append(graph);
+
+            LabUseGraph('lab' + room);
         }
     });
     jqxhr.fail(function() {

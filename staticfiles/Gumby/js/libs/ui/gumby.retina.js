@@ -1,11 +1,14 @@
 /**
 * Gumby Retina
 */
-!function() {
+!function($) {
 
 	'use strict';
 
 	function Retina($el) {
+		
+		Gumby.debug('Initializing Retina', $el);
+
 		this.$el = $el;
 		this.imageSrc = this.$el.attr('src');
 		this.retinaSrc = this.fetchRetinaImage();
@@ -21,6 +24,8 @@
 		// load retina image
 		this.$retinaImg.attr('src', this.retinaSrc).load(function() {
 			scope.retinaImageLoaded();
+		}).error(function() {
+			Gumby.error('Couln\'t load retina image: '+scope.retinaSrc);
 		});
 	}
 
@@ -40,6 +45,8 @@
 
 	// once retina image loaded swap original src
 	Retina.prototype.retinaImageLoaded = function() {
+		Gumby.debug('Swapping image for retina version', this.$el);
+		Gumby.debug('Triggering onRetina event', this.$el);
 		this.$el.attr('src', this.$retinaImg.attr('src')).trigger('gumby.onRetina');
 	};
 
@@ -71,4 +78,4 @@
 			Gumby.initialize('retina');
 		}
 	});
-}();
+}(jQuery);

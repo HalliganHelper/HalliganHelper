@@ -1,11 +1,14 @@
 /**
 * Gumby SkipLink
 */
-!function() {
+!function($) {
 
 	'use strict';
 
 	function SkipLink($el) {
+
+		Gumby.debug('Initializing Skiplink', $el);
+
 		this.$el = $el;
 		this.targetPos = 0;
 		this.duration = 0;
@@ -20,9 +23,11 @@
 
 		// skip to target element on click or trigger of gumby.skipTo event
 		this.$el.on(Gumby.click+' gumby.skip', function(e) {
-
-			e.stopImmediatePropagation();
 			e.preventDefault();
+
+			if(e.namespace === 'skip') {
+				Gumby.debug('Skip event triggered', scope.$el);
+			}
 
 			// calculate target on each click if update var set to true
 			if(scope.update) {
@@ -33,6 +38,7 @@
 				scope.skipTo();
 			}
 		}).on('gumby.initialize', function() {
+			Gumby.debug('Re-initializing Skiplink', scope.$el);
 			scope.setup();
 		});
 	}
@@ -67,7 +73,8 @@
 			$target = $(target);
 
 			// target does not exist, we need a target
-			if(!$target) {
+			if(!$target.length) {
+				Gumby.error('Cannot find skiplink target: '+target);
 				return false;
 			}
 
@@ -81,12 +88,17 @@
 
 	// animate body, html scrollTop value to target px point
 	SkipLink.prototype.skipTo = function() {
+		
+		Gumby.debug('Skipping to target', this.$el);
+
 		var scope = this;
 
 		// slide to position of target
 		$('html,body').animate({
 			'scrollTop' : this.calculateOffset()
 		}, this.duration, this.easing).promise().done(function() {
+
+			Gumby.debug('Triggering onComplete event', scope.$el);
 			scope.$el.trigger('gumby.onComplete');
 		});
 	};
@@ -112,7 +124,7 @@
 	};
 
 	// add initialisation
-	Gumby.addInitalisation('skiplinks', function(all) {
+	Gumby.addInitalisation('skiplink', function(all) {
 		$('.skiplink > a, .skip').each(function() {
 			var $this = $(this);
 
@@ -137,9 +149,9 @@
 	// register UI module
 	Gumby.UIModule({
 		module: 'skiplink',
-		events: ['onComplete', 'skip'],
+		events: ['initialize', 'onComplete', 'skip'],
 		init: function() {
-			Gumby.initialize('skiplinks');
+			Gumby.initialize('skiplink');
 		}
 	});
-}();
+}(jQuery);

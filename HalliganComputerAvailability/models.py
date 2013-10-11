@@ -35,6 +35,7 @@ class RoomInfo(models.Model):
     lab = models.CharField(max_length=10)
     numReporting = models.IntegerField()
     avgCpu = models.FloatField()
+    updateTime = models.DateTimeField(auto_now=True)
 
 admin.site.register(RoomInfo)
 
