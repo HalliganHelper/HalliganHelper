@@ -1,7 +1,9 @@
 function LabUseGraph(lab){
-    google.load("visualization", "1", {packages: ["corechart"]});
+    console.log('LABUSEGRAPH')
+    //google.load("visualization", "1", {packages:["corechart"]});
     google.setOnLoadCallback(drawChart);
     function drawChart(){
+        console.log('DRAW CHART')
 
         $.getJSON('/api/getRoomInfo', {'lab': lab}, function(data){
 
