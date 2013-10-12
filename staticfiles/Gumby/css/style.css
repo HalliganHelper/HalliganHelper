@@ -1,0 +1,106 @@
+/*
+We highly recommend you use SASS and write your custom styles in sass/_custom.scss.
+However, this blank file is available if you prefer
+*/
+
+.Hidden {
+    display: none;
+}
+
+.Shown {
+
+}
+
+.Available {
+    color: green;
+}
+
+.Error {
+    color: orange;
+}
+
+.InUse {
+    color: red;
+}
+
+.Off {
+
+}
+
+.InSession {
+    color: red;
+}
+
+.ComingUp {
+    color: orange;
+}
+
+.ServerOn {
+
+}
+
+.ServerOff {
+    color: red;
+}
+
+.ServerError {
+    color: orange;
+}
+
+.Header {
+    color: dodgerblue;
+    text-shadow: 0px 2px 3px white;
+}
+
+#content {
+    height: 80%;
+}
+
+#name {
+    float: left;
+
+}
+
+#feedback {
+    float: right;
+}
+
+#FailureDiv {
+    cursor: pointer;
+}
+
+.Refresh {
+    float:right;
+    color: white;
+}
+
+.Refresh:hover {
+    color: orange;
+}
+
+
+/*ToolTip Stuff Begins Here */
+.hasTooltip {
+    position:relative;
+}
+.hasTooltip span {
+    display:none;
+}
+
+.hasTooltip:hover span {
+    display:inline-block;
+    background-color:dodgerblue;
+    border-radius:10px;
+    color:white;
+    box-shadow:2px 2px 6px gray;
+    position:absolute;
+    padding:5px;
+    top:0em;
+
+
+    right:40px;
+    max-height:250px;
+    white-space: nowrap;
+
+}
+/*Tooltip Stuff Ends Here */
