@@ -104,7 +104,7 @@ function GetComputerInfo(room) {
 
             $(DataDiv).empty().append(table);
             var id = 'lab' + room + '_graph';
-            var graph = $("<div id='" + id + "'/>").addClass('svg');
+            var graph = $("<div id='" + id + "'/>");
             $(DataDiv).append(graph);
 
             LabUseGraph('lab' + room);

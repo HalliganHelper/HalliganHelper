@@ -1,7 +1,9 @@
+var plots = [];
+
 function LabUseGraph(lab){
     $.get('/api/getRoomInfo', {'lab': lab}, function(data){
         var inUse = [];
-        console.log("LENGTH: " + data.length);
+        console.log( lab + "LENGTH: " + data.length);
         if (data.length < 1){
             return;
         }
@@ -9,8 +11,8 @@ function LabUseGraph(lab){
             var time = py2jsDate(data[i].fields.updateTime);
             inUse.push([time, data[i].fields.numReporting]);
         }
-
-        var plot = $.jqplot(lab + '_graph', [inUse],
+        //console.log(inUse);
+        var plot = $('#' + lab + '_graph').jqplot([inUse],
             {
                 title: 'Use Over Time',
                 seriesDefaults: {
@@ -18,18 +20,21 @@ function LabUseGraph(lab){
                     pointLabels: {show: true }
                 },
                 axesDefaults: {
-                    labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+                    labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer
                 },
                 axes: {
                     xaxis: {
                         renderer: $.jqplot.DateAxisRenderer,
-                        tickOptions: {formatString: '%t'},
+                        tickOptions: {formatString: '%m/%d %H:%M', angle: -30},
                         min: 'October 8, 2013',
                         tickInterval: '1 week'
                     },
                     yaxis: {
                         label: "Computers On",
-                        pad: 0
+                        tickoptions: {formatString: '%d'},
+                        pad: 0,
+                        min: 0
                     }
                 },
                 cursor: {
@@ -45,6 +50,17 @@ function LabUseGraph(lab){
                 ]
             }
         );
+        plots.push(plot);
+        //console.log(plot);
 
     });
+
 }
+$(document).ready(function(){
+    $('#tabs').on('gumby.onChange', function(e, index){
+        console.log(plots);
+        for(p in plots){
+            $.jqplot(plots[p]).replot();
+        }
+    });
+});
