@@ -103,6 +103,11 @@ However, this blank file is available if you prefer
     white-space: nowrap;
 
 }
+
+.graphWrapper {
+    width: 100%;
+    height: 300px;
+}
 /*Tooltip Stuff Ends Here */
 
 .axis path,
