@@ -91,49 +91,6 @@
             <div class="tab-content">
                 <div id="ServerContainer"></div>
             </div>
-            {% comment %}
-            <div class="tab-content">
-                <table class="striped rounded">
-                    <thead>
-                        <tr>
-                            <td>Server Name</td>
-                            <td>Number of Users</td>
-                            <td>Status</td>
-                            <td>Last Updated</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for server in servers|dictsort:'ComputerName'  %}
-                            {% if server.Status == "ON" %}
-                            <tr class="ServerOn">
-                            {% elif server.Status == "OFF" %}
-                            <tr class="ServerOff">
-                            {% elif server.Status == "ERROR" %}
-                            <tr class="ServerError">
-                            {% endif %}
-
-                                <td><a href="#" class="switch" gumby-trigger="#modal_{{ server.ComputerName }}">{{ server.ComputerName }}</a></td>
-                                <td>{{ server.NumUsers }}</td>
-                                <td>{{ server.Status }}</td>
-                                <td>{{ server.LastUpdated }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% for server in servers|dictsort:'ComputerName' %}
-                    <div class="modal" id="modal_{{ server.ComputerName }}">
-                        <div class="content">
-                            <div id="ChartFor{{ server.ComputerName }}"></div>
-                            <p class="btn primary small">
-                                <a href="#" class="switch" gumby-trigger="|#modal_{{ server.ComputerName }}">Close</a>
-                            </p>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-            {% endcomment %}
-
-
         </section>
     </div>
     {% include "footer.html" %}

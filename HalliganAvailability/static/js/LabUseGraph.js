@@ -3,7 +3,6 @@ var plots = [];
 function LabUseGraph(lab){
     $.get('/api/getRoomInfo', {'lab': lab}, function(data){
         var inUse = [];
-        console.log( lab + "LENGTH: " + data.length);
         if (data.length < 1){
             return;
         }
@@ -11,10 +10,11 @@ function LabUseGraph(lab){
             var time = py2jsDate(data[i].fields.updateTime);
             inUse.push([time, data[i].fields.numReporting]);
         }
-        //console.log(inUse);
-        var plot = $('#' + lab + '_graph').jqplot([inUse],
+        var plot = $.jqplot(lab + '_graph', [inUse],
             {
                 title: 'Use Over Time',
+                height: 300,
+                width: 400,
                 seriesDefaults: {
                     showMarker: false,
                     pointLabels: {show: true }
@@ -26,8 +26,8 @@ function LabUseGraph(lab){
                 axes: {
                     xaxis: {
                         renderer: $.jqplot.DateAxisRenderer,
-                        tickOptions: {formatString: '%m/%d %H:%M', angle: -30},
-                        min: 'October 8, 2013',
+                        tickOptions: {formatString: '%m/%d %I:%M %p', angle: -30},
+                        min: 'October 15, 2013',
                         tickInterval: '1 week'
                     },
                     yaxis: {
@@ -50,17 +50,28 @@ function LabUseGraph(lab){
                 ]
             }
         );
-        plots.push(plot);
-        //console.log(plot);
-
+        plots.push([plot, lab]);
     });
 
 }
+
+
 $(document).ready(function(){
     $('#tabs').on('gumby.onChange', function(e, index){
-        console.log(plots);
         for(p in plots){
-            $.jqplot(plots[p]).replot();
+            try {
+                $('#' + plots[p][1] + '_graph').height($('#' + plots[p][1] + '_graph_wrapper').height() * 0.96);
+                $('#' + plots[p][1] + '_graph').width($('#' + plots[p][1] + '_graph_wrapper').width() * 0.96);
+                plots[p][0]._width = $('#' + plots[p][1] + '_graph').width();
+                plots[p][0]._height = $('#' + plots[p][1] + '_graph').height();
+                plots[p][0].replot();
+            } catch(e) {
+
+                $('#' + plots[p][1] + '_graph').empty().text('Something Went Wrong')
+
+            }
+
         }
     });
 });
+
