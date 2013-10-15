@@ -219,7 +219,10 @@ def GetRoomInfo(request):
 
     try:
         labs = RoomInfo.objects.filter(lab=labName)
+        if labs.count() == 0:
+            return HttpResponse(status=400)
         data = serializers.serialize('json', labs, fields=('lab', 'numReporting', 'avgCpu', 'updateTime'))
+
     except RoomInfo.DoesNotExist:
         return HttpResponse(status=400)
 
