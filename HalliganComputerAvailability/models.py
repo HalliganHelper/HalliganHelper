@@ -1,7 +1,7 @@
 from django.db import models
 from datetime import datetime
 import datetime as dt
-from datetime import timedelta
+from django.utils import timezone
 from django.contrib import admin
 
 # Create your models here.
@@ -35,7 +35,12 @@ class RoomInfo(models.Model):
     lab = models.CharField(max_length=10)
     numReporting = models.IntegerField()
     avgCpu = models.FloatField()
-    updateTime = models.DateTimeField(auto_now=True)
+    updateTime = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        self.updateTime = timezone.make_aware(dt.datetime.now(), timezone.get_default_timezone())
+        return super(RoomInfo, self).save(*args, **kwargs)
+
 
 admin.site.register(RoomInfo)
 
