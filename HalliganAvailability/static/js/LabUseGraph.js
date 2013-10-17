@@ -8,8 +8,10 @@ function LabUseGraph(lab){
         }
         for(var i in data){
             var time = py2jsDate(data[i].fields.updateTime);
+            /* TODO this is a total horseshit way of doing timezones */
             var hr = time.getHours();
             time.setHours(hr - 4);
+            /* TODO end of horseshit */
             inUse.push([time, data[i].fields.numReporting]);
         }
         var plot = $.jqplot(lab + '_graph', [inUse],
