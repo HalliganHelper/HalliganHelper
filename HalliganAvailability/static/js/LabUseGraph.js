@@ -21,7 +21,7 @@ function LabUseGraph(lab){
                 width: 400,
                 seriesDefaults: {
                     showMarker: false,
-                    pointLabels: {show: false }
+                    pointLabels: {show: true }
                 },
                 axesDefaults: {
                     labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
