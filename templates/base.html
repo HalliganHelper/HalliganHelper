@@ -31,13 +31,12 @@
             <span class="Header"> HalliganHelper </span>
         </h1>
         <ul class="push_fifteen one columns">
-        {% comment %}
-        {% if request.user %}
+
+        {% if request.user.is_authenticated %}
             <li><a href="#">{{ request.user.name }}</a></li>
         {% else %}
             <li><a href="#">Login</a></li>
         {% endif %}
-        {% endcomment %}
         </ul>
     </div>
     <div id="content">

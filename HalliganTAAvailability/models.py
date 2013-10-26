@@ -1,32 +1,41 @@
 from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User
+import datetime
+import pytz
 # Create your models here.
 
 
+class Student(models.Model):
+    usr = models.OneToOneField(User)
+
+admin.site.register(Student)
+
+class TA(models.Model):
+    usr = models.OneToOneField(User)
+    officeHours = models.TextField()
+
+admin.site.register(TA)
+
 class Course(models.Model):
     Name = models.CharField(max_length=10)
-    Number = models.CharField(max_length=20)
     Professor = models.CharField(max_length=50)
+    tas = models.ForeignKey(TA, blank=True, null=True)
+    students = models.ForeignKey(Student, blank=True, null=True)
 
 admin.site.register(Course)
 
 
-class Profile(models.Model):
-    NeedsHelp = models.BooleanField()
-    BaseUser = models.ForeignKey(User, primary_key=True)
-    NeedHelpWith = models.ForeignKey(Course)
+class Request(models.Model):
+    course = models.ForeignKey(Course)
+    student = models.ForeignKey(Student)
+    question = models.TextField()
+    whenAsked = models.DateTimeField()
 
-admin.site.register(Profile)
+    def save(self, *args, **kwargs):
+        est = pytz.timezone('US/Eastern')
+        self.whenAsked = datetime.datetime.now(est)
+        super(Request, self).save(*args, **kwargs)
 
 
-class TA(models.Model):
-    Classes = models.ManyToManyField(Course, related_name='AllClasses')
-    CurrentClass = models.ManyToManyField(Course, related_name='CurrentClass')
-    Date = models.DateField(auto_now=True)
-    StartTime = models.TimeField(auto_now=True)
-    EndTime = models.TimeField(auto_now=True)
-    HomeBaseRoom = models.CharField(max_length=30)
-    Data = models.ForeignKey(Profile, primary_key=True)
-
-admin.site.register(TA)
+admin.site.register(Request)

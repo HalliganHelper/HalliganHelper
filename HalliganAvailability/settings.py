@@ -100,6 +100,15 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.request',
+    'django.contrib.auth.context_processors.auth',
+)
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -132,7 +141,10 @@ INSTALLED_APPS = (
     'HalliganComputerAvailability',
     'HalliganTAAvailability',
     'south',
+    'registration'
 )
+
+
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
@@ -207,3 +219,18 @@ def get_cache():
     }
 
 CACHES = get_cache()
+
+
+#EMAIL SETTINGS
+EMAIL_HOST_PASSWORD = 'QWERTYhalliganhelper1382'
+EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_PORT = 465
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+LOGIN_REDIRECT_URL = '/'
+
+ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_OPEN = True
