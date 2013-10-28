@@ -8,92 +8,89 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'Student'
+        db.create_table(u'HalliganTAAvailability_student', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('usr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
+        ))
+        db.send_create_signal(u'HalliganTAAvailability', ['Student'])
+
+        # Adding model 'TA'
+        db.create_table(u'HalliganTAAvailability_ta', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('usr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
+            ('officeHours', self.gf('django.db.models.fields.TextField')()),
+        ))
+        db.send_create_signal(u'HalliganTAAvailability', ['TA'])
+
         # Adding model 'Course'
         db.create_table(u'HalliganTAAvailability_course', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('Name', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('Number', self.gf('django.db.models.fields.CharField')(max_length=20)),
             ('Professor', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('tas', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['HalliganTAAvailability.TA'], null=True, blank=True)),
+            ('students', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['HalliganTAAvailability.Student'], null=True, blank=True)),
         ))
         db.send_create_signal(u'HalliganTAAvailability', ['Course'])
 
-        # Adding model 'Profile'
-        db.create_table(u'HalliganTAAvailability_profile', (
-            ('NeedsHelp', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('BaseUser', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], primary_key=True)),
-            ('NeedHelpWith', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['HalliganTAAvailability.Course'])),
+        # Adding model 'Request'
+        db.create_table(u'HalliganTAAvailability_request', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['HalliganTAAvailability.Course'])),
+            ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['HalliganTAAvailability.Student'])),
+            ('question', self.gf('django.db.models.fields.TextField')()),
+            ('whenAsked', self.gf('django.db.models.fields.DateTimeField')()),
+            ('whereLocated', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('solved', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('whenSolved', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
         ))
-        db.send_create_signal(u'HalliganTAAvailability', ['Profile'])
-
-        # Adding model 'TA'
-        db.create_table(u'HalliganTAAvailability_ta', (
-            ('Date', self.gf('django.db.models.fields.DateField')(auto_now=True, blank=True)),
-            ('StartTime', self.gf('django.db.models.fields.TimeField')(auto_now=True, blank=True)),
-            ('EndTime', self.gf('django.db.models.fields.TimeField')(auto_now=True, blank=True)),
-            ('HomeBaseRoom', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('Data', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['HalliganTAAvailability.Profile'], primary_key=True)),
-        ))
-        db.send_create_signal(u'HalliganTAAvailability', ['TA'])
-
-        # Adding M2M table for field Classes on 'TA'
-        m2m_table_name = db.shorten_name(u'HalliganTAAvailability_ta_Classes')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('ta', models.ForeignKey(orm[u'HalliganTAAvailability.ta'], null=False)),
-            ('course', models.ForeignKey(orm[u'HalliganTAAvailability.course'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['ta_id', 'course_id'])
-
-        # Adding M2M table for field CurrentClass on 'TA'
-        m2m_table_name = db.shorten_name(u'HalliganTAAvailability_ta_CurrentClass')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('ta', models.ForeignKey(orm[u'HalliganTAAvailability.ta'], null=False)),
-            ('course', models.ForeignKey(orm[u'HalliganTAAvailability.course'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['ta_id', 'course_id'])
+        db.send_create_signal(u'HalliganTAAvailability', ['Request'])
 
 
     def backwards(self, orm):
-        # Deleting model 'Course'
-        db.delete_table(u'HalliganTAAvailability_course')
-
-        # Deleting model 'Profile'
-        db.delete_table(u'HalliganTAAvailability_profile')
+        # Deleting model 'Student'
+        db.delete_table(u'HalliganTAAvailability_student')
 
         # Deleting model 'TA'
         db.delete_table(u'HalliganTAAvailability_ta')
 
-        # Removing M2M table for field Classes on 'TA'
-        db.delete_table(db.shorten_name(u'HalliganTAAvailability_ta_Classes'))
+        # Deleting model 'Course'
+        db.delete_table(u'HalliganTAAvailability_course')
 
-        # Removing M2M table for field CurrentClass on 'TA'
-        db.delete_table(db.shorten_name(u'HalliganTAAvailability_ta_CurrentClass'))
+        # Deleting model 'Request'
+        db.delete_table(u'HalliganTAAvailability_request')
 
 
     models = {
         u'HalliganTAAvailability.course': {
             'Meta': {'object_name': 'Course'},
             'Name': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'Number': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
             'Professor': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'students': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['HalliganTAAvailability.Student']", 'null': 'True', 'blank': 'True'}),
+            'tas': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['HalliganTAAvailability.TA']", 'null': 'True', 'blank': 'True'})
         },
-        u'HalliganTAAvailability.profile': {
-            'BaseUser': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'primary_key': 'True'}),
-            'Meta': {'object_name': 'Profile'},
-            'NeedHelpWith': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['HalliganTAAvailability.Course']"}),
-            'NeedsHelp': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        u'HalliganTAAvailability.request': {
+            'Meta': {'object_name': 'Request'},
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['HalliganTAAvailability.Course']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'question': ('django.db.models.fields.TextField', [], {}),
+            'solved': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['HalliganTAAvailability.Student']"}),
+            'whenAsked': ('django.db.models.fields.DateTimeField', [], {}),
+            'whenSolved': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'whereLocated': ('django.db.models.fields.CharField', [], {'max_length': '50'})
+        },
+        u'HalliganTAAvailability.student': {
+            'Meta': {'object_name': 'Student'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'usr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True'})
         },
         u'HalliganTAAvailability.ta': {
-            'Classes': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'AllClasses'", 'symmetrical': 'False', 'to': u"orm['HalliganTAAvailability.Course']"}),
-            'CurrentClass': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'CurrentClass'", 'symmetrical': 'False', 'to': u"orm['HalliganTAAvailability.Course']"}),
-            'Data': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['HalliganTAAvailability.Profile']", 'primary_key': 'True'}),
-            'Date': ('django.db.models.fields.DateField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'EndTime': ('django.db.models.fields.TimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'HomeBaseRoom': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'Meta': {'object_name': 'TA'},
-            'StartTime': ('django.db.models.fields.TimeField', [], {'auto_now': 'True', 'blank': 'True'})
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'officeHours': ('django.db.models.fields.TextField', [], {}),
+            'usr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True'})
         },
         u'auth.group': {
             'Meta': {'object_name': 'Group'},

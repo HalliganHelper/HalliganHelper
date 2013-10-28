@@ -141,7 +141,8 @@ INSTALLED_APPS = (
     'HalliganComputerAvailability',
     'HalliganTAAvailability',
     'south',
-    'registration'
+    'registration',
+    'widget_tweaks'
 )
 
 
@@ -225,7 +226,7 @@ CACHES = get_cache()
 EMAIL_HOST_PASSWORD = 'QWERTYhalliganhelper1382'
 EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_PORT = 465
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

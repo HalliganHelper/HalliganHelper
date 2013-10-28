@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html>
+<html class="metro">
 <head>
     <title>{% block title %}Halligan Helper{% endblock %}</title>
     {% load staticfiles %}
@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="{% static "Gumby/css/style.css" %}">
     {% block header %}{% endblock %}
 </head>
-<body>
+<body class="colgrid">
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -25,20 +25,41 @@
     ga('send', 'pageview');
 
     </script>
+    <nav id="main-navbar" class="navbar">
+        <div class="row">
+        <a class="toggle" gumby-trigger="#main-navbar #main-nav" href="#"><i class="icon-menu"></i></a>
+            <h1 class="four columns logo">
+                <a href="/">
+                    <img src="{% static "img/HalliganHelper_mainlogo.png" %}">
+                </a>
+            </h1>
 
-    <div class="row navbar pretty">
-        <h1 class="two columns logo">
-            <span class="Header"> HalliganHelper </span>
-        </h1>
-        <ul class="push_fifteen one columns">
+            <nav class="four columns push_seven">
+                <ul id="main-nav">
+                        <li><a href="/taSystem">TA Queue</a></li>
+                    {% if request.user.is_authenticated %}
+                        <li>
+                            <a href="/users">{{ request.user.username }}</a>
+                            <div class="dropdown">
+                                <ul>
+                                    <li><a href="/users/gethelp">Get Help</a></li>
+                                    <li><a href="/users/listRequests">List Past Requests</a></li>
 
-        {% if request.user.is_authenticated %}
-            <li><a href="#">{{ request.user.name }}</a></li>
-        {% else %}
-            <li><a href="#">Login</a></li>
-        {% endif %}
-        </ul>
-    </div>
+                                </ul>
+                            </div>
+                        </li>
+                        <li>
+                                    <a href="/accounts/logout?next=/">Logout</a>
+                        </li>
+                    {% else %}
+                        <li><a href="/accounts/register">Sign Up</a></li>
+                        <li><a href="/accounts/login">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+        </div>
+    </nav>
     <div id="content">
         {% block content %}{% endblock %}
     </div>

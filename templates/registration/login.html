@@ -1,12 +1,37 @@
 {% extends "base.html" %}
 
-{% block content %}
-    <form method='post' action='.'>{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Log in"/>
-    <input type="hidden" name="next" value="{{ next }}"/>
+{% load widget_tweaks %}
 
-    </form>
-    <p>Forgot password? <a href="{% url auth_password_reset %}">Reset it!</a></p>
-    <p>Not a member? <a href="{% url registration_register %}">Register</a></p>
+{% block content %}
+<div class="row">
+        <div class="sixteen columns">
+            <form method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
+                <div class="row">
+                    <div class="field centered six columns">
+                        {% render_field form.username class="wide text input" type="text" placeholder="Username or Tufts Email" %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field centered six columns">
+                        {% render_field form.password class="wide input password" type="password" placeholder="Password"%}
+                    </div>
+                </div>
+                {% if errors %}
+                <div class="row centererd 5 columns">
+                    <li class="danger alert">Your username and password dont' match</li>
+                </div>
+                {% endif %}
+                <div class="row">
+                    <div class="centered four columns">
+
+                        <div class="medium primary btn">
+                            <input type="submit" value="Login"/>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="next" value="{{ next }}" />
+            </form>
+        </div>
+</div>
+
 {% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Profile for {{ student.usr.email }}</h3>
+<h4>Your Help Requests</h4>
+    <ul>
+    {% for i in rqs %}
+        <li>{{ i.whenAsked }} - {{ i.question }}</li>
+    {% endfor %}
+    </ul>
+<h4>TA Status - {% if ta %}YES{% else %}NO{% endif %}</h4>
+    {% if ta %}
+    <h5>{{ ta.officeHours }}</h5>
+    {% endif %}
+{% endblock %}

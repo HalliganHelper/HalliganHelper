@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% for r in requests %}
+        <li>{{ r.whenAsked }} - {{ r.question }} <button>X</button><span class="alert badge">X</span></li>
+    {% endfor %}
+{% endblock %}
