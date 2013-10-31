@@ -5,29 +5,15 @@
 {% block content %}
     <form method="post" action=""> {% csrf_token %}
 
-        {% if form.question.errors %}
-            <div class="row">
-                <div class="centered six columns">
-                    <li class="danger alert text-center">{{ form.question.errors }}</li>
-                </div>
-            </div>
-        {% endif %}
         <div class="row">
-            <div class="field centered six columns">
-                {% render_field form.question class="input textarea" type="text" placeholder="Please describe your problem" %}
+            <div class="field centered six columns {% if form.question.errors %}danger{% endif %}">
+                {% render_field form.question class="input textarea" type="text" placeholder="Briefly describe your problem" %}
             </div>
         </div>
 
 
-        {% if form.whereLocated.errors %}
-            <div class="row">
-                <div class="centered six columns">
-                    <li class="danger alert text-center">{{ form.whereLocated.errors }}</li>
-                </div>
-            </div>
-        {% endif %}
         <div class="row">
-            <div class="field centered six columns">
+            <div class="field centered six columns {% if form.whereLocated.errors %}danger{% endif %}">
                 {% render_field form.whereLocated class="text input" type="text" placeholder="What computer are you at?" %}
             </div>
         </div>
@@ -36,7 +22,7 @@
         {% if form.course.errors %}
             <div class="row">
                 <div class="centered six columns">
-                    <li class="danger alert text-center">{{ form.course.errors }}</li>
+                    <li class="danger alert text-center">Don't forget to pick a class!</li>
                 </div>
             </div>
         {% endif %}
@@ -55,7 +41,7 @@
                 </select>
             </div>
         </div>
-
+        <br/>
         <div class="row">
             <div class="centered six columns text-center">
                 <div class="medium primary btn">

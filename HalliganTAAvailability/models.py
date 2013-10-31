@@ -35,7 +35,7 @@ admin.site.register(Course)
 class Request(models.Model):
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
-    question = models.TextField()
+    question = models.CharField(max_length=140)
     whenAsked = models.DateTimeField()
     whereLocated = models.CharField(max_length=50)
     solved = models.BooleanField(default=False)
@@ -48,6 +48,9 @@ class Request(models.Model):
         est = pytz.timezone('US/Eastern')
         self.whenAsked = datetime.datetime.now(est)
         super(Request, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return "Request for " + self.course.Name
 
 
 admin.site.register(Request)

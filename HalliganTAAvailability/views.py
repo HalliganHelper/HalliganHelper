@@ -1,7 +1,7 @@
 from django.shortcuts import render, render_to_response, HttpResponseRedirect
 from registration.backends.default.views import RegistrationView
-from forms import TuftsEmail, RequestForm
-from models import Student, Request, TA
+from forms import TuftsEmail, RequestForm, TARegister
+from models import Student, Request, TA, Course
 from django.contrib.auth.admin import User
 from forms import LoginForm
 from django.contrib import auth
@@ -94,6 +94,8 @@ def profile(request):
     usr = User.objects.get(email=request.user.email)
     student = Student.objects.get(usr=usr)
 
+    taForm = TARegister()
+
     try:
         rqs = Request.objects.filter(student=student)
         ta = TA.objects.get(usr=usr)
@@ -102,11 +104,21 @@ def profile(request):
     except TA.DoesNotExist:
         ta = None
 
-    data = {'student': student, 'rqs': rqs, 'ta': ta}
+    data = {'student': student, 'rqs': rqs, 'ta': ta, 'taForm': taForm}
     return render(request, 'profile.html', data)
 
 
 def taSystem(request):
+    comp11Class = Course.objects.get(Name='Comp 11')
+    comp15Class = Course.objects.get(Name='Comp 15')
+    comp40Class = Course.objects.get(Name='Comp 40')
+    comp105Class = Course.objects.get(Name='Comp 105')
+
+    comp11Requests = Request.objects.filter(course=comp11Class).order_by('whenAsked')
+    comp15Requests = Request.objects.filter(course=comp15Class).order_by('whenAsked')
+    comp40Requests = Request.objects.filter(course=comp40Class).order_by('whenAsked')
+    comp105Requests = Request.objects.filter(course=comp105Class).order_by('whenAsked')
+
     r = Request.objects.all()
-    data = {'req': r}
-    return render(request, 'taSystem.html', data)
+    requests = {'comp11': comp11Requests, 'comp15': comp15Requests, 'comp40': comp40Requests, 'comp105': comp105Requests}
+    return render(request, 'taSystem.html', requests)

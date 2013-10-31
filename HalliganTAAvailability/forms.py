@@ -1,6 +1,6 @@
 from registration.forms import RegistrationFormUniqueEmail
 from django import forms
-from models import Request, Student
+from models import Request, Student, Course
 import datetime
 import pytz
 from django.contrib.auth.models import User
@@ -44,6 +44,11 @@ class SuggestionForm(forms.Form):
     email = forms.CharField(required=False)
 
     #def send(self):
+
+
+class TARegister(forms.Form):
+    password = forms.CharField()
+    classes = forms.ModelMultipleChoiceField(queryset=Course.objects.all())
 
 
 

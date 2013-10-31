@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="{% static "Gumby/css/style.css" %}">
     {% block header %}{% endblock %}
 </head>
-<body class="colgrid">
+<body>
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -65,6 +65,23 @@
     </div>
 
     <script src="{% static "js/modernizer.js"%} "></script>
-    <script src="{% static "Gumby/js/libs/gumby.min.js" %}"></script>
+    {% comment %}
+    {# Production Scripts #}
+    <script gumby-touch="{% static "Gumby/js/libs" %}" src="{% static "Gumby/js/libs/gumby.min.js" %}"></script>
+    {% endcomment %}
+
+    {# Dev Scripts #}
+    <script gumby-touch="Gumby/js/libs" src="{% static "Gumby/js/libs/gumby.min.js"%}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.retina.js"%}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.fixed.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.skiplink.js" %} "></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.toggleswitch.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.checkbox.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.radiobtn.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.tabs.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.navbar.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.fittext.js"%}"></script>
+    <script src="{% static "Gumby/js/libs/ui/jquery.validation.js"%}"></script>
+    <script src="{% static "Gumby/js/libs/gumby.init.js" %}"></script>
 </body>
 </html>
