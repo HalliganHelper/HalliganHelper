@@ -35,7 +35,7 @@ admin.site.register(Course)
 class Request(models.Model):
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
-    question = models.CharField(max_length=140)
+    question = models.CharField(max_length=51)
     whenAsked = models.DateTimeField()
     whereLocated = models.CharField(max_length=50)
     solved = models.BooleanField(default=False)

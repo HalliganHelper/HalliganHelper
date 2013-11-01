@@ -7,6 +7,7 @@ from forms import LoginForm
 from django.contrib import auth
 from registration.signals import user_registered
 from forms import TuftsEmail
+import pytz, datetime
 
 
 def user_created(sender, user, request, **kwargs):
@@ -114,10 +115,17 @@ def taSystem(request):
     comp40Class = Course.objects.get(Name='Comp 40')
     comp105Class = Course.objects.get(Name='Comp 105')
 
-    comp11Requests = Request.objects.filter(course=comp11Class).order_by('whenAsked')
-    comp15Requests = Request.objects.filter(course=comp15Class).order_by('whenAsked')
-    comp40Requests = Request.objects.filter(course=comp40Class).order_by('whenAsked')
-    comp105Requests = Request.objects.filter(course=comp105Class).order_by('whenAsked')
+    est = pytz.timezone('US/Eastern')
+    now = datetime.datetime.now(est)
+    before = now - datetime.timedelta(hours=3)
+
+
+    allReqs = Request.objects.filter(whenAsked__gte=before).order_by('whenAsked')
+
+    comp11Requests = allReqs.filter(course=comp11Class)
+    comp15Requests = allReqs.filter(course=comp15Class)
+    comp40Requests = allReqs.filter(course=comp40Class)
+    comp105Requests = allReqs.filter(course=comp105Class)
 
     r = Request.objects.all()
     requests = {'comp11': comp11Requests, 'comp15': comp15Requests, 'comp40': comp40Requests, 'comp105': comp105Requests}

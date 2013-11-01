@@ -65,11 +65,12 @@
     </div>
 
     <script src="{% static "js/modernizer.js"%} "></script>
-    {% comment %}
+
     {# Production Scripts #}
     <script gumby-touch="{% static "Gumby/js/libs" %}" src="{% static "Gumby/js/libs/gumby.min.js" %}"></script>
-    {% endcomment %}
 
+
+    {% comment %}
     {# Dev Scripts #}
     <script gumby-touch="Gumby/js/libs" src="{% static "Gumby/js/libs/gumby.min.js"%}"></script>
     <script src="{% static "Gumby/js/libs/ui/gumby.retina.js"%}"></script>
@@ -83,5 +84,6 @@
     <script src="{% static "Gumby/js/libs/ui/gumby.fittext.js"%}"></script>
     <script src="{% static "Gumby/js/libs/ui/jquery.validation.js"%}"></script>
     <script src="{% static "Gumby/js/libs/gumby.init.js" %}"></script>
+    {% endcomment %}
 </body>
 </html>

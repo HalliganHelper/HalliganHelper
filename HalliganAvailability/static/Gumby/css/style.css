@@ -199,6 +199,10 @@ ul#sidebar-nav > li.active {
 }
 */
 
+td {
+    word-wrap: break-word;
+}
+
 #inner-nav {
   margin-bottom: 40px;
 }
