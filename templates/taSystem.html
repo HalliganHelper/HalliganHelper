@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load staticfiles %}
 {% block content %}
     <div class="row">
 
@@ -7,23 +7,23 @@
             <section class="three columns">
                 <nav id="sidebar-nav-holder" class="vertical-nav" gumby-fixed="top" gumby-pin="[data-target='comp105']" >
                     <ul id="sidebar-nav">
-                        <li class="active">
+                        <li class="active" id="comp11Nav">
                             <a href="#comp11" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp11']">
                                 Comp 11
                             </a>
 
                         </li>
-                        <li>
+                        <li id="comp15Nav">
                             <a href="#comp15" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp15']">
                                 Comp 15
                             </a>
                         </li>
-                        <li>
+                        <li id="comp40Nav">
                             <a href="#comp40" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp40']">
                                 Comp 40
                             </a>
                         </li>
-                        <li>
+                        <li id="comp105Nav">
                             <a href="#comp105" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp105']">
                                 Comp 105
                             </a>
@@ -148,4 +148,8 @@
         </div>
 
     </div>
+{% endblock %}
+
+{% block endScripts %}
+    <script src="{% static "js/ScrollingSideBar.js" %}"></script>
 {% endblock %}
