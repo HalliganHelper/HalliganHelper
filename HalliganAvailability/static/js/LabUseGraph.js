@@ -32,7 +32,7 @@ function LabUseGraph(lab){
                         renderer: $.jqplot.DateAxisRenderer,
                         tickOptions: {formatString: '%m/%d %I:%M %p', angle: -30},
                         min: 'October 15, 2013',
-                        tickInterval: '1 day'
+                        tickInterval: '3 days'
                     },
                     yaxis: {
                         label: "Computers On",
