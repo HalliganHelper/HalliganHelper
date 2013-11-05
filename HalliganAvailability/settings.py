@@ -142,7 +142,8 @@ INSTALLED_APPS = (
     'HalliganTAAvailability',
     'south',
     'registration',
-    'widget_tweaks'
+    'widget_tweaks',
+    'django_extensions'
 )
 
 
