@@ -21,7 +21,7 @@ function LabUseGraph(lab){
                 width: 400,
                 seriesDefaults: {
                     showMarker: false,
-                    pointLabels: {show: true }
+                    pointLabels: {show: false }
                 },
                 axesDefaults: {
                     labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
@@ -32,7 +32,7 @@ function LabUseGraph(lab){
                         renderer: $.jqplot.DateAxisRenderer,
                         tickOptions: {formatString: '%m/%d %I:%M %p', angle: -30},
                         min: 'October 15, 2013',
-                        tickInterval: '1 week'
+                        tickInterval: '3 days'
                     },
                     yaxis: {
                         label: "Computers On",
