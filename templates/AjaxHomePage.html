@@ -3,21 +3,7 @@
 {% block header %}
 
 
-    {% load staticfiles %}
-    <link rel="stylesheet" href="{% static "css/jquery.jqplot.min.css" %}"/>
-    <script src="{% static "js/jqplot/jquery.jqplot.min.js" %}"></script>
-    <script src="{% static "js/jqplot/jqplot.canvasAxisLabelRenderer.min.js" %}"></script>
-    <script src="{% static "js/jqplot/jqplot.canvasTextRenderer.min.js" %}"></script>
-    <script src="{% static "js/jqplot/jqplot.dateAxisRenderer.min.js" %}"></script>
-    <script src="{% static "js/jqplot/jqplot.pointLabels.min.js" %}"></script>
-    <script src="{% static "js/jqplot/jqplot.cursor.min.js" %}"></script>
-    <script src="{% static "js/jqplot/jqplot.canvasAxisTickRenderer.min.js" %}"></script>
-    <script src="{% static "js/pyDate2jsDate.js" %}"></script>
-    <script src="{% static "js/LabUseGraph.js" %}"></script>
-    <script src="{% static "js/GetComputerInfo.js" %}"></script>
-    <script src="{% static "js/GetLabInfo.js" %}"></script>
-    <script src="{% static "js/GetCurrentUpcomingLabInfo.js" %}"></script>
-    <script src="{% static "js/GetServerInfo.js" %}"></script>
+
 
 {% endblock %}
 
@@ -96,6 +82,20 @@
     {% include "footer.html" %}
 </div>
 
-
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static "css/jquery.jqplot.min.css" %}"/>
+    <script src="{% static "js/jqplot/jquery.jqplot.min.js" %}"></script>
+    <script src="{% static "js/jqplot/jqplot.canvasAxisLabelRenderer.min.js" %}"></script>
+    <script src="{% static "js/jqplot/jqplot.canvasTextRenderer.min.js" %}"></script>
+    <script src="{% static "js/jqplot/jqplot.dateAxisRenderer.min.js" %}"></script>
+    <script src="{% static "js/jqplot/jqplot.pointLabels.min.js" %}"></script>
+    <script src="{% static "js/jqplot/jqplot.cursor.min.js" %}"></script>
+    <script src="{% static "js/jqplot/jqplot.canvasAxisTickRenderer.min.js" %}"></script>
+    <script src="{% static "js/pyDate2jsDate.js" %}"></script>
+    <script src="{% static "js/LabUseGraph.js" %}"></script>
+    <script src="{% static "js/GetComputerInfo.js" %}"></script>
+    <script src="{% static "js/GetLabInfo.js" %}"></script>
+    <script src="{% static "js/GetCurrentUpcomingLabInfo.js" %}"></script>
+    <script src="{% static "js/GetServerInfo.js" %}"></script>
 
 {% endblock %}
