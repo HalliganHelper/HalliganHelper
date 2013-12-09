@@ -67,6 +67,7 @@ def AllComps(request):
 
 
 @require_GET
+
 def labInformation(request):
     room = request.GET.get('room', None)
     current = request.GET.get('current', False)
@@ -350,6 +351,8 @@ def ModularHomePage(request):
         Rooms = Computer.objects.values_list('RoomNumber', flat=True)
         Rooms = sorted(list(set(Rooms)))
         cache.set(ROOMS_CACHE_KEY, Rooms)
+
+
 
     TemplateParams['Rooms'] = Rooms
     print Rooms
