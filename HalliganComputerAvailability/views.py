@@ -10,7 +10,7 @@ from django.core import serializers
 from django.template import RequestContext
 import operator
 from dateutil import tz
-
+import datetime as dt
 
 def ApiDocs(request):
     return render_to_response('ApiDocs.html')
@@ -83,11 +83,13 @@ def labInformation(request):
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-
+    now = dt.datetime.now().date()
     if not room:
         labs = Lab.objects.all()
         for lab in labs:
-            response.append(lab.for_response())
+            print lab
+            if lab.EndDate > now:
+                response.append(lab.for_response())
 
     else:
         labs = Lab.objects.filter(RoomNumber=room)
@@ -95,7 +97,7 @@ def labInformation(request):
             data = lab.for_response()
             response.append(data)
 
-    response.sort(key=operator.itemgetter('RoomNumber', 'DayOfWeek_AsNum', 'StartTime'))
+    response.sort(key=operator.itemgetter('DayOfWeek_AsNum', 'StartTime', 'RoomNumber'))
 
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
