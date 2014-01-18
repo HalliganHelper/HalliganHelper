@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p> You are now registered. Please check your email for the activation code. </p>
+<div class="row">
+    <div class="text-center">
+        Thank you for registering!
+    </div>
+</div>
+<div class="row">
+    <div class="text-center">
+        You will receive an email with an activation link shortly. If you do not receive one, please check your spam folder.
+    </div>
+</div>
+<div class="row">
+    <div class="text-center">
+        <div class="medium primary btn">
+            <a href="{% url 'login'  %}">Login</a>
+        </div>
+    </div>
+</div>
 {% endblock %}
