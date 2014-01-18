@@ -224,7 +224,7 @@ CACHES = get_cache()
 
 
 #EMAIL SETTINGS
-EMAIL_HOST_PASSWORD = 'QWERTYhalliganhelper1382'
+EMAIL_HOST_PASSWORD = '***REMOVED***'
 EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
