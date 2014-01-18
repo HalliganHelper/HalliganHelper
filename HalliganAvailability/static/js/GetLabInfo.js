@@ -14,10 +14,10 @@ function GetLabInfo(){
         var head = $('<thead></thead>');
         var row = $('<tr></tr>');
 
-        $(row).append($('<td></td>').text('Room'));
         $(row).append($('<td></td>').text('Day'));
         $(row).append($('<td></td>').text('Start Time'));
         $(row).append($('<td></td>').text('End Time'));
+        $(row).append($('<td></td>').text('Room'));
 
         var lastUpdatedTD = $('<td></td>').text('Class');
         var RefreshButton = $('<i></i>').addClass('icon-arrows-ccw ttip');
@@ -46,10 +46,10 @@ function GetLabInfo(){
                 $(row).addClass('InSession');
             }
 
-            $(row).append($('<td></td>').text(lab.RoomNumber));
             $(row).append($('<td></td>').text(lab.DayOfWeek));
             $(row).append($('<td></td>').text(lab.StartTime));
             $(row).append($('<td></td>').text(lab.EndTime));
+            $(row).append($('<td></td>').text(lab.RoomNumber));
             $(row).append($('<td></td>').text(lab.ClassName));
             $(body).append(row);
         }
