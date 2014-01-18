@@ -4,7 +4,13 @@ from models import Request, Student, Course
 import datetime
 import pytz
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
+
+
+#class RegisteredUserAuthentication(AuthenticationForm):
+        #super(RegisteredUserAuthentication, self).__init__(*args, **kwargs)
+
 
 
 class TuftsEmail(RegistrationFormUniqueEmail):

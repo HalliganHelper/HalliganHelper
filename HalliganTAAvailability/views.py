@@ -54,7 +54,7 @@ def login(request):
 
     data = {'form': form, 'errors': errors}
 
-    return render(request, 'registration/login.html', data)
+    return render(request, 'registration/logout.html', data)
 
 
 

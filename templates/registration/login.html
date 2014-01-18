@@ -3,35 +3,34 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="row text-center">
-        <div class="sixteen columns">
-            <form method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
-                <div class="row">
-                    <div class="field centered six columns">
-                        {% render_field form.username class="wide text input" type="text" placeholder="Username or Tufts Email" %}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="field centered six columns">
-                        {% render_field form.password class="wide input password" type="password" placeholder="Password"%}
-                    </div>
-                </div>
-                {% if errors %}
-                <div class="row centererd 5 columns">
-                    <li class="danger alert">Your username and password dont' match</li>
-                </div>
-                {% endif %}
-                <div class="row">
-                    <div class="centered four columns">
 
-                        <div class="medium primary btn">
-                            <input type="submit" value="Login"/>
-                        </div>
-                    </div>
-                </div>
-                <input type="hidden" name="next" value="{{ next }}" />
-            </form>
-        </div>
+<div class="row text-center">
+    <form method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
+        <p class="field">
+            {% render_field form.username class="narrow text input" type="text" placeholder="Username or Tufts Email" %}
+        </p>
+        <p class="field">
+            {% render_field form.password class="narrow input password" type="password" placeholder="Password"%}
+        </p>
+       
+        {% for error in form.non_field_errors %}
+            <p class="danger alert">
+                {{ error }}
+            </p>
+            
+        {% endfor %} 
+        
+        <p>
+            <div class="medium primary btn">
+                <input type="submit" value="Login"/>
+            </div>
+            <div class="medium secondary btn">
+                <a href="{% url 'auth_password_reset' %}">
+                    Forgot Password?
+                </a>
+            </div>
+        </p>
+    </form>
 </div>
 
 {% endblock %}

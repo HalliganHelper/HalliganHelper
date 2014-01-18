@@ -49,11 +49,11 @@
                             </div>
                         </li>
                         <li>
-                                    <a href="/accounts/logout?next=/">Logout</a>
+                                    <a href="{% url 'auth_logout' %}">Logout</a>
                         </li>
                     {% else %}
-                        <li><a href="/accounts/register">Sign Up</a></li>
-                        <li><a href="/accounts/login">Login</a></li>
+                        <li><a href="{% url 'registration_register' %}">Register</a></li>
+                        <li><a href="{% url 'auth_login' %}">Login</a></li>
                     {% endif %}
                 </ul>
             </nav>

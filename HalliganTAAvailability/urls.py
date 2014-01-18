@@ -8,7 +8,7 @@ from views import TuftsRegistrationView
 
 urlpatterns = patterns('',
     url(r'^accounts/register/$', TuftsRegistrationView.as_view()),
-    url(r'^accounts/login/$', 'HalliganTAAvailability.views.login', name='login'),
+#    url(r'^accounts/login/$', 'HalliganTAAvailability.views.login', name='login'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^taSystem$', 'HalliganTAAvailability.views.taSystem', name='taSystem'),
     url(r'^users$', 'HalliganTAAvailability.views.profile', name='userProfile'),
