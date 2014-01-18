@@ -5,11 +5,12 @@ from models import Student, Request, TA, Course
 from django.contrib.auth.admin import User
 from forms import LoginForm
 from django.contrib import auth
+from django.contrib.auth.decorators import login_required
 from registration.signals import user_registered
 
 from forms import TuftsEmail
 import pytz, datetime
-
+from HalliganAvailability import settings
 
 def user_created(sender, user, request, **kwargs):
     form = TuftsEmail(request.POST)
@@ -26,45 +27,11 @@ class TuftsRegistrationView(RegistrationView):
     form_class = TuftsEmail
 
 
-#Deprecated. Don't write your own login code. Just don't.
-"""
-def login(request):
-    username = password = ''
-    errors = False
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            usr = None
-            try:
-                usr = User.objects.get(username=username)
-            except User.DoesNotExist:
-                try:
-                    usr = User.objects.get(email=username)
-                except User.DoesNotExist:
-                    pass
-
-            if usr is not None:
-                user = auth.authenticate(username=usr.username, password=password)
-                if user is not None:
-                    auth.login(request, user)
-                    return HttpResponseRedirect('/')
-            errors = True
-    else:
-        form = LoginForm()
-
-    data = {'form': form, 'errors': errors}
-
-    return render(request, 'registration/logout.html', data)
-"""
-
-
-
 def courseList(request):
     return render_to_response('courseList.html')
 
 
+@login_required
 def getHelp(request):
     if request.method == 'POST':
         form = RequestForm(request.POST)
@@ -80,7 +47,7 @@ def getHelp(request):
     data = {'form': form}
     return render(request, 'getHelp.html', data)
 
-
+@login_required()
 def listRequests(request):
     try:
         stu = Student.objects.get(usr=request.user)
@@ -94,6 +61,7 @@ def listRequests(request):
     return render(request, 'listRequests.html', data)
 
 
+@login_required()
 def profile(request):
     usr = User.objects.get(email=request.user.email)
     student = Student.objects.get(usr=usr)
@@ -112,24 +80,21 @@ def profile(request):
     return render(request, 'profile.html', data)
 
 
-def taSystem(request):
-    comp11Class = Course.objects.get(Name='Comp 11')
-    comp15Class = Course.objects.get(Name='Comp 15')
-    comp40Class = Course.objects.get(Name='Comp 40')
-    comp105Class = Course.objects.get(Name='Comp 105')
+def onlineQueue(request):
+    tz = pytz.timezone(settings.TIME_ZONE)
+    before = datetime.datetime.now(tz) - datetime.timedelta(hours=3)
+    
+    allReqs = Request.objects.filter(whenAsked__gte=before).order_by('-whenAsked')
+    courses = Course.objects.all().order_by('Number')
 
-    est = pytz.timezone('US/Eastern')
-    now = datetime.datetime.now(est)
-    before = now - datetime.timedelta(hours=3)
+    requestData = []
 
+    for course in courses:
+        insert = (course, allReqs.filter(course=course))
+        requestData.append(insert)
 
-    allReqs = Request.objects.filter(whenAsked__gte=before).order_by('whenAsked')
+    responseData = {
+        'requestData': requestData
+    }
 
-    comp11Requests = allReqs.filter(course=comp11Class)
-    comp15Requests = allReqs.filter(course=comp15Class)
-    comp40Requests = allReqs.filter(course=comp40Class)
-    comp105Requests = allReqs.filter(course=comp105Class)
-
-    r = Request.objects.all()
-    requests = {'comp11': comp11Requests, 'comp15': comp15Requests, 'comp40': comp40Requests, 'comp105': comp105Requests}
-    return render(request, 'taSystem.html', requests)
+    return render(request, 'taSystem.html', responseData)

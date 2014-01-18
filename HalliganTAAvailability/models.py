@@ -20,8 +20,10 @@ class TA(models.Model):
 
 admin.site.register(TA)
 
+
 class Course(models.Model):
-    Name = models.CharField(max_length=10)
+    Name = models.CharField(max_length=100)
+    Number = models.IntegerField()
     Professor = models.CharField(max_length=50)
     tas = models.ForeignKey(TA, blank=True, null=True)
     students = models.ForeignKey(Student, blank=True, null=True)

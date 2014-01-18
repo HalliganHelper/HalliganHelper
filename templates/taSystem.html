@@ -1,153 +1,91 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block content %}
+
     <div class="row">
 
         <div class="row">
             <section class="three columns">
-                <nav id="sidebar-nav-holder" class="vertical-nav" gumby-fixed="top" gumby-pin="[data-target='comp105']" >
+                <nav id="sidebar-nav-holder" class="vertical-nav" gumby-fixed="top" gumby-pin="[data-target='{{ classes.last.Number }}']" >
                     <ul id="sidebar-nav">
-                        <li class="active" id="comp11Nav">
-                            <a href="#comp11" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp11']">
-                                Comp 11
-                            </a>
 
-                        </li>
-                        <li id="comp15Nav">
-                            <a href="#comp15" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp15']">
-                                Comp 15
-                            </a>
-                        </li>
-                        <li id="comp40Nav">
-                            <a href="#comp40" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp40']">
-                                Comp 40
-                            </a>
-                        </li>
-                        <li id="comp105Nav">
-                            <a href="#comp105" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp105']">
-                                Comp 105
-                            </a>
-                        </li>
+                        {% for rq in requestData %}
+                            {% if forloop.first %}
+
+                                <li class="active" id="comp{{ rq.0.Number }}Nav">
+                                    <a href="#comp{{ rq.0.Number }}" class="skip" gumby-update gumby-duration gumby-goto="[data-target='comp{{ rq.0.Number }}']">
+                                        Comp {{ rq.0.Number }}
+                                    </a>
+                                </li>
+
+                            {% else %}
+
+                                <li id="comp{{ rq.0.Number }}Nav">
+                                    <a href="#comp{{ rq.0.Number }}" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp{{ rq.0.Number }}']">
+                                        Comp {{ rq.0.Number }}
+                                    </a>
+                                </li>
+
+                            {% endif %}
+                        {% endfor %}
+
                     </ul>
                 </nav>
             </section>
-            <section class="thirteen columns " >
-                <div class="left-center" data-target="comp11">
-                    <h2>Comp 11 Queue</h2>
-                    <table class=" striped rounded">
-                        <thead>
-                            <tr>
-                                <td>Name</td>
-                                <td>Location</td>
-                                <td>Problem Description</td>
-                                <td>When Asked</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% if not comp11 %}
-                        <tr>
-                            <td colspan="4" class="text-center">There's nothing here!</td>
-                        </tr>
-                        {% endif %}
-                        {% for r in comp11 %}
-                            <tr>
-                                <td>{{ r.student.usr.first_name }} {{ r.student.usr.last_name|first|capfirst}}.</td>
-                                <td>{{ r.whereLocated }}</td>
-                                <td wraptext>{{ r.question }}</td>
-                                <td>{{ r.whenAsked|date:"m/d P" }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="left-center" data-target="comp15">
-                    <h2>Comp 15 Queue</h2>
-                    <table class=" striped rounded">
-                        <thead>
-                        <tr>
-                                <td>Name</td>
-                                <td>Location</td>
-                                <td>Problem Description</td>
-                                <td>When Asked</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% if not comp15 %}
-                        <tr>
-                            <td colspan="4" class="text-center">There's nothing here!</td>
-                        </tr>
-                        {% endif %}
-                        {% for r in comp15 %}
-                            <tr>
-                                <td>{{ r.student.usr.first_name }} {{ r.student.usr.last_name|first|capfirst}}.</td>
-                                <td>{{ r.whereLocated }}</td>
-                                <td wraptext>{{ r.question }}</td>
-                                <td>{{ r.whenAsked|date:"m/d P" }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="left-center" data-target="comp40">
-                    <h2>Comp 40 Queue</h2>
-                    <table class=" striped rounded">
-                        <thead>
-                            <tr>
-                                <td>Name</td>
-                                <td>Location</td>
-                                <td>Problem Description</td>
-                                <td>When Asked</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% if not comp40 %}
-                        <tr>
-                            <td colspan="4" class="text-center">There's nothing here!</td>
-                        </tr>
-                        {% endif %}
-                        {% for r in comp40 %}
-                            <tr>
-                                <td>{{ r.student.usr.first_name }} {{ r.student.usr.last_name|first|capfirst}}.</td>
-                                <td>{{ r.whereLocated }}</td>
-                                <td wraptext>{{ r.question }}</td>
-                                <td>{{ r.whenAsked|date:"m/d P" }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="left-center" data-target="comp105">
-                    <h2>Comp 105 Queue</h2>
-                    <table class=" striped rounded">
-                        <thead>
-                            <tr>
-                                <td>Name</td>
-                                <td>Location</td>
-                                <td>Problem Description</td>
-                                <td>When Asked</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% if not comp105 %}
-                        <tr>
-                            <td colspan="4" class="text-center">There's nothing here!</td>
-                        </tr>
-                        {% endif %}
-                        {% for r in comp105 %}
-                            <tr>
-                                <td>{{ r.student.usr.first_name }} {{ r.student.usr.last_name|first|capfirst}}.</td>
-                                <td>{{ r.whereLocated }}</td>
-                                <td wraptext>{{ r.question }}</td>
-                                <td>{{ r.whenAsked|date:"m/d P" }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
 
+
+            <section class="thirteen columns " >
+
+                {% for rq in requestData %}
+                <div class="left-center" data-target="comp{{ rq.0.Number }}" id="comp{{ rq.0.Number }}">
+                    <h2>Comp {{ rq.0.Number }} Queue</h2>
+                    <table class="striped rounded">
+                        <thead>
+                            <tr>
+                                <td>Name</td>
+                                <td>Location</td>
+                                <td>Problem Description</td>
+                                <td>When Asked</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% if not rq.1 %}
+                        <tr>
+                            <td colspan="4" class="text-center">There's nothing here!</td>
+                        </tr>
+                        {% endif %}
+                        {% for r in rq.1 %}
+                            <tr>
+                                <td>{{ r.student.usr.first_name }} {{ r.student.usr.last_name|first|capfirst}}.</td>
+                                <td>{{ r.whereLocated }}</td>
+                                <td wraptext>{{ r.question }}</td>
+                                <td>{{ r.whenAsked|date:"m/d P" }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>
+                                    <div class="medium primary btn">
+                                        <a href="{% url 'getHelp' %}">Add Me!</a>
+                                    </div>
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+
+                            </tr>
+                        </tfoot>
+
+                    </table>
+                </div>
+                {% endfor %}
+            </section>
+
+        </div>
     </div>
+
+
 {% endblock %}
 
 {% block endScripts %}
