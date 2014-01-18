@@ -26,6 +26,8 @@ class TuftsRegistrationView(RegistrationView):
     form_class = TuftsEmail
 
 
+#Deprecated. Don't write your own login code. Just don't.
+"""
 def login(request):
     username = password = ''
     errors = False
@@ -55,7 +57,7 @@ def login(request):
     data = {'form': form, 'errors': errors}
 
     return render(request, 'registration/logout.html', data)
-
+"""
 
 
 
