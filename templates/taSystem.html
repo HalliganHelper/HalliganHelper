@@ -3,7 +3,11 @@
 {% block content %}
 
     <div class="row">
-
+        {% if not requestData %}
+            <div class="row text-center">
+                Odd, looks like there isn't anything here yet. You should contact support!
+            </div>
+        {% endif %}
         <div class="row">
             <section class="three columns">
                 <nav id="sidebar-nav-holder" class="vertical-nav" gumby-fixed="top" gumby-pin="[data-target='{{ classes.last.Number }}']" >
@@ -46,34 +50,46 @@
                                 <td>Location</td>
                                 <td>Problem Description</td>
                                 <td>When Asked</td>
+                                <td>Resolve</td>
                             </tr>
                         </thead>
                         <tbody>
-                        {% if not rq.1 %}
-                        <tr>
-                            <td colspan="4" class="text-center">There's nothing here!</td>
-                        </tr>
-                        {% endif %}
+
                         {% for r in rq.1 %}
+
                             <tr>
                                 <td>{{ r.student.usr.first_name }} {{ r.student.usr.last_name|first|capfirst}}.</td>
                                 <td>{{ r.whereLocated }}</td>
                                 <td wraptext>{{ r.question }}</td>
                                 <td>{{ r.whenAsked|date:"m/d P" }}</td>
+                                <td>
+                                    {% if r.student.usr == request.user %}
+                                        <div class="medium success btn">
+                                            <a href="#">Solved!</a>
+                                        </div>
+                                    {% elif isTA %}
+                                        <div class="medium info btn">
+                                            <a href="#">Solved!</a>
+                                        </div>
+                                    {% endif %}
+                                </td>
                             </tr>
+
+                        {% empty %}
+
+                            <tr>
+                                <td colspan="5" class="text-center">There's nothing here!</td>
+                            </tr>
+
                         {% endfor %}
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td>
+                                <td colspan="5" class="text-center">
                                     <div class="medium primary btn">
-                                        <a href="{% url 'getHelp' %}">Add Me!</a>
+                                        <a href="{% url 'getHelp' %}">I Need Help</a>
                                     </div>
                                 </td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-
                             </tr>
                         </tfoot>
 

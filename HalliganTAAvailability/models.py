@@ -29,7 +29,7 @@ class Course(models.Model):
     students = models.ForeignKey(Student, blank=True, null=True)
 
     def __str__(self):
-        return self.Name
+        return str(self.Number) + ": " + self.Name
 
 admin.site.register(Course)
 
@@ -42,9 +42,7 @@ class Request(models.Model):
     whereLocated = models.CharField(max_length=50)
     solved = models.BooleanField(default=False)
     whenSolved = models.DateTimeField(blank=True, null=True)
-
-    def delRequest(self):
-        self.delete()
+    timedOut = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         est = pytz.timezone('US/Eastern')
@@ -52,7 +50,7 @@ class Request(models.Model):
         super(Request, self).save(*args, **kwargs)
 
     def __str__(self):
-        return "Request for " + self.course.Name
+        return self.student.usr.first_name + " - Comp " + self.course.Number
 
 
 admin.site.register(Request)

@@ -36,15 +36,15 @@
 
             <nav class="four columns push_seven">
                 <ul id="main-nav">
-                        <li><a href="/taSystem">TA Queue</a></li>
+                        <li><a href="{% url 'taSystem' %}">TA Queue</a></li>
                     {% if request.user.is_authenticated %}
                         <li>
-                            <a href="/users">{{ request.user.username }}</a>
+                            <a href="{% url 'userProfile' %}">{{ request.user.username }}</a>
                             <div class="dropdown">
                                 <ul>
-                                    <li><a href="/users/gethelp">Get Help</a></li>
-                                    <li><a href="/users/listRequests">List Past Requests</a></li>
-
+                                    <li><a href="{% url 'getHelp' %}">Get Help</a></li>
+                                    <li><a href="{% url 'listRequests' %}">Past Requests</a></li>
+                                    <li><a href="{% url 'userProfile' %}">Profile</a></li>
                                 </ul>
                             </div>
                         </li>

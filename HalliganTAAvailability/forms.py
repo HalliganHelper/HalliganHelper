@@ -34,6 +34,7 @@ class LoginForm(forms.Form):
 
 
 class RequestForm(forms.ModelForm):
+    course = forms.ModelChoiceField(queryset=Course.objects.order_by('Number'))
     class Meta:
         model = Request
         fields = ['question', 'whereLocated', 'course' ]
