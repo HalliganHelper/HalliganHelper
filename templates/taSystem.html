@@ -64,12 +64,12 @@
                                 <td>{{ r.whenAsked|date:"m/d P" }}</td>
                                 <td>
                                     {% if r.student.usr == request.user %}
-                                        <div class="medium success btn">
-                                            <a href="#">Solved!</a>
+                                        <div class="medium info btn">
+                                            <a href="#">Resolve</a>
                                         </div>
                                     {% elif isTA %}
                                         <div class="medium info btn">
-                                            <a href="#">Solved!</a>
+                                            <a href="#">Resolve</a>
                                         </div>
                                     {% endif %}
                                 </td>
