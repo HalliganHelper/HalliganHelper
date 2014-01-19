@@ -83,7 +83,7 @@ def onlineQueue(request):
     tz = pytz.timezone(settings.TIME_ZONE)
     before = datetime.datetime.now(tz) - datetime.timedelta(hours=3)
     
-    allReqs = Request.objects.filter(whenAsked__gte=before).order_by('-whenAsked')
+    allReqs = Request.objects.filter(whenAsked__gte=before).order_by('whenAsked')
     courses = Course.objects.all().order_by('Number')
 
     requestData = []
