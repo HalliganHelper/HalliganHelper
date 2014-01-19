@@ -7,10 +7,12 @@
         </div>
     </div>
     <div class="row">
-        <h4>Your Help Requests</h4>
+        <h4>Open Help Requests</h4>
             <ul>
             {% for i in rqs %}
-                <li>{{ i.whenAsked }} - {{ i.question }}</li>
+                {% if not i.solved %}
+                    <li>{{ i.whenAsked }} - {{ i.question }}</li>
+                {% endif %}
             {% endfor %}
             </ul>
 

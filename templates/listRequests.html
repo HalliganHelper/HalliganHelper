@@ -1,7 +1,48 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
+{% comment %}
+{% block header %}
+    <script src="{% static "js/jquery.tablesorter.min.js" %}"></script>
+    <script>
+        $(document).ready(function(){
+           $('#requests').tablesorter({'debug': true});
+        });
+    </script>
+{% endblock %}
+{% endcomment %}
 {% block content %}
-    {% for r in requests %}
-        <li>{{ r.whenAsked }} - {{ r.question }} <button>X</button><li class="alert badge">X</li></li>
-    {% endfor %}
+    <div class="row">
+        <table class="rounded striped" id="requests">
+            <thead>
+                <tr>
+                    <td>Class Number</td>
+                    <td>Date</td>
+                    <td>Problem</td>
+                    <td>Resolved</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in requests %}
+                    <tr>
+                        <td>{{ r.course.Number }}</td>
+                        <td>{{ r.whenAsked|date:"m/d P" }}</td>
+                        <td>{{ r.question }}</td>
+                        <td>
+                            {% if r.solved %}
+                                {{ r.whenSolved|date:"m/d P" }}
+                            {% elif r.timedOut %}
+                                Timed Out
+                            {% else %}
+                                No
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
 {% endblock %}

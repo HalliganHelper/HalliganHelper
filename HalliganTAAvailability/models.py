@@ -49,8 +49,11 @@ class Request(models.Model):
         self.whenAsked = datetime.datetime.now(est)
         super(Request, self).save(*args, **kwargs)
 
+    def timeOut(self):
+        self.timedOut = True
+
     def __str__(self):
-        return self.student.usr.first_name + " - Comp " + self.course.Number
+        return self.student.usr.first_name + " - Comp " + str(self.course.Number)
 
 
 admin.site.register(Request)

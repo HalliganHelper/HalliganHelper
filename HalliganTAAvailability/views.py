@@ -52,10 +52,9 @@ def listRequests(request):
     try:
         stu = Student.objects.get(usr=request.user)
     except Student.DoesNotExist:
-        print 'fail'
         return render_to_response('listRequests.html')
 
-    rqs = Request.objects.filter(student=stu)
+    rqs = Request.objects.filter(student=stu).order_by('-whenAsked')
     data = {'requests': rqs}
     print data['requests']
     return render(request, 'listRequests.html', data)
