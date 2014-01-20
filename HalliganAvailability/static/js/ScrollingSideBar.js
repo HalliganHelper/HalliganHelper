@@ -10,10 +10,14 @@ $(function(){
 
     $("#sidebar-nav-holder.vertical-nav").on("gumby.onFixed", function addToTop(){
         var $this = $(this),
-            html = '<li> <a href="#" class="skip" gumby-goto="top" gumby-duration="600"><i class="icon icon-up-open"></i>Back to top</li>';
+            html = '<li id="topLink"> <a href="#" class="skip" gumby-goto="top" gumby-duration="600"><i class="icon icon-up-open"></i>Back to top</li>';
 
         if(!$this.find("ul li:first-child a i").length){
             $this.find("ul").prepend(html);
+            $("#topLink").click(function(){
+                $("#sidebar-nav li").removeClass("active");
+            });
+
         }
         Gumby.initialize("skiplink");
     }).on("gumby.onUnfixed", function removeToTop(){

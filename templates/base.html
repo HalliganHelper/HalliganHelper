@@ -40,7 +40,7 @@
                         <li><a href="{% url 'taSystem' %}">TA Queue</a></li>
                     {% if request.user.is_authenticated %}
                         <li>
-                            <a href="{% url 'userProfile' %}">{{ request.user.username }}</a>
+                            <a href="{% url 'userProfile' %}">{{ request.user.first_name }}</a>
                             <div class="dropdown">
                                 <ul>
                                     <li><a href="{% url 'getHelp' %}">Get Help</a></li>
