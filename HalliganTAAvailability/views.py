@@ -110,7 +110,7 @@ def onlineQueue(request):
         insert = (course, reqs)
         requestData.append(insert)
 
-    isTA = TA.objects.filter(usr=request.user).count() > 0
+    isTA = TA.objects.filter(usr=request.user).exists()
 
     responseData = {
         'requestData': requestData,
