@@ -45,6 +45,18 @@ class RequestForm(forms.ModelForm):
         super(RequestForm, self).__init__(*args, **kwargs)
 
 
+class ResolveForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ResolveForm, self).__init_(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            self.fields['course'].widget.attrs['readonly'] = True
+            self.fields['question'].widget.attrs['readonly'] = True
+            self.fields['whenSolved'].widget.attrs['readonly'] = True
+    class Meta:
+        model = Request
+        fields = ['course', 'question', 'whenSolved']
+
 class SuggestionForm(forms.Form):
     suggestion = forms.CharField(widget=forms.Textarea)
     name = forms.CharField()

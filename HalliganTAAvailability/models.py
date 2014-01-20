@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 import datetime
 import pytz
 from HalliganAvailability import settings
-# Create your models here.
 
 
 class Student(models.Model):
@@ -31,7 +30,6 @@ admin.site.register(Course)
 class TA(models.Model):
     usr = models.OneToOneField(User)
     course = models.ManyToManyField(Course)
-    officeHours = models.TextField()
 
 admin.site.register(TA)
 
@@ -61,7 +59,6 @@ class Request(models.Model):
 
     def __str__(self):
         return self.student.usr.first_name + " - Comp " + str(self.course.Number)
-
 
 admin.site.register(Request)
 

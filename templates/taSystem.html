@@ -15,21 +15,17 @@
 
                         {% for rq in requestData %}
                             {% if forloop.first %}
-
                                 <li class="active" id="comp{{ rq.0.Number }}Nav">
                                     <a href="#comp{{ rq.0.Number }}" class="skip" gumby-update gumby-duration gumby-goto="[data-target='comp{{ rq.0.Number }}']">
                                         Comp {{ rq.0.Number }}
                                     </a>
                                 </li>
-
                             {% else %}
-
                                 <li id="comp{{ rq.0.Number }}Nav">
                                     <a href="#comp{{ rq.0.Number }}" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp{{ rq.0.Number }}']">
                                         Comp {{ rq.0.Number }}
                                     </a>
                                 </li>
-
                             {% endif %}
                         {% endfor %}
 
@@ -39,11 +35,10 @@
 
 
             <section class="thirteen columns " >
-
                 {% for rq in requestData %}
                 <div class="left-center" data-target="comp{{ rq.0.Number }}" id="comp{{ rq.0.Number }}">
                     <h2>Comp {{ rq.0.Number }} Queue</h2>
-                    <table class="striped rounded">
+                    <table class="striped rounded" id={{ rq.0.Number }}Table>
                         <thead>
                             <tr>
                                 <td>Name</td>
@@ -54,9 +49,7 @@
                             </tr>
                         </thead>
                         <tbody>
-
                         {% for r in rq.1 %}
-
                             {% if r.student.usr == request.user %}
                             <tr class="myRequest" >
                             {% else %}
@@ -69,22 +62,19 @@
                                 <td>
                                     {% if r.student.usr == request.user %}
                                         <div class="medium info btn">
-                                            <a href="#">Resolve</a>
+                                            <a href="#" class="resolveBtn" data-id="{{ r.pk }}">Resolve</a>
                                         </div>
                                     {% elif isTA %}
                                         <div class="medium info btn">
-                                            <a href="#">Resolve</a>
+                                            <a href="#" class="resolveBtn" data-id="{{ r.pk }}">Resolve</a>
                                         </div>
                                     {% endif %}
                                 </td>
                             </tr>
-
                         {% empty %}
-
                             <tr>
                                 <td colspan="5" class="text-center">There's nothing here!</td>
                             </tr>
-
                         {% endfor %}
                         </tbody>
                         <tfoot>
@@ -96,7 +86,6 @@
                                 </td>
                             </tr>
                         </tfoot>
-
                     </table>
                 </div>
                 {% endfor %}
@@ -110,4 +99,5 @@
 
 {% block endScripts %}
     <script src="{% static "js/ScrollingSideBar.js" %}"></script>
+    <script src="{% static "js/resolveRequest.js" %}"></script>
 {% endblock %}

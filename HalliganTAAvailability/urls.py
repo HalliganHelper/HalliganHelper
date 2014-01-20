@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^users$', 'HalliganTAAvailability.views.profile', name='userProfile'),
     url(r'^users/gethelp', 'HalliganTAAvailability.views.getHelp', name='getHelp'),
     url(r'^users/listRequests', 'HalliganTAAvailability.views.listRequests', name='listRequests'),
+    url(r'^users/resolveRequest', 'HalliganTAAvailability.views.resolveRequest', name='resolveRequest'),
 
     #url(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}),
 
