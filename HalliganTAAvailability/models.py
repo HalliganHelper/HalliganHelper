@@ -46,11 +46,13 @@ class Request(models.Model):
 
     def save(self, *args, **kwargs):
         est = pytz.timezone('US/Eastern')
-        self.whenAsked = datetime.datetime.now(est)
+        if self.pk is None:
+            self.whenAsked = datetime.datetime.now(est)
         super(Request, self).save(*args, **kwargs)
 
     def timeOut(self):
         self.timedOut = True
+        self.save()
 
     def resolutionTime(self):
         if not self.whenSolved:

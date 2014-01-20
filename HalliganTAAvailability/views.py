@@ -11,7 +11,9 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 import pytz, datetime
+from django.db.models import Q
 from HalliganAvailability import settings
+
 
 
 def _now():
@@ -87,11 +89,17 @@ def profile(request):
     data = {'student': student, 'rqs': rqs, 'ta': ta, 'taForm': taForm}
     return render(request, 'profile.html', data)
 
+
 @ensure_csrf_cookie
 def onlineQueue(request):
     tz = pytz.timezone(settings.TIME_ZONE)
     before = datetime.datetime.now(tz) - datetime.timedelta(hours=3)
-    
+
+    expiredReqs = Request.objects.filter(whenAsked__lt=before).filter(Q(timedOut=False))
+    for e in expiredReqs:
+        print e
+        e.timeOut()
+
     allReqs = Request.objects.filter(whenAsked__gte=before).order_by('whenAsked')
     courses = Course.objects.all().order_by('Number')
 
@@ -132,9 +140,6 @@ def resolveRequest(request):
 
     req = get_object_or_404(Request, pk=id)
 
-    print req.student
-    print student
-    print ta
     if req.student.pk != student.pk and not ta:
         return HttpResponse(status=401)
 
