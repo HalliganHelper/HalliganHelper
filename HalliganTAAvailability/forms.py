@@ -21,8 +21,9 @@ class TuftsEmail(RegistrationFormUniqueEmail):
     def clean_email(self):
         data = super(TuftsEmail, self).clean_email()
         domain = data.split('@')[1].lower()
+        print domain
         #TODO: Make this be 'if not in'
-        if domain != 'tufts.edu' or domain != 'cs.tufts.edu':
+        if domain != 'tufts.edu' and domain != 'cs.tufts.edu':
             raise forms.ValidationError("Only @tufts.edu email addresses are allowed.")
         return data
 

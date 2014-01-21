@@ -8,7 +8,7 @@ from django.core.cache import cache
 
 class Command(BaseCommand):
     args = 'none'
-    help = 'Add semesters labs from Bruce Molays online log'
+    help = 'Add semesters labs from Bruce Molay\'s online log'
 
     def handle(self, *args, **options):
         cache.delete('HOMEPAGE')
@@ -54,10 +54,6 @@ class Command(BaseCommand):
 
             StartTimeElement = datetime.time(StartHour, int(StartTime.split(':')[1]))
             EndTimeElement = datetime.time(EndHour, int(EndTime.split(':')[1]))
-
-
-            #print StartTimeElement, EndTimeElement
-            #print StartDate, EndDate
 
             def DayToInt(x):
                 return {
