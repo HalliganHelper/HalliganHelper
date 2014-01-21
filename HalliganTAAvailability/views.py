@@ -47,7 +47,7 @@ def getHelp(request):
         form = RequestForm(request.POST)
         if form.is_valid():
             rq = form.save(commit=False)
-            stu, create = Student.objects.get_or_create(usr=request.user)
+            stu, create = Student.objects.get_or_create(usr__id=request.user.id)
             rq.student = stu
             rq.save()
             return HttpResponseRedirect(reverse('taSystem'))
@@ -60,7 +60,7 @@ def getHelp(request):
 @login_required()
 def listRequests(request):
     try:
-        stu = Student.objects.get(usr=request.user)
+        stu = Student.objects.get(usr__id=request.user.id)
         rqs = stu.request_set.order_by('-whenAsked')
     except Student.DoesNotExist:
         rqs = None
@@ -110,7 +110,7 @@ def onlineQueue(request):
         insert = (course, reqs)
         requestData.append(insert)
 
-    isTA = TA.objects.filter(usr=request.user).exists()
+    isTA = TA.objects.filter(usr__id=request.user.id).exists()
 
     responseData = {
         'requestData': requestData,
@@ -124,9 +124,9 @@ def onlineQueue(request):
 @login_required()
 def resolveRequest(request):
     id = request.POST.get('requestID', None)
-    student = Student.objects.get(usr=request.user)
+    student = Student.objects.get(usr__id=request.user.id)
     try:
-        ta = TA.objects.get(usr=request.user)
+        ta = TA.objects.get(usr__id=request.user.id)
     except TA.DoesNotExist:
         ta = None
     if not id:
