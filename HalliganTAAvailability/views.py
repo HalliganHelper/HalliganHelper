@@ -15,7 +15,6 @@ from django.db.models import Q
 from HalliganAvailability import settings
 
 
-
 def _now():
     tz = pytz.timezone(settings.TIME_ZONE)
     now = datetime.datetime.now(tz)
@@ -64,11 +63,8 @@ def listRequests(request):
         rqs = stu.request_set.order_by('-whenAsked')
     except Student.DoesNotExist:
         rqs = None
-        #return render_to_response('listRequests.html')
 
-    #rqs = Request.objects.filter(student=stu).order_by('-whenAsked')
-    data = {'requests': rqs}
-    return render(request, 'listRequests.html', data)
+    return render(request, 'listRequests.html', {'requests': rqs})
 
 
 @login_required()
@@ -97,7 +93,6 @@ def onlineQueue(request):
 
     expiredReqs = Request.objects.filter(whenAsked__lt=before).filter(Q(timedOut=False))
     for e in expiredReqs:
-        print e
         e.timeOut()
 
     allReqs = Request.objects.filter(whenAsked__gte=before).order_by('whenAsked')
