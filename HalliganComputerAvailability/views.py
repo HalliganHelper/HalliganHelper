@@ -32,7 +32,7 @@ def AllComps(request):
         Comps = Computer.objects.all()
     except Computer.DoesNotExist:
         response['success'] = False
-        return HttpResponse(json.dumps(response, default=SerializeHandler), mimetype="application/json")
+        return HttpResponse(json.dumps(response, default=SerializeHandler), content_type="application/json")
 
     try:
         Labs = Lab.objects.all()
@@ -60,7 +60,7 @@ def AllComps(request):
             }
 
     response['success'] = True
-    return HttpResponse(json.dumps(response, default=SerializeHandler), mimetype="application/json")
+    return HttpResponse(json.dumps(response, default=SerializeHandler), content_type="application/json")
 
 
 
@@ -81,7 +81,7 @@ def labInformation(request):
             if lab.is_lab_coming_up() or lab.is_lab_in_session():
                 response.append(lab.for_response())
 
-        return HttpResponse(json.dumps(response), mimetype="application/json")
+        return HttpResponse(json.dumps(response), content_type="application/json")
 
 
     now = dt.datetime.now().date()
@@ -100,7 +100,7 @@ def labInformation(request):
 
     response.sort(key=operator.itemgetter('DayOfWeek_AsNum', 'StartTime', 'RoomNumber'))
 
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return HttpResponse(json.dumps(response), content_type="application/json")
 
 
 @require_GET
@@ -110,7 +110,7 @@ def SpecificRoom(request, RmNum):
     if Comps.count() is 0:
         response['success'] = False
 
-        return HttpResponse(json.dumps(response), mimetype="application/json")
+        return HttpResponse(json.dumps(response), content_type="application/json")
 
     Labs = Lab.objects.filter(RoomNumber=RmNum)
     Labs = list(Labs)
@@ -135,7 +135,7 @@ def SpecificRoom(request, RmNum):
     response['success'] = True
     response['classRoom'] = RmNum
 
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return HttpResponse(json.dumps(response), content_type="application/json")
 
 
 @require_GET
@@ -146,11 +146,11 @@ def SpecificMachine(request):
         Comps = Computer.objects.filter(pk__in=Machines)
     except Computer.DoesNotExist:
         response['success'] = False
-        return HttpResponse(json.dumps(response), mimetype="application/json")
+        return HttpResponse(json.dumps(response), content_type="application/json")
 
     if Comps.count() is 0:
         response['success'] = False
-        return HttpResponse(json.dumps(response), mimetype="application/json")
+        return HttpResponse(json.dumps(response), content_type="application/json")
 
     response['success'] = True
     response['machines'] = {}
@@ -158,7 +158,7 @@ def SpecificMachine(request):
     for c in Comps:
         response['machines'][c.ComputerNumber] = c.Status
 
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return HttpResponse(json.dumps(response), content_type="application/json")
 
 @require_POST
 @csrf_exempt
@@ -172,19 +172,19 @@ def UpdateStatus(request, MchID, NewStatus):
     if not AuthCode == 'OnlyTylerGetsAccessToThis':
         result['success'] = False
         result['error'] = 'You do not have the permissions to update machine status'
-        return HttpResponse(json.dumps(result), mimetype="application/json")
+        return HttpResponse(json.dumps(result), content_type="application/json")
 
     if NewStatus not in Computer.CHOICES:
         result['success'] = False
         result['error'] = 'Failure. You set status to ' + NewStatus + '. Use one of: ' + str(Computer.CHOICES)
-        return HttpResponse(json.dumps(result), mimetype="application/json")
+        return HttpResponse(json.dumps(result), content_type="application/json")
 
     try:
         RoomNum = int(MchID[3:6])
     except ValueError:
         result['success'] = False
         result['error'] = 'Failure. RoomNumber in incorrect form. Needs to be lab[num][letter]'
-        return HttpResponse(json.dumps(result), mimetype="application/json")
+        return HttpResponse(json.dumps(result), content_type="application/json")
 
     Comp, created = Computer.objects.get_or_create(pk=MchID, RoomNumber=RoomNum)
     Comp.Status = NewStatus
@@ -193,8 +193,42 @@ def UpdateStatus(request, MchID, NewStatus):
 
     result['success'] = True
     cache.delete("HOMEPAGE")
-    return HttpResponse(json.dumps(result), mimetype="application/json")
+    return HttpResponse(json.dumps(result), content_type="application/json")
 
+
+@require_POST
+@csrf_exempt
+def UpdateAllStatus(request):
+    #available, course, computer, user(Always 'None'), error#
+    data = json.loads(request.body)
+    #print data
+    for comp in data:
+        print comp
+        MchID = comp['computer'].lower()
+        RoomNum = int(MchID[3:6])
+        cmptr, created = Computer.objects.get_or_create(pk=MchID, RoomNumber=RoomNum)
+        if not comp['error']:
+            course = comp['course']
+            if course:
+                course = course.lower()
+            else:
+                course = None
+            available = comp['available']
+            if available:
+                status = 'AVAILABLE'
+            else:
+                status = 'INUSE'
+
+            cmptr.used_for = course
+            cmptr.Status = status
+            
+        else:
+            cmptr.Status = 'ERROR'
+            pass
+
+        cmptr.save()
+
+    return HttpResponse(status=200) 
 
 @require_POST
 @csrf_exempt
@@ -226,7 +260,7 @@ def GetRoomInfo(request):
     except RoomInfo.DoesNotExist:
         return HttpResponse(status=404)
 
-    return HttpResponse(data, mimetype="application/json")
+    return HttpResponse(data, content_type="application/json")
 
 
 
@@ -242,12 +276,12 @@ def UpdateServer(request, MchID, NewStatus, NumUsers):
     if not AuthCode == 'OnlyTylerGetsAccessToThis':
         result['success'] = False
         result['error'] = 'You do not have the permissions to update server status'
-        return HttpResponse(json.dumps(result), mimetype="application/json")
+        return HttpResponse(json.dumps(result), content_type="application/json")
 
     if NewStatus not in Server.CHOICES:
         result['success'] = False
         result['error'] = 'Failure, You set status to ' + NewStatus + '. Use one of: ' + str(Server.CHOICES)
-        return HttpResponse(json.dumps(result), mimetype="application/json")
+        return HttpResponse(json.dumps(result), content_type="application/json")
 
     try:
         Serv = Server.objects.get(ComputerName=MchID)
@@ -262,7 +296,7 @@ def UpdateServer(request, MchID, NewStatus, NumUsers):
     #ServInfo.save()
 
     result['success'] = True
-    return HttpResponse(json.dumps(result), mimetype="application/json")
+    return HttpResponse(json.dumps(result), content_type="application/json")
 
 @require_GET
 def ServerInfoView(request):
@@ -285,7 +319,7 @@ def ServerInfoView(request):
     jsonStr = jsonStr.replace('\\', '')
     jsonStr = jsonStr.replace('"[', '[')
     jsonStr = jsonStr.replace(']"', ']')
-    return HttpResponse(jsonStr, mimetype="application/json")
+    return HttpResponse(jsonStr, content_type="application/json")
 
 def HomePage(request):
 
@@ -377,7 +411,7 @@ def ServerList(request):
         print serv.LastUpdated.astimezone(tz.gettz('America/New_York'))
     response.sort(key=operator.itemgetter('ComputerName'))
 
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    return HttpResponse(json.dumps(response), content_type="application/json")
 
 
 def GridPage(request):

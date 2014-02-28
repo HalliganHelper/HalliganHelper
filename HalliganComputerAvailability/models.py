@@ -26,8 +26,10 @@ class Computer(models.Model):
     Status = models.CharField(max_length=9,
                               choices=STATUS_CHOICES,
                               default=AVAILABLE)
+    used_for = models.CharField(max_length=40, null=True)
     LastUpdate = models.DateTimeField(auto_now=True)
-
+    
+    #TODO: Foreign Key to computers in TA System?
 admin.site.register(Computer)
 
 
