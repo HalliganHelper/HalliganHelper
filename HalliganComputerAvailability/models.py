@@ -45,6 +45,11 @@ class RoomInfo(models.Model):
 admin.site.register(RoomInfo)
 
 
+class CourseUsageInfo(models.Model):
+    room = models.ForeignKey(RoomInfo)
+    course = models.CharField(max_length=20)
+    num_machines = models.IntegerField()
+
 class ComputerInfo(models.Model):
     OFF = 'OFF'
     INUSE = 'INUSE'
@@ -59,6 +64,10 @@ class ComputerInfo(models.Model):
         (AVAILABLE, 'Available'),
         (ERROR, 'Error')
     )
+    
+    def __init__(self, *args, **kwargs):
+        super(models.Model, self).__init__(*args, **kwargs)
+        print "\n\nDON'T ACTUALLY USE THIS MODEL: ComputerInfo\n\n"
 
     RoomNumber = models.IntegerField()
     ComputerNumber = models.CharField(max_length=7)
@@ -80,6 +89,7 @@ class Server(models.Model):
         (ON, 'On'),
         (ERROR, 'Error')
     )
+   
     ComputerName = models.CharField(max_length=20,
                                     primary_key=True)
     NumUsers = models.IntegerField()
@@ -178,7 +188,4 @@ class Lab(models.Model):
 admin.site.register(Lab)
 
 
-
-
-
-
+    
