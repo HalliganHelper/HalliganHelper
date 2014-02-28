@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block content %}
+
+    <div class="row">
+        {% if not requestData %}
+            <div class="row text-center">
+                Odd, looks like there isn't anything here yet. You should contact support!
+            </div>
+        {% endif %}
+        <div class="row">
+            <section class="three columns">
+                <nav id="sidebar-nav-holder" class="vertical-nav" gumby-fixed="top" gumby-pin="[data-target='{{ classes.last.Number }}']" >
+                    <ul id="sidebar-nav">
+
+                        {% for rq in requestData %}
+                            {% if forloop.first %}
+                                <li class="active" id="comp{{ rq.0.Number }}Nav">
+                                    <a href="#comp{{ rq.0.Number }}" class="skip" gumby-update gumby-duration gumby-goto="[data-target='comp{{ rq.0.Number }}']">
+                                        Comp {{ rq.0.Number }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li id="comp{{ rq.0.Number }}Nav">
+                                    <a href="#comp{{ rq.0.Number }}" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp{{ rq.0.Number }}']">
+                                        Comp {{ rq.0.Number }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                    </ul>
+                </nav>
+            </section>
+
+
+            <section class="thirteen columns " >
+                {% for rq in requestData %}
+                <div class="left-center" data-target="comp{{ rq.0.Number }}" id="comp{{ rq.0.Number }}">
+                    <h2>Comp {{ rq.0.Number }} Queue</h2>
+                    <table class="striped rounded" id={{ rq.0.Number }}Table>
+                        <thead>
+                            <tr>
+                                <td>Name</td>
+                                <td>Location</td>
+                                <td>Problem Description</td>
+                                <td>When Asked</td>
+                                <td>Resolve</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for r in rq.1 %}
+                            {% if r.student.usr == request.user %}
+                            <tr class="myRequest" >
+                            {% else %}
+                            <tr>
+                            {% endif %}
+                                <td>{{ r.student.usr.first_name }} {{ r.student.usr.last_name|first|capfirst}}.</td>
+                                <td>{{ r.whereLocated }}</td>
+                                <td wraptext>{{ r.question }}</td>
+                                <td>{{ r.whenAsked|date:"m/d P" }}</td>
+                                <td>
+                                    {% if r.student.usr == request.user %}
+                                        <div class="medium info btn">
+                                            <a href="#" class="resolveBtn" data-id="{{ r.pk }}">Resolve</a>
+                                        </div>
+                                    {% elif isTA %}
+                                        <div class="medium info btn">
+                                            <a href="#" class="resolveBtn" data-id="{{ r.pk }}">Resolve</a>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">There's nothing here!</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    <div class="medium primary btn">
+                                        <a href="{% url 'getHelp' %}">I Need Help</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                {% endfor %}
+            </section>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block endScripts %}
+    <script src="{% static "js/ScrollingSideBar.js" %}"></script>
+    <script src="{% static "js/resolveRequest.js" %}"></script>
+{% endblock %}

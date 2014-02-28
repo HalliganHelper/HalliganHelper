@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+    <form method="post" action=""> {% csrf_token %}
+
+        <div class="row">
+            <div class="field centered six columns {% if form.question.errors %}danger{% endif %}">
+                {% render_field form.question class="input textarea" type="text" placeholder="Briefly describe your problem" %}
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="field centered six columns {% if form.whereLocated.errors %}danger{% endif %}">
+                {% render_field form.whereLocated class="text input" type="text" placeholder="What computer are you at?" %}
+            </div>
+        </div>
+
+
+        {% if form.course.errors %}
+            <div class="row">
+                <div class="centered six columns">
+                    <li class="danger alert text-center">Don't forget to pick a class!</li>
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="picker centered six columns">
+                <select id="{{ form.course.auto_id }}" name="course">
+                    <option value="#" disabled >Which Class?</option>
+                    {% for choice in form.course.field.choices %}
+                        {% if forloop.first %}
+                            <option value="">Select a Class</option>
+                        {% else %}
+                            <option value="{{ choice.0 }}">{{ choice.1}}</option>
+                        {% endif %}
+
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="centered six columns text-center">
+                <div class="medium primary btn">
+                    <input type="submit" value="Submit"/>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}

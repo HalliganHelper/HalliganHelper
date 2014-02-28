@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html>
+<html class="metro">
 <head>
     <title>{% block title %}Halligan Helper{% endblock %}</title>
     {% load staticfiles %}
@@ -12,6 +12,7 @@
     <script src="{% static "Gumby/js/libs/jquery.mobile.custom.min.js"%} "></script>
     <link rel="stylesheet" href="{% static "Gumby/css/gumby.css" %}">
     <link rel="stylesheet" href="{% static "Gumby/css/style.css" %}">
+
     {% block header %}{% endblock %}
 </head>
 <body>
@@ -25,26 +26,68 @@
     ga('send', 'pageview');
 
     </script>
+    <nav id="main-navbar" class="navbar">
+        <div class="row">
+        <a class="toggle" gumby-trigger="#main-navbar #main-nav" href="#"><i class="icon-menu"></i></a>
+            <h1 class="four columns logo">
+                <a href="/">
+                    <img src="{% static "img/HalliganHelper_mainlogo.png" %}">
+                </a>
+            </h1>
 
-    <div class="row navbar pretty">
-        <h1 class="two columns logo">
-            <span class="Header"> HalliganHelper </span>
-        </h1>
-        <ul class="push_fifteen one columns">
-        {% comment %}
-        {% if request.user %}
-            <li><a href="#">{{ request.user.name }}</a></li>
-        {% else %}
-            <li><a href="#">Login</a></li>
-        {% endif %}
-        {% endcomment %}
-        </ul>
-    </div>
+            <nav class="four columns push_seven">
+                <ul id="main-nav">
+                        <li><a href="{% url 'taSystem' %}">TA Queue</a></li>
+                    {% if request.user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'userProfile' %}">{{ request.user.first_name }}</a>
+                            <div class="dropdown">
+                                <ul>
+                                    <li><a href="{% url 'getHelp' %}">Get Help</a></li>
+                                    <li><a href="{% url 'listRequests' %}">Past Requests</a></li>
+                                    <li><a href="{% url 'userProfile' %}">Profile</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li>
+                                    <a href="{% url 'auth_logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li><a href="{% url 'registration_register' %}">Register</a></li>
+                        <li><a href="{% url 'auth_login' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+        </div>
+    </nav>
     <div id="content">
         {% block content %}{% endblock %}
     </div>
 
     <script src="{% static "js/modernizer.js"%} "></script>
-    <script src="{% static "Gumby/js/libs/gumby.min.js" %}"></script>
+
+    {# Production Scripts #}
+    <script gumby-touch="{% static "Gumby/js/libs" %}" src="{% static "Gumby/js/libs/gumby.min.js" %}"></script>
+
+
+    {% comment %}
+    {# Dev Scripts #}
+    <script gumby-touch="Gumby/js/libs" src="{% static "Gumby/js/libs/gumby.min.js"%}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.retina.js"%}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.fixed.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.skiplink.js" %} "></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.toggleswitch.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.checkbox.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.radiobtn.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.tabs.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.navbar.js" %}"></script>
+    <script src="{% static "Gumby/js/libs/ui/gumby.fittext.js"%}"></script>
+    <script src="{% static "Gumby/js/libs/ui/jquery.validation.js"%}"></script>
+    <script src="{% static "Gumby/js/libs/gumby.init.js" %}"></script>
+    {% endcomment %}
+    {% block endScripts %}
+
+    {% endblock %}
 </body>
 </html>

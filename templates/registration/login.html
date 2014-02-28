@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="row text-center">
+    <form method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
+        <p class="field">
+            {% render_field form.username class="narrow text input" type="text" placeholder="Username" %}
+        </p>
+        <p class="field">
+            {% render_field form.password class="narrow input password" type="password" placeholder="Password"%}
+        </p>
+       
+        {% for error in form.non_field_errors %}
+            <p class="danger alert">
+                {{ error }}
+            </p>
+            
+        {% endfor %} 
+        
+        <p>
+            <div class="medium primary btn">
+                <input type="submit" value="Login"/>
+            </div>
+            <div class="medium secondary btn">
+                <a href="{% url 'auth_password_reset' %}">
+                    Forgot Password?
+                </a>
+            </div>
+        </p>
+    </form>
+</div>
+
+{% endblock %}

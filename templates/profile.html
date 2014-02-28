@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="centered ten columns text-center">
+            <h2>{{ student.usr.first_name }} {{ student.usr.last_name }}'s Profile</h2>
+        </div>
+    </div>
+    <div class="row">
+        <h4>Open Help Requests</h4>
+            <ul>
+            {% for i in rqs %}
+                {% if not i.solved %}
+                    <li>{{ i.whenAsked }} - {{ i.question }}</li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+
+            <h4>TA Profile</h4>
+            {% if ta %}
+            <h5>{{ ta.officeHours }}</h5>
+            {% endif %}
+    </div>
+
+
+    <div class="row">
+    <fieldset>
+    <legend>Test</legend>
+    </fieldset>
+        </div>
+
+        {{ taForm }}
+{% endblock %}

@@ -3,6 +3,10 @@ We highly recommend you use SASS and write your custom styles in sass/_custom.sc
 However, this blank file is available if you prefer
 */
 
+.myRequest {
+    background-color: greenyellow !important;
+}
+
 .Hidden {
     display: none;
 }
@@ -125,4 +129,131 @@ However, this blank file is available if you prefer
   fill: none;
   stroke: steelblue;
   stroke-width: 1.5px;
+}
+
+.onoffswitch {
+    position: relative; 
+    width: 90px;
+    -webkit-user-select:none; 
+    -moz-user-select:none; 
+    -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 0px;
+}
+.onoffswitch-inner {
+    width: 200%; margin-left: -100%;
+    -moz-transition: margin 0.3s ease-in 0s; 
+    -webkit-transition: margin 0.3s ease-in 0s;
+    -o-transition: margin 0.3s ease-in 0s; 
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    float: left; width: 50%; height: 30px; 
+    padding: 0; line-height: 30px;
+    font-size: 14px; color: white; 
+    font-weight: bold;
+    -moz-box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    box-sizing: border-box;
+}
+
+.onoffswitch-inner:before {
+    content: "YES";
+    padding-left: 10px;
+    background-color: #3085d6; color: #FFFFFF;
+}
+
+.onoffswitch-inner:after {
+    content: "NO";
+    padding-right: 10px;
+    background-color: #EEEEEE; color: #999999;
+    text-align: right;
+}
+.onoffswitch-switch {
+    width: 18px; margin: 6px;
+    background: #FFFFFF;
+    border: 2px solid #999999; border-radius: 0px;
+    position: absolute; top: 0; bottom: 0; right: 56px;
+    -moz-transition: all 0.3s ease-in 0s; 
+    -webkit-transition: all 0.3s ease-in 0s;
+    -o-transition: all 0.3s ease-in 0s; 
+    transition: all 0.3s ease-in 0s; 
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+        margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+        right: 0px; 
+}
+
+/*
+ul#sidebar-nav > li {
+    color: blue;
+
+}
+
+ul#sidebar-nav > li.active {
+    color: red;
+    background-color: #3085d6;
+}
+*/
+
+td {
+    word-wrap: break-word;
+}
+
+#inner-nav {
+  margin-bottom: 40px;
+}
+
+#sidebar-nav-holder.fixed {
+  top: 10px;
+}
+@media only screen and (max-width: 768px) {
+  #sidebar-nav-holder.fixed {
+    width: 100%;
+  }
+}
+
+#sidebar-nav-holder.end {
+  position: absolute;
+}
+
+#sidebar-nav {
+  text-align: left;
+}
+@media only screen and (max-width: 767px) {
+  #sidebar-nav {
+    margin-bottom: 30px;
+  }
+}
+
+#sidebar-nav li a {
+  background: none;
+  -webkit-transition: 0.4s;
+  -moz-transition: 0.4s;
+  -o-transition: 0.4s;
+  transition: 0.4s;
+}
+
+#sidebar-nav li.active a {
+  color: #fff;
+  background: #3085d6;
+}
+#sidebar-nav li.active a:hover {
+  background: #3085d6;
+}
+
+#sidebar-nav a {
+  color: #555555;
+  display: block;
+  padding: 8px 14px;
+}
+#sidebar-nav a:hover {
+  background: #E9E9E9;
 }
