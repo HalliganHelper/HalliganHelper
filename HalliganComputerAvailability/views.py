@@ -189,9 +189,6 @@ def UpdateStatus(request, MchID, NewStatus):
     Comp.Status = NewStatus
     Comp.save()
 
-    #CompInfo = ComputerInfo(ComputerNumber=MchID, ComputerStatus=NewStatus, RoomNumber=RoomNum)
-    #CompInfo.save()
-
 
     result['success'] = True
     cache.delete("HOMEPAGE")
