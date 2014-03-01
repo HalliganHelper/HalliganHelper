@@ -2,6 +2,14 @@ from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from HalliganComputerAvailability import urls as ComputerURLS
 from HalliganTAAvailability import urls as TAURLS
+from tastypie.api import Api
+from HalliganComputerAvailability.api import CourseUsageInfoResource, RoomInfoResource
+
+v1_api = Api(api_name='v2')
+v1_api.register(CourseUsageInfoResource())
+v1_api.register(RoomInfoResource())
+
+
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -18,6 +26,7 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('HalliganComputerAvailability.urls')),
+    url(r'^api/', include(v1_api.urls)),
     url(r'^', include('HalliganTAAvailability.urls')),
     #url(r'^$', 'HalliganComputerAvailability.views.HomePage'),
     url(r'^$', 'HalliganComputerAvailability.views.ModularHomePage', name='ModularHomePage'),

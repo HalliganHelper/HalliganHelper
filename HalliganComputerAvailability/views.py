@@ -4,6 +4,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response, render
 from models import Lab, Computer, Server, ServerInfo, ComputerInfo, RoomInfo
+from models import CourseUsageInfo
 import json
 from django.core.cache import cache
 from django.core import serializers
@@ -11,6 +12,7 @@ from django.template import RequestContext
 import operator
 from dateutil import tz
 import datetime as dt
+from collections import defaultdict
 
 def ApiDocs(request):
     return render_to_response('ApiDocs.html')
@@ -202,8 +204,12 @@ def UpdateAllStatus(request):
     #available, course, computer, user(Always 'None'), error#
     data = json.loads(request.body)
     #print data
+   
+    room_data = defaultdict(lambda: defaultdict(int))
+    room_available_info = defaultdict(lambda: defaultdict(int))
+     
     for comp in data:
-        print comp
+    #    print comp
         MchID = comp['computer'].lower()
         RoomNum = int(MchID[3:6])
         cmptr, created = Computer.objects.get_or_create(pk=MchID, RoomNumber=RoomNum)
@@ -213,20 +219,52 @@ def UpdateAllStatus(request):
                 course = course.lower()
             else:
                 course = None
+            
+
             available = comp['available']
             if available:
                 status = 'AVAILABLE'
+                room_available_info['lab' + str(RoomNum)]['available'] += 1
             else:
                 status = 'INUSE'
+                room_available_info['lab' + str(RoomNum)]['unavailable'] += 1
 
             cmptr.used_for = course
             cmptr.Status = status
+            #Deal with collecting course information
+            #if RoomNum not in room_data:
+#            room_data['lab' + str(RoomNum)] = defaultdict(int)
+            
+            room_data['lab' + str(RoomNum)][course] += 1
             
         else:
             cmptr.Status = 'ERROR'
-            pass
+            room_available_info['lab' + str(RoomNum)]['error'] += 1
 
         cmptr.save()
+    print "Room Data".upper()
+    print room_data
+    print '*'*80
+    print "Room Available Info".upper()
+    print room_available_info
+
+    for room, availability in room_available_info.iteritems():
+        rm_info = RoomInfo()
+        rm_info.lab = room
+        rm_info.numReporting = sum(availability.values())
+        rm_info.num_available = availability['available']
+        rm_info.num_unavailable = availability['unavailable']
+        rm_info.num_error = availability['error']
+        rm_info.save()
+
+        for course, count in room_data[room].iteritems():
+            print course
+            c_u_i = CourseUsageInfo()
+            c_u_i.room = rm_info
+            c_u_i.course = course
+            c_u_i.num_machines = count
+            c_u_i.save()
+
 
     return HttpResponse(status=200) 
 
@@ -255,7 +293,7 @@ def GetRoomInfo(request):
         labs = RoomInfo.objects.filter(lab=labName)
         if not labs.exists():
             return HttpResponse(status=404)
-        data = serializers.serialize('json', labs, fields=('lab', 'numReporting', 'avgCpu', 'updateTime'))
+        data = serializers.serialize('json', labs, fields=('lab', 'numReporting', 'updateTime', 'num_available', 'num_unavailable', 'num_error', 'courseusageinfo'))
 
     except RoomInfo.DoesNotExist:
         return HttpResponse(status=404)

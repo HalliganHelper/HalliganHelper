@@ -3,8 +3,15 @@ from datetime import datetime
 import datetime as dt
 from django.utils import timezone
 from django.contrib import admin
+import pytz
+from django.conf import settings
 
 # Create your models here.
+
+def _now():
+    tz = pytz.timezone(settings.TIME_ZONE)
+    now = dt.datetime.now(tz=tz)
+    return now
 
 class Computer(models.Model):
     OFF = 'OFF'
@@ -36,22 +43,35 @@ admin.site.register(Computer)
 class RoomInfo(models.Model):
     lab = models.CharField(max_length=10)
     numReporting = models.IntegerField()
-    avgCpu = models.FloatField()
+    num_available = models.IntegerField()
+    num_unavailable = models.IntegerField()
+    num_error = models.IntegerField()
+
     updateTime = models.DateTimeField()
 
     def save(self, *args, **kwargs):
-        self.updateTime = timezone.make_aware(dt.datetime.now(), timezone.get_default_timezone())
+        self.updateTime = _now() 
         return super(RoomInfo, self).save(*args, **kwargs)
 
-
+    def __str__(self):
+        return '{5}: {0} has {1} machine(s) reporting: {2} available {3} unavailable and {4} broken'.format(self.lab, self.numReporting, self.num_available, self.num_unavailable, self.num_error, self.updateTime)
 admin.site.register(RoomInfo)
 
 
 class CourseUsageInfo(models.Model):
-    room = models.ForeignKey(RoomInfo)
+    room = models.ForeignKey(RoomInfo, related_name='cuis')
     course = models.CharField(max_length=20)
     num_machines = models.IntegerField()
-
+    
+    def save(self, *args, **kwargs):
+        if self.course is None:
+            self.course = 'Other'
+        return super(CourseUsageInfo, self).save(*args, **kwargs)
+    
+    def __str__(self):
+        return "{0} has {1} machine(s) in room {2}".format(self.course,
+                                                        self.num_machines,
+                                                        self.room.lab)
 class ComputerInfo(models.Model):
     OFF = 'OFF'
     INUSE = 'INUSE'
