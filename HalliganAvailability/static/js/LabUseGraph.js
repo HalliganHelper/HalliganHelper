@@ -2,19 +2,22 @@ var plots = [];
 
 function LabUseGraph(lab){
     $.get('/api/getRoomInfo', {'lab': lab}, function(data){
-        var inUse = [];
+        var reporting = [];
+        var unavailable = [];
+        var available = [];
+        var error = [];
+
         if (data.length < 1){
             return;
         }
         for(var i in data){
             var time = py2jsDate(data[i].fields.updateTime);
-            /* TODO this is a total horseshit way of doing timezones */
-            var hr = time.getHours();
-            time.setHours(hr - 4);
-            /* TODO end of horseshit */
-            inUse.push([time, data[i].fields.numReporting]);
+            reporting.push([time, data[i].fields.numReporting]);
+            unavailable.push([time, data[i].fields.num_unavailable]);
+            available.push([time, data[i].fields.num_available]);
+            error.push([time, data[i].fields.num_error]);
         }
-        var plot = $.jqplot(lab + '_graph', [inUse],
+        var plot = $.jqplot(lab + '_graph', [unavailable],
             {
                 title: 'Use Over Time',
                 height: 300,
@@ -44,7 +47,7 @@ function LabUseGraph(lab){
                 cursor: {
                     show: true,
                     zoom: true,
-                    showTooltip: false
+                    showTooltip: true
                 },
                 series: [
                     {

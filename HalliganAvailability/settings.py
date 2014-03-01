@@ -4,9 +4,10 @@ import os
 DEBUG = False
 try:
     os.environ['ON_HEROKU']
+    print "On Prod Server, debug mode is OFF"
     DEBUG = False
 except KeyError:
-    print "KEYERROR"
+    print "On Dev Server, Debug mode is ON"
     DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
@@ -143,7 +144,9 @@ INSTALLED_APPS = (
     'south',
     'registration',
     'widget_tweaks',
-    'django_extensions'
+    'django_extensions',
+    'tastypie'
+
 )
 
 
