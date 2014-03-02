@@ -29,6 +29,11 @@
                         Servers
                     </a>
                 </li>
+                <li>
+                    <a href="#">
+                        Graphs
+                    </a>
+                </li>
             </ul>
             {% for room in Rooms %}
                 {% if forloop.first %}
@@ -77,6 +82,9 @@
             <div class="tab-content">
                 <div id="ServerContainer"></div>
             </div>
+            <div class="tab-content">
+                <div id="GraphContainer"></div>
+            </div>
         </section>
     </div>
     {% include "footer.html" %}
@@ -91,6 +99,7 @@
     <script src="{% static "js/jqplot/jqplot.pointLabels.min.js" %}"></script>
     <script src="{% static "js/jqplot/jqplot.cursor.min.js" %}"></script>
     <script src="{% static "js/jqplot/jqplot.canvasAxisTickRenderer.min.js" %}"></script>
+    <script src="{% static "js/jqplot/jqplot.json2.min.js" %}"></script>
     <script src="{% static "js/pyDate2jsDate.js" %}"></script>
     <script src="{% static "js/LabUseGraph.js" %}"></script>
     <script src="{% static "js/GetComputerInfo.js" %}"></script>

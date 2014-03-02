@@ -212,6 +212,7 @@ def UpdateAllStatus(request):
     #    print comp
         MchID = comp['computer'].lower()
         RoomNum = int(MchID[3:6])
+        room_key = 'lab' + str(RoomNum)
         cmptr, created = Computer.objects.get_or_create(pk=MchID, RoomNumber=RoomNum)
         if not comp['error']:
             course = comp['course']
@@ -224,10 +225,10 @@ def UpdateAllStatus(request):
             available = comp['available']
             if available:
                 status = 'AVAILABLE'
-                room_available_info['lab' + str(RoomNum)]['available'] += 1
+                room_available_info[room_key]['available'] += 1
             else:
                 status = 'INUSE'
-                room_available_info['lab' + str(RoomNum)]['unavailable'] += 1
+                room_available_info[room_key]['unavailable'] += 1
 
             cmptr.used_for = course
             cmptr.Status = status
@@ -235,18 +236,19 @@ def UpdateAllStatus(request):
             #if RoomNum not in room_data:
 #            room_data['lab' + str(RoomNum)] = defaultdict(int)
             
-            room_data['lab' + str(RoomNum)][course] += 1
+            room_data[room_key][course] += 1
             
         else:
             cmptr.Status = 'ERROR'
-            room_available_info['lab' + str(RoomNum)]['error'] += 1
+            room_available_info[room_key]['error'] += 1
+            room_data[room_key]['error'] += 1
 
         cmptr.save()
-    print "Room Data".upper()
-    print room_data
-    print '*'*80
-    print "Room Available Info".upper()
-    print room_available_info
+#    print "Room Data".upper()
+#    print room_data
+#    print '*'*80
+#    print "Room Available Info".upper()
+#    print room_available_info
 
     for room, availability in room_available_info.iteritems():
         rm_info = RoomInfo()
