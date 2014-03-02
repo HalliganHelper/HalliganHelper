@@ -19,7 +19,7 @@ class RoomInfoResource(ModelResource):
             param = bundle.request.GET['room']
             full_query = full_query.filter(lab=param)
    
-        return full_query.order_by('-updateTime')
+        return full_query.order_by('updateTime')
 
 class CourseUsageInfoResource(ModelResource):
     room = fields.ToOneField(RoomInfoResource, 'room')
