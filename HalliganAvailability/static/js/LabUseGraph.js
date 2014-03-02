@@ -18,7 +18,8 @@ function CreateGraph(where, room) {
             c105 = [], other=[];
         for (var i in ret) {
             var obj = ret[i];
-            ticks.push([i, obj.updateTime]);
+//            ticks.push([i, obj.updateTime]);
+            ticks.push(py2jsDate(obj.updateTime));
             var appended = [false, false, false, false, false, false, false];
             for (var indx in obj.cuis) {
                 var cui = obj.cuis[indx];
@@ -91,6 +92,9 @@ function CreateGraph(where, room) {
             unusedOptionalUrl: jsonurl
         },
         stackSeries: true,
+        seriesDefaults: {
+            fill: true
+        },
         series: [
             {label: 'Comp 11'},
             {label: 'Comp 15'},
@@ -102,14 +106,28 @@ function CreateGraph(where, room) {
         ],
         legend: {
             show: true,
-            location: 'e',
-            placement: 'outside'
+            renderer: $.jqplot.EnhancedLegendRenderer,
+            rendererOptions: {
+                numberRows: 1
+            },
+            location: 's',
+            placement: 'outsideGrid'
         },
         axes: {
-       /*     xaxis: {
+        /*
+            xaxis: {
+                renderer: $.jqplot.DateAxisRenderer,
+                tickOptions: {
+                    formatString: '%b %#d, %y'
+                },
+                min: 'March 1, 2014',
+                tickInterval: '1 month',
                 ticks: ticks
-            }
+            },
         */
+            yaxis: {
+                min: 0
+            }
         }
 
     });
@@ -121,7 +139,12 @@ $(document).ready(function(){
 /* Gumby tab onchange event */
     $('#tabs').on('gumby.onChange', function(e, index) {
         if (index == 5) {
-            CreateGraph('GraphContainer', 116);
+            $('#116Graph').empty();
+            CreateGraph('116Graph', 116);
+            $('#118Graph').empty();
+            CreateGraph('118Graph', 118);
+            $('#120Graph').empty();
+            CreateGraph('120Graph', 120);
         }
     });
 
