@@ -108,7 +108,7 @@ function CreateGraph(where, room) {
             show: true,
             renderer: $.jqplot.EnhancedLegendRenderer,
             rendererOptions: {
-                numberRows: 1
+                numberRows: 2
             },
             location: 's',
             placement: 'outsideGrid'
