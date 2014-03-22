@@ -100,4 +100,3 @@ socket.on("message", function(obj) {
     }
 });
 
-socket.emit("remove", {'hi': 'stuff'});

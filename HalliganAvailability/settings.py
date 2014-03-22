@@ -269,6 +269,10 @@ LOGGING = {
         'HalliganTAAvailability.views': {
             'handlers': ['console'],
             'level': 'DEBUG'
+        },
+        'sockets': {
+            'handlers' : ['console'],
+            'level': 'DEBUG'
         }
     }
 }

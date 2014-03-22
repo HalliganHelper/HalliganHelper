@@ -18,7 +18,7 @@ from socketio.namespace import BaseNamespace
 from socketio import socketio_manage
 
 logger = logging.getLogger(__name__)
-
+socket_logger = logging.getLogger('sockets')
 def _now():
     tz = pytz.timezone(settings.TIME_ZONE)
     now = datetime.datetime.now(tz)
@@ -58,7 +58,7 @@ def getHelp(request, course=None):
                 'name': '{0} {1}'.format(stu.usr.first_name, stu.usr.last_name[0].upper()),
                 'location': rq.whereLocated,
                 'problem': rq.question,
-                'when': rq.whenAsked.strftime('%d/%m %I:%M %p'),
+                'when': rq.whenAsked.strftime('%m/%d %I:%M %p'),
                 'course': rq.course.Number,
                 'type': 'add'
             }
@@ -172,15 +172,16 @@ class QueueNamespace(BaseNamespace):
     
     def initialize(self, *args, **kwargs):
         self._connections[id(self)] = self
+        socket_logger.debug("Adding socket with ID {}".format(id(self)))
         super(QueueNamespace, self).initialize(*args, **kwargs)
         
     def disconnect(self, *args, **kwargs):
         del self._connections[id(self)]
+        socket_logger.debug("Deleting socket with ID {}".format(id(self)))
         super(QueueNamespace, self).disconnect(*args, **kwargs)
                  
     def on_remove(self, packet):
         logger.debug(packet)
-        logger.debug('Hello look over here hello hello'.upper())
         self.send({'message': 'Goodbye!'}, json=True)
    
     @staticmethod
