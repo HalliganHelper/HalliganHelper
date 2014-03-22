@@ -28,17 +28,12 @@
     </script>
     <nav id="main-navbar" class="navbar">
         <div class="row">
-{% comment %}
-TODO: Uncomment this when ready for menu items
         <a class="toggle" gumby-trigger="#main-navbar #main-nav" href="#"><i class="icon-menu"></i></a>
-{% endcomment %}
             <h1 class="four columns logo">
                 <a href="/">
                     <img src="{% static "img/HalliganHelper_mainlogo.png" %}">
                 </a>
             </h1>
-{% comment %}
-TODO: Uncomment this when ready for menu items
             <nav class="four columns push_seven">
                 <ul id="main-nav">
                         <li><a href="{% url 'taSystem' %}">TA Queue</a></li>
@@ -62,7 +57,6 @@ TODO: Uncomment this when ready for menu items
                     {% endif %}
                 </ul>
             </nav>
-{% endcomment %}
         </div>
     </nav>
     <div id="content">

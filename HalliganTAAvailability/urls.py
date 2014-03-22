@@ -6,15 +6,15 @@ from views import TuftsRegistrationView
 
 
 
-urlpatterns = patterns('',
+urlpatterns = patterns('HalliganTAAvailability.views',
     url(r'^accounts/register/$', TuftsRegistrationView.as_view()),
-#    url(r'^accounts/login/$', 'HalliganTAAvailability.views.login', name='login'),
     url(r'^accounts/', include('registration.backends.default.urls')),
-    url(r'^taSystem$', 'HalliganTAAvailability.views.onlineQueue', name='taSystem'),
-    url(r'^users$', 'HalliganTAAvailability.views.profile', name='userProfile'),
-    url(r'^users/gethelp', 'HalliganTAAvailability.views.getHelp', name='getHelp'),
-    url(r'^users/listRequests', 'HalliganTAAvailability.views.listRequests', name='listRequests'),
-    url(r'^users/resolveRequest', 'HalliganTAAvailability.views.resolveRequest', name='resolveRequest'),
+    url(r'^taSystem$', 'onlineQueue', name='taSystem'),
+    url(r'^users$', 'profile', name='userProfile'),
+    url(r'^users/gethelp$', 'getHelp', name='getHelp'),
+    url(r'^users/listRequests', 'listRequests', name='listRequests'),
+    url(r'^users/resolveRequest', 'resolveRequest', name='resolveRequest'),
+    url(r'^socket\.io', 'socketio', name='socketio'), 
 
     #url(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}),
 

@@ -45,13 +45,59 @@ $.ajaxSetup({
     }
 });
 
+function remove_row(rq_id) {
+    var el = $("[data-rqID='" + rq_id + "']");
+    var tbl = $(el[0]).parent();
+    
+    $(el).remove();
+    if ($(tbl).prop('rows').length == 0) {
+        var tdstr = "<td colspan='5' class='text-center'>There's nothing here!</td>";
+        var my_row = $('<tr data-empty="true">' + tdstr + '</tr>');
+        $(tbl).append($(my_row));
+    }
+}
+
+function add_row(obj) {
+    var nm_td = "<td>" + obj.name + "</td>";
+    var lo_td = "<td>" + obj.location + "</td>";
+    var pr_td = "<td>" + obj.problem + "</td>";
+    var wh_td = "<td>" + obj.when + "</td>";
+    var re_td = "<td></td>";
+    var new_row = $("<tr></tr>").append($(nm_td)).append($(lo_td));
+    $(new_row).append($(pr_td)).append($(wh_td)).append($(re_td));
+
+    var tbdy = $('#' + obj.course + 'Table > tbody');
+    $(tbdy).children().each(function(){
+        if( $(this).data('empty') == true ) {
+            $(this).remove();
+        }
+    });
+    $(tbdy).append($(new_row));
+}
+
 $(function resolve(){
     $('.resolveBtn').click(function(e){
+        e.preventDefault();
+        var btn = $(this);
         var id = $(this).data('id');
         var tableID = $(this).parents('table').attr('id');
-        $.post('users/resolveRequest', {'requestID': id}, function(data){
-            window.location.hash = '#' + tableID;
-            window.location.reload();
+        var jqxhr = $.post('users/resolveRequest', {'requestID': id}, function(data){
+        })
+        .fail(function() {
+            $(btn).text('Failed?');
+            console.log('Failed to resolve request');
         });
     })
 })
+socket = io.connect('/taqueue');
+
+socket.on("message", function(obj) {
+    switch (obj.type){
+        case 'resolve':
+            remove_row(obj.rq);
+        case 'add':
+            add_row(obj);
+    }
+});
+
+socket.emit("remove", {'hi': 'stuff'});

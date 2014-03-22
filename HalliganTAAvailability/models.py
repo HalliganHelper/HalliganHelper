@@ -43,7 +43,7 @@ class Request(models.Model):
     solved = models.BooleanField(default=False)
     whenSolved = models.DateTimeField(blank=True, null=True)
     timedOut = models.BooleanField(default=False)
-
+    emailed = models.BooleanField(default=False)
     def save(self, *args, **kwargs):
         est = pytz.timezone('US/Eastern')
         if self.pk is None:

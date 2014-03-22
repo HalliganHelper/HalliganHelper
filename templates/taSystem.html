@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% block header %}
+<script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js"></script>
+{% endblock %}
+
+
 {% block content %}
 
     <div class="row">
@@ -51,9 +56,9 @@
                         <tbody>
                         {% for r in rq.1 %}
                             {% if r.student.usr == request.user %}
-                            <tr class="myRequest" >
+                            <tr class="myRequest" data-rqID='{{ r.id }}'>
                             {% else %}
-                            <tr>
+                            <tr data-rqID="{{ r.id }}">
                             {% endif %}
                                 <td>{{ r.student.usr.first_name }} {{ r.student.usr.last_name|first|capfirst}}.</td>
                                 <td>{{ r.whereLocated }}</td>
@@ -72,7 +77,7 @@
                                 </td>
                             </tr>
                         {% empty %}
-                            <tr>
+                            <tr data-empty="true">
                                 <td colspan="5" class="text-center">There's nothing here!</td>
                             </tr>
                         {% endfor %}

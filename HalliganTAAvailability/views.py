@@ -11,9 +11,13 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 import pytz, datetime
+import logging
 from django.db.models import Q
 from HalliganAvailability import settings
+from socketio.namespace import BaseNamespace
+from socketio import socketio_manage
 
+logger = logging.getLogger(__name__)
 
 def _now():
     tz = pytz.timezone(settings.TIME_ZONE)
@@ -41,17 +45,31 @@ def courseList(request):
 
 
 @login_required
-def getHelp(request):
+def getHelp(request, course=None):
     if request.method == 'POST':
         form = RequestForm(request.POST)
         if form.is_valid():
             rq = form.save(commit=False)
             stu, create = Student.objects.get_or_create(usr__id=request.user.id)
             rq.student = stu
+            rq.emailed = False
             rq.save()
+            d = {
+                'name': '{0} {1}'.format(stu.usr.first_name, stu.usr.last_name[0].upper()),
+                'location': rq.whereLocated,
+                'problem': rq.question,
+                'when': rq.whenAsked.strftime('%d/%m %I:%M %p'),
+                'course': rq.course.Number,
+                'type': 'add'
+            }
+            QueueNamespace.emit(d, json=True)
             return HttpResponseRedirect(reverse('taSystem'))
     else:
-        form = RequestForm()
+        logger.debug(course)
+        if course is not None:
+            form = RequestForm(init_course=course)
+        else:
+            form = RequestForm()
 
     data = {'form': form}
     return render(request, 'getHelp.html', data)
@@ -118,22 +136,22 @@ def onlineQueue(request):
 @require_POST
 @login_required()
 def resolveRequest(request):
-    id = request.POST.get('requestID', None)
+    rq_id = request.POST.get('requestID', None)
     student = Student.objects.get(usr__id=request.user.id)
     try:
         ta = TA.objects.get(usr__id=request.user.id)
     except TA.DoesNotExist:
         ta = None
-    if not id:
+    if not rq_id:
         #TODO: add error message
         return HttpResponse(status=400)
     try:
-        id = int(id)
+        rq_id = int(rq_id)
     except ValueError:
         #TODO: add error message
         return HttpResponse(status=400)
 
-    req = get_object_or_404(Request, pk=id)
+    req = get_object_or_404(Request, pk=rq_id)
 
     if req.student.pk != student.pk and not ta:
         return HttpResponse(status=401)
@@ -142,7 +160,46 @@ def resolveRequest(request):
     req.whenSolved = _now()
     req.timedOut = False
     req.save()
-
+    QueueNamespace.emit({'type': 'resolve', 'rq': rq_id}, json=True)
     return HttpResponse(status=200)
 
+############################################################################
+##             Socketio Stuff
+############################################################################
+
+class QueueNamespace(BaseNamespace):
+    _connections = {}
+    
+    def initialize(self, *args, **kwargs):
+        self._connections[id(self)] = self
+        super(QueueNamespace, self).initialize(*args, **kwargs)
+        
+    def disconnect(self, *args, **kwargs):
+        del self._connections[id(self)]
+        super(QueueNamespace, self).disconnect(*args, **kwargs)
+                 
+    def on_remove(self, packet):
+        logger.debug(packet)
+        logger.debug('Hello look over here hello hello'.upper())
+        self.send({'message': 'Goodbye!'}, json=True)
+   
+    @staticmethod
+    def emit(msg, json=True):
+        for connection_id, connection in QueueNamespace._connections.items():
+            logger.debug("Sending {0} to {1} with id {2}".format(msg, connection, connection_id))
+            connection.send(msg, json)
+   
+    
+def socketio(request):
+    try:
+        socketio_manage(request.environ, 
+                        {
+                            '/taqueue': QueueNamespace,
+                        }, 
+                        request=request
+        )
+    except:
+        logger.error("Exception while handling sockets")
+
+    return HttpResponse()
 
