@@ -50,10 +50,14 @@ function remove_row(rq_id) {
     var tbl = $(el[0]).parent();
     
     $(el).remove();
-    if ($(tbl).prop('rows').length == 0) {
-        var tdstr = "<td colspan='5' class='text-center'>There's nothing here!</td>";
-        var my_row = $('<tr data-empty="true">' + tdstr + '</tr>');
-        $(tbl).append($(my_row));
+    try {
+        if ($(tbl).prop('rows').length == 0) {
+            var tdstr = "<td colspan='5' class='text-center'>There's nothing here!</td>";
+            var my_row = $('<tr data-empty="true">' + tdstr + '</tr>');
+            $(tbl).append($(my_row));
+        }
+    } catch (e) {
+        console.log("Couldn't find any rows");
     }
 }
 
