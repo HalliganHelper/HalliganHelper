@@ -1,0 +1,82 @@
+[
+{
+    "pk": 1, 
+    "model": "HalliganTAAvailability.course", 
+    "fields": {
+        "students": null, 
+        "Professor": "Mark Sheldon", 
+        "Name": "Intro to Computer Science", 
+        "Number": 11
+    }
+},
+{
+    "pk": 2, 
+    "model": "HalliganTAAvailability.course", 
+    "fields": {
+        "students": null, 
+        "Professor": "Chris Gregg", 
+        "Name": "Data Structures", 
+        "Number": 15
+    }
+},
+{
+    "pk": 3, 
+    "model": "HalliganTAAvailability.course", 
+    "fields": {
+        "students": null, 
+        "Professor": "Ming Chow", 
+        "Name": "Web Programming", 
+        "Number": 20
+    }
+},
+{
+    "pk": 4, 
+    "model": "HalliganTAAvailability.course", 
+    "fields": {
+        "students": null, 
+        "Professor": "Ming Chow", 
+        "Name": "Game Development", 
+        "Number": 23
+    }
+},
+{
+    "pk": 5, 
+    "model": "HalliganTAAvailability.course", 
+    "fields": {
+        "students": null, 
+        "Professor": "Noah Mendelsohn", 
+        "Name": "Machine Structure & Assembly Language", 
+        "Number": 40
+    }
+},
+{
+    "pk": 6, 
+    "model": "HalliganTAAvailability.course", 
+    "fields": {
+        "students": null, 
+        "Professor": "Sam Guyer", 
+        "Name": "Programming Languages", 
+        "Number": 105
+    }
+},
+{
+    "pk": 7, 
+    "model": "HalliganTAAvailability.course", 
+    "fields": {
+        "students": null, 
+        "Professor": "Anselm Blumer", 
+        "Name": "Algorithms", 
+        "Number": 160
+    }
+},
+{
+    "pk": 8, 
+    "model": "HalliganTAAvailability.course", 
+    "fields": {
+        "students": null, 
+        "Professor": "Ben Hescott", 
+        "Name": "Computational Theory", 
+        "Number": 170
+    }
+}
+]
