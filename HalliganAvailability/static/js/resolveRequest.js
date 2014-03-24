@@ -93,7 +93,7 @@ $(function resolve(){
         });
     })
 })
-socket = io.connect('/taqueue');
+socket = io.connect('/taqueue', {transports: ['xhr-polling']});
 
 socket.on("message", function(obj) {
     switch (obj.type){
