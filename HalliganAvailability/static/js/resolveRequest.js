@@ -50,15 +50,15 @@ function remove_row(rq_id) {
     var tbl = $(el[0]).parent();
     
     $(el).remove();
-    try {
+//    try {
         if ($(tbl).prop('rows').length == 0) {
             var tdstr = "<td colspan='5' class='text-center'>There's nothing here!</td>";
             var my_row = $('<tr data-empty="true">' + tdstr + '</tr>');
             $(tbl).append($(my_row));
         }
-    } catch (e) {
-        console.log("Couldn't find any rows");
-    }
+//    } catch (e) {
+//        console.log("Couldn't find any rows");
+//    }
 }
 
 function add_row(obj) {
@@ -67,7 +67,7 @@ function add_row(obj) {
     var pr_td = "<td>" + obj.problem + "</td>";
     var wh_td = "<td>" + obj.when + "</td>";
     var re_td = "<td></td>";
-    var new_row = $("<tr></tr>").append($(nm_td)).append($(lo_td));
+    var new_row = $("<tr data-rqID='" + obj.pk + "'></tr>").append($(nm_td)).append($(lo_td));
     $(new_row).append($(pr_td)).append($(wh_td)).append($(re_td));
 
     var tbdy = $('#' + obj.course + 'Table > tbody');

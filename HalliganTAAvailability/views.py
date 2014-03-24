@@ -55,6 +55,7 @@ def getHelp(request, course=None):
             rq.emailed = False
             rq.save()
             d = {
+                'pk': rq.pk,
                 'name': '{0} {1}'.format(stu.usr.first_name, stu.usr.last_name[0].upper()),
                 'location': rq.whereLocated,
                 'problem': rq.question,
