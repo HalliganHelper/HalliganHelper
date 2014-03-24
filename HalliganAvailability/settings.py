@@ -127,6 +127,7 @@ WSGI_APPLICATION = 'HalliganAvailability.wsgi.application'
 
 import os
 TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), '..', 'templates').replace('\\','/'),)
+TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
