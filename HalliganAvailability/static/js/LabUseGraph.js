@@ -16,40 +16,44 @@ function CreateGraph(where, room) {
 
         var c11 = [], c15 = [], c40 = [], c20 = [], c23 = [],
             c105 = [], other=[];
+
+        var FirstTime = py2jsDate(ret[0].updateTime).toString();
         for (var i in ret) {
             var obj = ret[i];
 //            ticks.push([i, obj.updateTime]);
             ticks.push(py2jsDate(obj.updateTime));
+            var t = (py2jsDate(obj.updateTime)).toString();
+            console.log("Time is: " + t)
             var appended = [false, false, false, false, false, false, false];
             for (var indx in obj.cuis) {
                 var cui = obj.cuis[indx];
                 switch (cui.course) {
                     case 'comp11':
-                        c11.push(cui.num_machines);
+                        c11.push([t, cui.num_machines]);
                         appended[0] = true;
                         break;
                     case 'comp15':
-                        c15.push(cui.num_machines);
+                        c15.push([t, cui.num_machines]);
                         appended[1] = true;
                         break;
                     case 'comp40':
-                        c40.push(cui.num_machines);
+                        c40.push([t, cui.num_machines]);
                         appended[2] = true;
                         break;
                     case 'comp20':
-                        c20.push(cui.num_machines);
+                        c20.push([t, cui.num_machines]);
                         appended[3] = true;
                         break;
                     case 'comp23':
-                        c23.push(cui.num_machines);
+                        c23.push([t, cui.num_machines]);
                         appended[4] = true;
                         break;
                     case 'comp105':
-                        c105.push(cui.num_machines);
+                        c105.push([t, cui.num_machines]);
                         appended[5] = true;
                         break;
                     case 'Other':
-                        other.push(cui.num_machines);
+                        other.push([t, cui.num_machines]);
                         appended[6] = true;
                         break;
                 }
@@ -58,25 +62,25 @@ function CreateGraph(where, room) {
 
                 if (v == 0) {
                     if (!appended[v])
-                        c11.push(0);
+                        c11.push([t, 0]);
                 } else if (v == 1) {
                     if (!appended[v])
-                        c15.push(0);
+                        c15.push([t, 0]);
                 } else if (v == 2) {
                     if (!appended[v])
-                        c40.push(0);
+                        c40.push([t, 0]);
                 } else if (v == 3) {
                     if (!appended[v])
-                        c20.push(0);
+                        c20.push([t, 0]);
                 } else if (v == 4) {
                     if (!appended[v])
-                        c23.push(0);
+                        c23.push([t, 0]);
                 } else if (v == 5) {
                     if (!appended[v])
-                        c105.push(0);
+                        c105.push([t, 0]);
                 } else if (v == 6) {
                     if (!appended[v])
-                        other.push(0);
+                        other.push([t, 0]);
                 }
             }
         }
@@ -96,7 +100,7 @@ function CreateGraph(where, room) {
             fill: true
         },
         series: [
-            {label: 'Comp 11'},
+            {label: 'Comp 11', color: 'blue'},
             {label: 'Comp 15'},
             {label: 'Comp 40'},
             {label: 'Comp 20'},
@@ -108,23 +112,25 @@ function CreateGraph(where, room) {
             show: true,
             renderer: $.jqplot.EnhancedLegendRenderer,
             rendererOptions: {
-                numberRows: 2
+                numberRows: 1
             },
             location: 's',
             placement: 'outsideGrid'
         },
         axes: {
-        /*
             xaxis: {
                 renderer: $.jqplot.DateAxisRenderer,
+                tickRenderer: $.jqplot.CanvasAxisTickRenderer,
                 tickOptions: {
-                    formatString: '%b %#d, %y'
+                    formatString: "%m/%d/%y %H:%M",
+                    angle: -45,
+                    fontSize: '10pt'   
                 },
                 min: 'March 1, 2014',
-                tickInterval: '1 month',
+                tickInterval: '15 minutes',
                 ticks: ticks
             },
-        */
+        
             yaxis: {
                 min: 0
             }
