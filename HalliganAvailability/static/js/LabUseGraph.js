@@ -1,6 +1,6 @@
 function CreateGraph(where, room) {
     var ticks = [];
-    
+    var FirstTime = 'March 23, 2014'; 
     var ajaxDataRenderer = function(url, plot, options) {
         var ret = null;
         $.ajax({
@@ -17,7 +17,8 @@ function CreateGraph(where, room) {
         var c11 = [], c15 = [], c40 = [], c20 = [], c23 = [],
             c105 = [], other=[];
 
-        var FirstTime = py2jsDate(ret[0].updateTime).toString();
+        FirstTime = py2jsDate(ret[0].updateTime).toString();
+        plot.axes.xaxis.min = FirstTime;
         for (var i in ret) {
             var obj = ret[i];
 //            ticks.push([i, obj.updateTime]);
@@ -126,7 +127,7 @@ function CreateGraph(where, room) {
                     angle: -45,
                     fontSize: '10pt'   
                 },
-                min: 'March 1, 2014',
+                min: FirstTime, 
                 tickInterval: '15 minutes',
                 ticks: ticks
             },
