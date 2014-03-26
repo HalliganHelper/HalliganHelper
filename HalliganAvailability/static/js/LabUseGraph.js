@@ -1,5 +1,4 @@
 function CreateGraph(where, room) {
-    var ticks = [];
     var FirstTime = 'March 23, 2014'; 
     var ajaxDataRenderer = function(url, plot, options) {
         var ret = null;
@@ -18,13 +17,9 @@ function CreateGraph(where, room) {
             c105 = [], other=[];
 
         FirstTime = py2jsDate(ret[0].updateTime).toString();
-        plot.axes.xaxis.min = FirstTime;
         for (var i in ret) {
             var obj = ret[i];
-//            ticks.push([i, obj.updateTime]);
-            ticks.push(py2jsDate(obj.updateTime));
             var t = (py2jsDate(obj.updateTime)).toString();
-            console.log("Time is: " + t)
             var appended = [false, false, false, false, false, false, false];
             for (var indx in obj.cuis) {
                 var cui = obj.cuis[indx];
@@ -85,10 +80,13 @@ function CreateGraph(where, room) {
                 }
             }
         }
-        return [c11, c15, c40, c20, c23, c105, other];
+        vals = [c11, c15, c40, c20, c23, c105, other];
+        vals.map(function(val){ return val.reverse() });
+
+        return vals;
     };
 
-    var jsonurl = "/api/v2/roominfo/?format=json&room=lab" + room;
+    var jsonurl = "/api/v2/roominfo/?format=json&lab=lab" + room;
 
     var plot = $.jqplot(where, jsonurl, {
         title: "Use over time: " + room,
@@ -101,7 +99,7 @@ function CreateGraph(where, room) {
             fill: true
         },
         series: [
-            {label: 'Comp 11', color: 'blue'},
+            {label: 'Comp 11'},
             {label: 'Comp 15'},
             {label: 'Comp 40'},
             {label: 'Comp 20'},
@@ -127,9 +125,7 @@ function CreateGraph(where, room) {
                     angle: -45,
                     fontSize: '10pt'   
                 },
-                min: FirstTime, 
-                tickInterval: '15 minutes',
-                ticks: ticks
+                tickInterval: '1 hour'
             },
         
             yaxis: {
