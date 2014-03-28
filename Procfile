@@ -1,3 +1,2 @@
 #web: newrelic-admin run-program gunicorn -b "0.0.0.0:$PORT" -w 3 HalliganAvailability.wsgi
- 
 web: gunicorn --worker-class socketio.sgunicorn.GeventSocketIOWorker HalliganAvailability.wsgi
