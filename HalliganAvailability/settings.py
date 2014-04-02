@@ -15,15 +15,9 @@ except KeyError:
 #except ImportError:
 #    print "No local environment"
 
+import dj_database_url
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_db',
-        'USER': 'django_login',
-        'PASSWORD': '***REMOVED***',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
+    'default': dj_database_url.config(default='postgres://django_login:***REMOVED***@localhost:5432/django_db')
 }
 
 EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
