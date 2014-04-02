@@ -30,6 +30,7 @@ admin.site.register(Course)
 class TA(models.Model):
     usr = models.OneToOneField(User)
     course = models.ManyToManyField(Course)
+    active = models.BooleanField(default=True)
 
 admin.site.register(TA)
 
