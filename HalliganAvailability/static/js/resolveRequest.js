@@ -57,7 +57,6 @@ function remove_row(rq_id) {
             $(tbl).append($(my_row));
         }
 //    } catch (e) {
-//        console.log("Couldn't find any rows");
 //    }
 }
 
@@ -107,10 +106,8 @@ socket.on("message", function(obj) {
 $(function setStorage(){
 
     if (localStorage) {
-        console.log('Need help clicked');
         $('.needHelp').click(function(e) {
             var t = this;
-            console.log(t);
             var id = $(t).data('course');
             localStorage['gethelp'] = id;
         });
