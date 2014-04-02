@@ -105,7 +105,9 @@ socket.on("message", function(obj) {
 });
 
 $(function setStorage(){
+
     if (localStorage) {
+        console.log('Need help clicked');
         $('.needHelp').click(function(e) {
             var t = this;
             console.log(t);
