@@ -21,7 +21,6 @@ class TuftsEmail(RegistrationFormUniqueEmail):
     def clean_email(self):
         data = super(TuftsEmail, self).clean_email()
         domain = data.split('@')[1].lower()
-        print domain
         #TODO: Make this be 'if not in'
         if domain != 'tufts.edu' and domain != 'cs.tufts.edu':
             raise forms.ValidationError("Only @tufts.edu email addresses are allowed.")
@@ -42,9 +41,6 @@ class RequestForm(forms.ModelForm):
         fields = ['question', 'whereLocated', 'course' ]
 
     def __init__(self, *args, **kwargs):
-#        print kwargs['initial']['course']
-#        est = pytz.timezone('US/Eastern')
-#        self.whenAsked = datetime.datetime.now(est)
         super(RequestForm, self).__init__(*args, **kwargs)
 
 

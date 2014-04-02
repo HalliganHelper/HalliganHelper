@@ -53,7 +53,6 @@ def AllComps(request):
 
     for lab in Labs:
         if lab.is_lab_in_session() and lab.RoomNumber in response['rooms']:
-            #print lab.DayOfWeek
             response['rooms'][lab.RoomNumber]['inLab'] = True
             response['rooms'][lab.RoomNumber]['labInfo'] = {
                 'class': lab.ClassName,
@@ -90,7 +89,6 @@ def labInformation(request):
     if not room:
         labs = Lab.objects.all()
         for lab in labs:
-            print lab
             if lab.EndDate > now:
                 response.append(lab.for_response())
 
@@ -169,7 +167,6 @@ def UpdateStatus(request, MchID, NewStatus):
     MchID = MchID.lower()
 
     AuthCode = request.POST.get('AuthKey', default='')
-    print "AUTHCODE", AuthCode
 
     if not AuthCode == 'OnlyTylerGetsAccessToThis':
         result['success'] = False
@@ -203,13 +200,11 @@ def UpdateStatus(request, MchID, NewStatus):
 def UpdateAllStatus(request):
     #available, course, computer, user(Always 'None'), error#
     data = json.loads(request.body)
-    #print data
    
     room_data = defaultdict(lambda: defaultdict(int))
     room_available_info = defaultdict(lambda: defaultdict(int))
      
     for comp in data:
-    #    print comp
         MchID = comp['computer'].lower()
         RoomNum = int(MchID[3:6])
         room_key = 'lab' + str(RoomNum)
@@ -252,7 +247,6 @@ def UpdateAllStatus(request):
         rm_info.save()
 
         for course, count in room_data[room].iteritems():
-            print course
             c_u_i = CourseUsageInfo()
             c_u_i.room = rm_info
             c_u_i.course = course
@@ -357,7 +351,6 @@ def HomePage(request):
 
     retVal = cache.get("HOMEPAGE")
     if not retVal or retVal:
-        print "Not Cached"
         TemplateParams = {}
         LabsInSession = {}
         comps = {}
@@ -420,7 +413,6 @@ def ModularHomePage(request):
 
 
     TemplateParams['Rooms'] = Rooms
-    print Rooms
 
 
     return render(request, 'AjaxHomePage.html', TemplateParams)
@@ -440,7 +432,6 @@ def ServerList(request):
         }
 
         response.append(data)
-        print serv.LastUpdated.astimezone(tz.gettz('America/New_York'))
     response.sort(key=operator.itemgetter('ComputerName'))
 
     return HttpResponse(json.dumps(response), content_type="application/json")
