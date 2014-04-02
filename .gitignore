@@ -1,5 +1,5 @@
 HalliganAvailability/environment.py
-
+*.swp
 .db/
 
 *.py[cod]

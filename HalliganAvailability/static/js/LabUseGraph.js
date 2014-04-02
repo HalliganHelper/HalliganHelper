@@ -138,16 +138,20 @@ function CreateGraph(where, room) {
 }
 
 
-$(document).ready(function(){
+$(function(){
 /* Gumby tab onchange event */
     $('#tabs').on('gumby.onChange', function(e, index) {
         if (index == 5) {
             $('#116Graph').empty();
-            CreateGraph('116Graph', 116);
             $('#118Graph').empty();
-            CreateGraph('118Graph', 118);
             $('#120Graph').empty();
-            CreateGraph('120Graph', 120);
+            $('#graph_spinner').show();
+            setTimeout(function(){
+                CreateGraph('116Graph', 116);
+                CreateGraph('118Graph', 118);
+                CreateGraph('120Graph', 120);
+                $('#graph_spinner').hide();
+            }, 30);
         }
     });
 
