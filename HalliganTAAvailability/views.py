@@ -66,9 +66,13 @@ def getHelp(request, course=None):
             QueueNamespace.emit(d, json=True)
             return HttpResponseRedirect(reverse('taSystem'))
     else:
-        logger.debug(course)
-        if course is not None:
-            form = RequestForm(init_course=course)
+        course = 1
+        c = Course.objects.get(pk=course)
+        logger.debug(c.pk)
+        if course is not None and False:
+            form = RequestForm(initial={'course': c, 
+            'question': 'Hello my name is'})
+            logger.debug("IN PLACE")
         else:
             form = RequestForm()
 

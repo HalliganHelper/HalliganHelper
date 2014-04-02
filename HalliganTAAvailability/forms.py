@@ -42,8 +42,9 @@ class RequestForm(forms.ModelForm):
         fields = ['question', 'whereLocated', 'course' ]
 
     def __init__(self, *args, **kwargs):
-        est = pytz.timezone('US/Eastern')
-        self.whenAsked = datetime.datetime.now(est)
+#        print kwargs['initial']['course']
+#        est = pytz.timezone('US/Eastern')
+#        self.whenAsked = datetime.datetime.now(est)
         super(RequestForm, self).__init__(*args, **kwargs)
 
 

@@ -104,3 +104,13 @@ socket.on("message", function(obj) {
     }
 });
 
+$(function setStorage(){
+    if (localStorage) {
+        $('.needHelp').click(function(e) {
+            var t = this;
+            console.log(t);
+            var id = $(t).data('course');
+            localStorage['gethelp'] = id;
+        });
+    }
+});

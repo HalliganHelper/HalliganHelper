@@ -232,9 +232,6 @@ def UpdateAllStatus(request):
 
             cmptr.used_for = course
             cmptr.Status = status
-            #Deal with collecting course information
-            #if RoomNum not in room_data:
-#            room_data['lab' + str(RoomNum)] = defaultdict(int)
             
             room_data[room_key][course] += 1
             
@@ -244,11 +241,6 @@ def UpdateAllStatus(request):
             room_data[room_key]['error'] += 1
 
         cmptr.save()
-#    print "Room Data".upper()
-#    print room_data
-#    print '*'*80
-#    print "Room Available Info".upper()
-#    print room_available_info
 
     for room, availability in room_available_info.iteritems():
         rm_info = RoomInfo()

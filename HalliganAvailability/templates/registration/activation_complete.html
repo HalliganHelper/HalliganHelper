@@ -2,6 +2,13 @@
 
 {% block content %}
 
-<p>You are now registered. Please <a href="/accounts/login">Login</a></p>
+<div class="row text-center">
+    Your account is now active. Please don't hesitate to contact <a mailto="halliganhelper@tylerlubeck.com">support</a> if you have any questions.
+</div>
+<div class="row text-center">
+    <div class="large primary btn">
+        <a href="{% url 'auth_login' %}">Login</a>
+    </div>
+</div>
 
 {% endblock %}

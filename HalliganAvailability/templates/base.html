@@ -34,8 +34,9 @@
                     <img src="{% static "img/HalliganHelper_mainlogo.png" %}">
                 </a>
             </h1>
-            <nav class="four columns push_seven">
+            <nav class="five columns push_six">
                 <ul id="main-nav">
+                        <li><a href="{% url 'ModularHomePage' %}"><i class="icon-home"></i></a></li>
                         <li><a href="{% url 'taSystem' %}">TA Queue</a></li>
                     {% if request.user.is_authenticated %}
                         <li>
