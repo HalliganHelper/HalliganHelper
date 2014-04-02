@@ -15,6 +15,28 @@ except KeyError:
 #except ImportError:
 #    print "No local environment"
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'django_db',
+        'USER': 'django_login',
+        'PASSWORD': '***REMOVED***',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+
+EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
+EMAIL_HOST_PASSWORD = '***REMOVED***'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+STATIC_ROOT = 'staticfiles'
+STATIC_URL = '/static/'
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -228,25 +250,3 @@ LOGGING = {
         }
     }
 }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_db',
-        'USER': 'django_login',
-        'PASSWORD': '***REMOVED***',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
-
-EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
-EMAIL_HOST_PASSWORD = '***REMOVED***'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = True
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/static/'
