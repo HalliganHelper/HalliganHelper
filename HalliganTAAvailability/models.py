@@ -31,6 +31,9 @@ class TA(models.Model):
     usr = models.OneToOneField(User)
     course = models.ManyToManyField(Course)
     active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return "{0}: {1}".format(self.usr, self.usr.get_full_name())
 
 admin.site.register(TA)
 

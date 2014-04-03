@@ -5,7 +5,7 @@ from models import Student, Request, TA, Course
 from django.contrib.auth.admin import User
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from registration.signals import user_registered
+from registration.signals import user_registered, user_activated
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
@@ -16,6 +16,11 @@ from django.db.models import Q
 from HalliganAvailability import settings
 from socketio.namespace import BaseNamespace
 from socketio import socketio_manage
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.template import Context
+import requests
+
 
 logger = logging.getLogger(__name__)
 socket_logger = logging.getLogger('sockets')
@@ -24,6 +29,54 @@ def _now():
     now = datetime.datetime.now(tz)
     return now
 
+def notify(user, courses, adding_ta=True):
+    subject = 'TA Activation'
+    from_email = 'halliganhelper@tylerlubeck.com'
+    to_email = user.email
+    if adding_ta:
+        plaintext = get_template('ta_activation.txt')
+        htmly = get_template('ta_activation.html')
+    else:
+        plaintext = get_template('remove_ta.txt')
+        htmly = get_template('remove_ta.html')
+
+    d = Context({'user': user, 'courses': courses})
+    text_content = plaintext.render(d)
+    html_content = htmly.render(d)
+
+    msg = EmailMultiAlternatives(subject, text_content, 
+                                 from_email, [to_email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
+def check_ta(user):
+    email = user.email
+    url = "http://www.cs.tufts.edu/~molay/compta/isata.cgi/{0}"
+    r = requests.get(url.format(email))
+    is_ta = r.text.strip() != 'NONE'
+    logger.debug(r.text)
+    if is_ta:
+        course_nums = r.text.strip().split(' ')
+        courses = Course.objects.filter(Number__in=course_nums)
+
+        logger.debug("{0} has been added as a ta".format(user))
+        ta, created = TA.objects.get_or_create(usr=user)
+        ta.active = True
+        ta.course = courses
+        ta.save()
+        notify(user, courses, adding_ta=True)
+    else:
+        if TA.objects.filter(usr__email=email).exists():
+            ta = TA.objects.get(usr__email=email)
+            ta.active = False
+            ta.courses = []
+            ta.save()
+            notify(user, None, adding_ta=False)
+
+def user_confirmed(sender, user, request, **kwargs):
+    check_ta(user)
+    logger.debug("User {0} confirmed".format(user))
 
 def user_created(sender, user, request, **kwargs):
     form = TuftsEmail(request.POST)
@@ -32,9 +85,10 @@ def user_created(sender, user, request, **kwargs):
     user.first_name=form.data['first_name']
     user.last_name=form.data['last_name']
     user.save()
+    logger.debug("User {0} created".format(user))
 
 user_registered.connect(user_created)
-
+user_activated.connect(user_confirmed)
 
 class TuftsRegistrationView(RegistrationView):
     form_class = TuftsEmail

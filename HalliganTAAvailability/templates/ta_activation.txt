@@ -1,0 +1,16 @@
+Hello {{ user.get_full_name.title }},
+    You have been activated as a TA on Halligan Helper.
+    This means that you now have the power to resolve requests for any class.
+    Use this wisely!
+
+    You will receive notifications for:
+
+    {% for course in courses %}
+        {{ course }}
+    {% endfor %}
+
+    Let me know if anything goes wrong!
+
+    Thanks,
+    Tyler Lubeck
+    halliganhelper@tylerlubeck.com
