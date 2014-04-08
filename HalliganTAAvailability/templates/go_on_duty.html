@@ -4,12 +4,30 @@
 {% load staticfiles %}
 
 {% block content %}
-    {% if already_on_duty %}
+    {% if cancel %}
 
     <div class="row">
         <div class="centered eight columns text-center">
-            You seem to already be on duty.<br/> Would you like to <a href="{% url 'cancel_hours' %}">cancel </a> your hours?
+            You seem to already be on duty.<br/> Would you like to cancel your hours?
         </div>
+    </div>
+    <div class="row">
+        <div class="push_four four columns text-center">
+            <div class="medium secondary btn" >
+                <a href="#" id="dont_cancel_btn">Don't Cancel</a>
+            </div>
+        </div>
+        <div class="four columns text-center">
+            <div class="medium primary btn">
+                <a href="#" id="cancel_btn">Cancel</a>
+            </div>
+        </div>
+        <form method="post" action="" id="cancel_hours">{% csrf_token %}
+        {% render_field ca_form.confirm class="Hidden" %}
+        <script>
+            var cancel_field_name = "{{ ca_form.confirm.auto_id }}";
+        </script>
+        </form>
     </div>
 
     {% else %}
@@ -18,23 +36,23 @@
     </div>
     <form method="post" action=""> {% csrf_token %}
 
-        {% if form.end_time.errors %}
+        {% if oh_form.end_time.errors %}
         <div class="row">
             <div class="centered eight columns">
-                <li class="danger alert text-center">{{ form.end_time.errors }}</li>
+                <li class="danger alert text-center">{{ oh_form.end_time.errors }}</li>
             </div>
         </div>
         {% endif %}
         <div class="row">
-            <div class="field centered eight columns {% if form.end_time.errors %}danger{% endif %}">
-                <input id="{{ form.end_time.auto_id }}"  type="text" placeholder="When will you be done?" name="{{ form.end_time.name }}">
+            <div class="field centered eight columns {% if oh_form.end_time.errors %}danger{% endif %}">
+                <input id="{{ oh_form.end_time.auto_id }}"  type="text" placeholder="When will you be done?" name="{{ oh_form.end_time.html_name }}">
                 <script>
-                    var field_id = "{{ form.end_time.auto_id }}";
+                    var field_id = "{{ oh_form.end_time.auto_id }}";
                 </script>
             </div>
         </div>
 
-        {% if form.course.errors %}
+        {% if oh_form.course.errors %}
             <div class="row">
                 <div class="centered eight columns">
                     <li class="danger alert text-center">Don't forget to pick a class!</li>
@@ -43,9 +61,9 @@
         {% endif %}
         <div class="row">
             <div class="picker centered eight columns">
-                <select id="{{ form.course.auto_id }}" name="course">
+                <select id="{{ oh_form.course.auto_id }}" name="{{ oh_form.course.html_name }}">
                     <option value="#" disabled >Which Class?</option>
-                    {% for choice in form.course.field.choices %}
+                    {% for choice in oh_form.course.field.choices %}
                         {% if forloop.first %}
                             <option value="">Select a Class</option>
                         {% else %}

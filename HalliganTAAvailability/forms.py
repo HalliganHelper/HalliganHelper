@@ -74,5 +74,5 @@ class OfficeHourForm(forms.ModelForm):
         model = OfficeHour
         fields = ['end_time', 'course']
 
-class CancelHours(forms.Form):
+class CancelHoursForm(forms.Form):
     confirm = forms.BooleanField(required=False) 

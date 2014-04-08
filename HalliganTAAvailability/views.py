@@ -1,6 +1,6 @@
 from django.shortcuts import render, render_to_response, HttpResponseRedirect
 from registration.backends.default.views import RegistrationView
-from forms import TuftsEmail, RequestForm, TARegister, OfficeHourForm, CancelHours
+from forms import TuftsEmail, RequestForm, TARegister, OfficeHourForm, CancelHoursForm
 from models import Student, Request, TA, Course, OfficeHour
 from django.contrib.auth.admin import User
 from django.http import HttpResponse
@@ -223,32 +223,57 @@ def is_ta(user):
 @user_passes_test(is_ta)
 def go_on_duty(request):
     user = request.user
-    
+     
     ta = user.ta
     if ta and OfficeHour.objects.on_duty().filter(ta=ta):
-        return render(request, 'go_on_duty.html', {'already_on_duty': True})
-
+        cancel = True
+    else:
+        cancel = False 
+     
     if request.method == 'POST':
-        form = OfficeHourForm(request.POST)
-        if form.is_valid():
+        ca_form = CancelHoursForm(request.POST, prefix='ca_form')
+        oh_form = OfficeHourForm(request.POST, prefix='oh_form')
+        logger.debug('POSTED')
+        if oh_form.is_valid():
+            logger.debug('OH FORM VALID')
             my_tz = pytz.timezone(settings.TIME_ZONE)
-            new_hours = form.save(commit=False)
+            new_hours = oh_form.save(commit=False)
             new_hours.end_time = new_hours.end_time.astimezone(my_tz)
             new_hours.ta = user.ta
             new_hours.start_time = _now()
             new_hours.save()
+            logger.debug(new_hours)
             return HttpResponseRedirect(reverse('taSystem'))
+        
+        elif ca_form.is_valid() and cancel:
+            logger.debug('CA FORM VALID')
+            logger.debug(ca_form.cleaned_data)
+            if ca_form.cleaned_data['confirm']:
+                try:
+                    oh = OfficeHour.objects.on_duty().filter(ta=user.ta)[0]
+                    oh.end_time = _now() - timedelta(minutes=1)
+                    oh.save()
+                    return HttpResponseRedirect(reverse('go_on_duty'))
+                except OfficeHour.DoesNotExist:
+                    logger.debug('No Office hours exist')
+                    pass
+            else:
+                return HttpResponseRedirect(reverse('taSystem'))
     else:
-        form = OfficeHourForm()
+        logger.debug('NOT POSTED')
+        oh_form = OfficeHourForm(prefix='oh_form')
+        ca_form = CancelHoursForm(prefix='ca_form')
+    return render(request, 'go_on_duty.html', {'oh_form': oh_form, 
+                                               'ca_form': ca_form, 
+                                               'cancel': cancel})
 
-    return render(request, 'go_on_duty.html', {'form': form})
 
 @login_required()
 @user_passes_test(is_ta)
 def cancel_hours(request):
     user = request.user
     if request.method == "POST":
-        form = CancelHours(request.POST)
+        form = CancelHoursForm(request.POST)
         if form.is_valid():
             if form.cleaned_data['confirm']:
                 oh = OfficeHour.objects.on_duty().filter(ta = user.ta)[0]
@@ -258,7 +283,7 @@ def cancel_hours(request):
             else:
                 return HttpResponseRedirect(reverse('taSystem'))
     else:
-        form = CancelHours()
+        form = CancelHoursForm()
 
     return render(request, 'cancel_hours.html', {'form': form})
 
