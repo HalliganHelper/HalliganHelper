@@ -7,12 +7,13 @@
 
 {% block content %}
 
-    <div class="row">
-        {% if not requestData %}
+    {% if not requestData %}
+        <div class="row">
             <div class="row text-center">
                 Odd, looks like there isn't anything here yet. You should contact support!
             </div>
-        {% endif %}
+        </div>
+    {% endif %}
         <div class="row">
             <section class="three columns">
                 <nav id="sidebar-nav-holder" class="vertical-nav" gumby-fixed="top" gumby-pin="[data-target='{{ classes.last.Number }}']" >
@@ -20,15 +21,25 @@
 
                         {% for rq in requestData %}
                             {% if forloop.first %}
-                                <li class="active" id="comp{{ rq.0.Number }}Nav">
-                                    <a href="#comp{{ rq.0.Number }}" class="skip" gumby-update gumby-duration gumby-goto="[data-target='comp{{ rq.0.Number }}']">
-                                        Comp {{ rq.0.Number }}
+                                <li class="active" id="comp{{ rq.0.Number }}Nav" data-course="comp{{rq.0.Number}}">
+                                    <a href="#comp{{ rq.0.Number }}"> 
+                                        Comp {{ rq.0.Number }} 
+                                        {% if rq.1 %}
+                                            <span class="info badge" id="comp{{ rq.0.Number}}count" data-count="{{ rq.1|length}}">{{ rq.1|length }}</span>
+                                        {% else %}
+                                            <span class="info badge Hidden" id="comp{{ rq.0.Number}}count" data-count="0"></span>
+                                        {% endif %}
                                     </a>
                                 </li>
                             {% else %}
-                                <li id="comp{{ rq.0.Number }}Nav">
-                                    <a href="#comp{{ rq.0.Number }}" class="skip" gumby-update gumby-duration="600" gumby-goto="[data-target='comp{{ rq.0.Number }}']">
+                                <li id="comp{{ rq.0.Number }}Nav" data-course="comp{{rq.0.Number}}">
+                                    <a href="#comp{{ rq.0.Number }}">
                                         Comp {{ rq.0.Number }}
+                                        {% if rq.1 %}
+                                            <span class="info badge" id="comp{{ rq.0.Number}}count" data-count="{{ rq.1|length}}">{{ rq.1|length }}</span>
+                                        {% else %}
+                                            <span class="info badge Hidden" id="comp{{ rq.0.Number}}count" data-count="0"></span>
+                                        {% endif %}
                                     </a>
                                 </li>
                             {% endif %}
@@ -39,9 +50,13 @@
             </section>
 
 
-            <section class="thirteen columns " >
-                {% for rq in requestData %}
-                <div class="left-center" data-target="comp{{ rq.0.Number }}" id="comp{{ rq.0.Number }}">
+            {% for rq in requestData %}
+            {% if forloop.first %}
+                <section class="thirteen columns course" id="comp{{ rq.0.Number }}">
+            {% else %}
+                <section class="thirteen columns course Hidden" id="comp{{ rq.0.Number }}">
+            {% endif %}
+                <div class="left-center">
                     <h2>Comp {{ rq.0.Number }} Queue</h2>
                     <table class="striped rounded" id={{ rq.0.Number }}Table>
                         <thead>
@@ -93,11 +108,33 @@
                         </tfoot>
                     </table>
                 </div>
-                {% endfor %}
             </section>
+            {% if forloop.first %}
+                <div class="courseTA thirteen columns push_three" id='comp{{rq.0.Number}}TA'>
+            {% else %}
+                <div class="courseTA thirteen columns push_three Hidden" id='comp{{rq.0.Number}}TA'>
+            {% endif %}
+                <h2>TAs on Duty</h2>
+                    {% if rq.2 %}
+                        <ul class="two_up tiles">
+                        {% for oh in rq.2 %}
+                             <li>{{ oh.ta.usr.get_full_name }}: {{ oh.start_time|date:"P" }} -- {{ oh.end_time|date:"P" }} </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center"> No one is on duty </div>
+                    {% endif %}
+                    {% if isTA %}
+                    <div class="text-center">
+                        <div class="medium primary btn"> 
+                            <a href="{% url 'go_on_duty' %}" class="goOnDuty" data-course="{{ rq.0.pk }}">Go On Duty</a>
+                        </div>
+                    </div>
+                    {% endif %}
+            </div>
+        {% endfor %}
 
         </div>
-    </div>
 
 
 {% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block content %}
+    {% if already_on_duty %}
+
+    <div class="row">
+        <div class="centered eight columns text-center">
+            You seem to already be on duty.<br/> Would you like to <a href="{% url 'cancel_hours' %}">cancel </a> your hours?
+        </div>
+    </div>
+
+    {% else %}
+    <div class="row text-center">
+        <h3>Go On Duty</h3>
+    </div>
+    <form method="post" action=""> {% csrf_token %}
+
+        {% if form.end_time.errors %}
+        <div class="row">
+            <div class="centered eight columns">
+                <li class="danger alert text-center">{{ form.end_time.errors }}</li>
+            </div>
+        </div>
+        {% endif %}
+        <div class="row">
+            <div class="field centered eight columns {% if form.end_time.errors %}danger{% endif %}">
+                <input id="{{ form.end_time.auto_id }}"  type="text" placeholder="When will you be done?" name="{{ form.end_time.name }}">
+                <script>
+                    var field_id = "{{ form.end_time.auto_id }}";
+                </script>
+            </div>
+        </div>
+
+        {% if form.course.errors %}
+            <div class="row">
+                <div class="centered eight columns">
+                    <li class="danger alert text-center">Don't forget to pick a class!</li>
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="picker centered eight columns">
+                <select id="{{ form.course.auto_id }}" name="course">
+                    <option value="#" disabled >Which Class?</option>
+                    {% for choice in form.course.field.choices %}
+                        {% if forloop.first %}
+                            <option value="">Select a Class</option>
+                        {% else %}
+                            <option value="{{ choice.0 }}">{{ choice.1}}</option>
+                        {% endif %}
+
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="centered eight columns text-center">
+                <div class="medium primary btn">
+                    <input id="submit" type="submit" value="Submit"/>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% endif %}
+    
+{% endblock %}
+
+{% block endScripts %}
+    <link rel="stylesheet" href="{% static 'css/jquery.datetimepicker.css' %}"/>
+    <script src="{% static 'js/jquery.datetimepicker.js' %}"></script>
+    <script src="{% static 'js/go_on_duty.js' %}"></script>
+    <script src="{% static 'js/setupDuty.js' %}"></script>
+{% endblock %}

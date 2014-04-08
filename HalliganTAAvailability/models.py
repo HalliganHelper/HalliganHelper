@@ -6,6 +6,10 @@ import pytz
 from HalliganAvailability import settings
 
 
+def _now():
+    now = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
+    return now
+
 class Student(models.Model):
     usr = models.OneToOneField(User)
 
@@ -69,26 +73,18 @@ class Request(models.Model):
 admin.site.register(Request)
 
 
-class OfficeHours(models.Model):
-    MON, TUE, WED, THU, FRI, SAT, SUN = 0, 1, 2, 3, 4, 5, 6
-    DAY_OF_WEEK_CHOICES = (
-        (SUN, 'Sunday'),
-        (MON, 'Monday'),
-        (TUE, 'Tuesday'),
-        (THU, 'Thursday'),
-        (FRI, 'Friday'),
-        (SAT, 'Saturday')
-    )
+class OfficeHourManager(models.Manager):
+    def on_duty(self):
+        now = _now()
+        qs = self.get_query_set()
+        return qs.filter(start_time__lte=now).filter(end_time__gte=now)
+
+class OfficeHour(models.Model):
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    course = models.ForeignKey(Course)
+    ta = models.ForeignKey(TA)
+    objects = OfficeHourManager()
 
 
-    ta = models.ManyToManyField(TA)
-    startTime = models.TimeField()
-    endTime = models.TimeField()
-    dayOfWeek = models.PositiveSmallIntegerField(choices=DAY_OF_WEEK_CHOICES,
-                                                 default=MON)
-
-    def is_today(self):
-        now = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
-        return self.dayOfWeek == now.weekday()
-
-admin.site.register(OfficeHours)
+admin.site.register(OfficeHour)

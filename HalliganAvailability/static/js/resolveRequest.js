@@ -45,19 +45,25 @@ $.ajaxSetup({
     }
 });
 
-function remove_row(rq_id) {
+function remove_row(obj) {
+    var rq_id = obj.rq
     var el = $("[data-rqID='" + rq_id + "']");
     var tbl = $(el[0]).parent();
     
     $(el).remove();
-//    try {
         if ($(tbl).prop('rows').length == 0) {
             var tdstr = "<td colspan='5' class='text-center'>There's nothing here!</td>";
             var my_row = $('<tr data-empty="true">' + tdstr + '</tr>');
             $(tbl).append($(my_row));
         }
-//    } catch (e) {
-//    }
+    var counter = $('#comp' + obj.course + 'count');
+    var oldCount = $(counter).data('count');
+    var newCount = oldCount - 1;
+    $(counter).data('count', oldCount - 1);
+    $(counter).text(newCount);
+    if(newCount < 1){
+        $(counter).addClass('Hidden');
+    }
 }
 
 function add_row(obj) {
@@ -75,6 +81,15 @@ function add_row(obj) {
             $(this).remove();
         }
     });
+
+    var counter = $('#comp' + obj.course + 'count');
+    var oldCount = $(counter).data('count');
+    var newCount = oldCount + 1;
+    $(counter).data('count', oldCount + 1);
+    $(counter).text(newCount);
+    $(counter).removeClass('Hidden');
+    
+
     $(tbdy).append($(new_row));
 }
 
@@ -97,9 +112,11 @@ socket = io.connect('/taqueue', {transports: ['xhr-polling']});
 socket.on("message", function(obj) {
     switch (obj.type){
         case 'resolve':
-            remove_row(obj.rq);
+            remove_row(obj);
+            break;
         case 'add':
             add_row(obj);
+            break;
     }
 });
 
@@ -113,3 +130,13 @@ $(function setStorage(){
         });
     }
 });
+
+$(function goOnDuty(){
+    $('.goOnDuty').click(function(e) {
+        if(localStorage) {
+            var course = $(this).data('course');
+            console.log(course);
+            localStorage['goOnDuty'] = course;
+        }
+    });
+})
