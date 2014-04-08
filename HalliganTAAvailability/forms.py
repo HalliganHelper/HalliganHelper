@@ -1,6 +1,6 @@
 from registration.forms import RegistrationFormUniqueEmail
 from django import forms
-from models import Request, Student, Course
+from models import Request, Student, Course, OfficeHour
 import datetime
 import pytz
 from django.contrib.auth.models import User
@@ -69,8 +69,10 @@ class TARegister(forms.Form):
     classes = forms.ModelMultipleChoiceField(queryset=Course.objects.all())
 
 
+class OfficeHourForm(forms.ModelForm):
+    class Meta:
+        model = OfficeHour
+        fields = ['end_time', 'course']
 
-
-
-
-
+class CancelHoursForm(forms.Form):
+    confirm = forms.BooleanField(required=False) 

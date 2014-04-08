@@ -1,10 +1,10 @@
 from django.shortcuts import render, render_to_response, HttpResponseRedirect
 from registration.backends.default.views import RegistrationView
-from forms import TuftsEmail, RequestForm, TARegister
-from models import Student, Request, TA, Course
+from forms import TuftsEmail, RequestForm, TARegister, OfficeHourForm, CancelHoursForm
+from models import Student, Request, TA, Course, OfficeHour
 from django.contrib.auth.admin import User
 from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from registration.signals import user_registered, user_activated
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -19,6 +19,7 @@ from socketio import socketio_manage
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
+from datetime import timedelta
 import requests
 
 
@@ -120,15 +121,7 @@ def getHelp(request, course=None):
             QueueNamespace.emit(d, json=True)
             return HttpResponseRedirect(reverse('taSystem'))
     else:
-        course = 1
-        c = Course.objects.get(pk=course)
-        logger.debug(c.pk)
-        if course is not None and False:
-            form = RequestForm(initial={'course': c, 
-            'question': 'Hello my name is'})
-            logger.debug("IN PLACE")
-        else:
-            form = RequestForm()
+        form = RequestForm()
 
     data = {'form': form}
     return render(request, 'getHelp.html', data)
@@ -174,12 +167,13 @@ def onlineQueue(request):
 
     allReqs = Request.objects.filter(whenAsked__gte=before).order_by('whenAsked')
     courses = Course.objects.all().order_by('Number')
-
+    ohs = OfficeHour.objects.on_duty()
     requestData = []
 
     for course in courses:
         reqs = allReqs.filter(course=course).filter(timedOut=False).filter(solved=False)
-        insert = (course, reqs)
+        course_hours = ohs.filter(course=course)
+        insert = (course, reqs, course_hours)
         requestData.append(insert)
 
     isTA = TA.objects.filter(usr__id=request.user.id).exists()
@@ -219,8 +213,80 @@ def resolveRequest(request):
     req.whenSolved = _now()
     req.timedOut = False
     req.save()
-    QueueNamespace.emit({'type': 'resolve', 'rq': rq_id}, json=True)
+    QueueNamespace.emit({'type': 'resolve', 'rq': rq_id, 'course': req.course.Number}, json=True)
     return HttpResponse(status=200)
+
+def is_ta(user):
+    return TA.objects.filter(usr=user).exists()
+
+@login_required()
+@user_passes_test(is_ta)
+def go_on_duty(request):
+    user = request.user
+     
+    ta = user.ta
+    if ta and OfficeHour.objects.on_duty().filter(ta=ta):
+        cancel = True
+    else:
+        cancel = False 
+     
+    if request.method == 'POST':
+        ca_form = CancelHoursForm(request.POST, prefix='ca_form')
+        oh_form = OfficeHourForm(request.POST, prefix='oh_form')
+        logger.debug('POSTED')
+        if oh_form.is_valid():
+            logger.debug('OH FORM VALID')
+            my_tz = pytz.timezone(settings.TIME_ZONE)
+            new_hours = oh_form.save(commit=False)
+            new_hours.end_time = new_hours.end_time.astimezone(my_tz)
+            new_hours.ta = user.ta
+            new_hours.start_time = _now()
+            new_hours.save()
+            logger.debug(new_hours)
+            return HttpResponseRedirect(reverse('taSystem'))
+        
+        elif ca_form.is_valid() and cancel:
+            logger.debug('CA FORM VALID')
+            logger.debug(ca_form.cleaned_data)
+            if ca_form.cleaned_data['confirm']:
+                try:
+                    oh = OfficeHour.objects.on_duty().filter(ta=user.ta)[0]
+                    oh.end_time = _now() - timedelta(minutes=1)
+                    oh.save()
+                    return HttpResponseRedirect(reverse('go_on_duty'))
+                except OfficeHour.DoesNotExist:
+                    logger.debug('No Office hours exist')
+                    pass
+            else:
+                return HttpResponseRedirect(reverse('taSystem'))
+    else:
+        logger.debug('NOT POSTED')
+        oh_form = OfficeHourForm(prefix='oh_form')
+        ca_form = CancelHoursForm(prefix='ca_form')
+    return render(request, 'go_on_duty.html', {'oh_form': oh_form, 
+                                               'ca_form': ca_form, 
+                                               'cancel': cancel})
+
+
+@login_required()
+@user_passes_test(is_ta)
+def cancel_hours(request):
+    user = request.user
+    if request.method == "POST":
+        form = CancelHoursForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['confirm']:
+                oh = OfficeHour.objects.on_duty().filter(ta = user.ta)[0]
+                oh.end_time = _now() - timedelta(minutes=1)
+                oh.save()
+                return HttpResponseRedirect(reverse('go_on_duty'))
+            else:
+                return HttpResponseRedirect(reverse('taSystem'))
+    else:
+        form = CancelHoursForm()
+
+    return render(request, 'cancel_hours.html', {'form': form})
+
 
 ############################################################################
 ##             Socketio Stuff

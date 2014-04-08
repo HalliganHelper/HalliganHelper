@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block content %}
+
+    <div class="row">
+        <form method=post action="">
+        {% csrf_token %} 
+        {{ form }}        
+        <div class="row">
+            <div class="centered eight columns text-center">
+                <div class="medium primary btn">
+                    <input id="submit" type="submit" value="Confirm"/>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block endScripts %}
+    <script src="{% static "js/setupRequest.js" %}"></script>
+{% endblock %}
