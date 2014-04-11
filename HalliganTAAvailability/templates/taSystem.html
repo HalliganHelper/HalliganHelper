@@ -75,9 +75,9 @@
                             {% else %}
                             <tr data-rqID="{{ r.id }}">
                             {% endif %}
-                                <td>{{ r.student.usr.first_name }} {{ r.student.usr.last_name|first|capfirst}}.</td>
-                                <td>{{ r.whereLocated }}</td>
-                                <td wraptext>{{ r.question }}</td>
+                                <td>{{ r.student.usr.first_name|escape }} {{ r.student.usr.last_name|first|capfirst|escape}}.</td>
+                                <td>{{ r.whereLocated|escape }}</td>
+                                <td wraptext>{{ r.question|escape }}</td>
                                 <td>{{ r.whenAsked|date:"m/d P" }}</td>
                                 <td>
                                     {% if r.student.usr == request.user %}
@@ -118,7 +118,7 @@
                     {% if rq.2 %}
                         <ul class="two_up tiles">
                         {% for oh in rq.2 %}
-                             <li>{{ oh.ta.usr.get_full_name }}: {{ oh.start_time|date:"P" }} -- {{ oh.end_time|date:"P" }} </li>
+                             <li>{{ oh.ta.usr.get_full_name|escape }}: {{ oh.start_time|date:"P" }} -- {{ oh.end_time|date:"P" }} </li>
                         {% endfor %}
                         </ul>
                     {% else %}

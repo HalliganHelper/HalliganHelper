@@ -1,4 +1,5 @@
 from django.shortcuts import render, render_to_response, HttpResponseRedirect
+from django.utils.html import escape
 from registration.backends.default.views import RegistrationView
 from forms import TuftsEmail, RequestForm, TARegister, OfficeHourForm, CancelHoursForm
 from models import Student, Request, TA, Course, OfficeHour
@@ -111,9 +112,9 @@ def getHelp(request, course=None):
             rq.save()
             d = {
                 'pk': rq.pk,
-                'name': '{0} {1}'.format(stu.usr.first_name, stu.usr.last_name[0].upper()),
-                'location': rq.whereLocated,
-                'problem': rq.question,
+                'name': escape('{0} {1}'.format(stu.usr.first_name, stu.usr.last_name[0].upper())),
+                'location': escape(rq.whereLocated),
+                'problem': escape(rq.question),
                 'when': rq.whenAsked.strftime('%m/%d %I:%M %p'),
                 'course': rq.course.Number,
                 'type': 'add'
