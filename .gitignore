@@ -1,7 +1,8 @@
 HalliganAvailability/environment.py
-*.swp
+*.sw[o|p]
 .db/
-
+*.pid
+*.log
 *.py[cod]
 
 # C extensions

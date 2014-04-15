@@ -1,7 +1,8 @@
 from django.shortcuts import render, render_to_response, HttpResponseRedirect
 from django.utils.html import escape
 from registration.backends.default.views import RegistrationView
-from forms import TuftsEmail, RequestForm, TARegister, OfficeHourForm, CancelHoursForm
+from forms import TuftsEmail, RequestForm, TARegister
+from forms import OfficeHourForm, CancelHoursForm
 from models import Student, Request, TA, Course, OfficeHour
 from django.contrib.auth.admin import User
 from django.http import HttpResponse
@@ -11,7 +12,8 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
-import pytz, datetime
+import pytz
+import datetime
 import logging
 from django.db.models import Q
 from HalliganAvailability import settings
@@ -26,10 +28,13 @@ import requests
 
 logger = logging.getLogger(__name__)
 socket_logger = logging.getLogger('sockets')
+
+
 def _now():
     tz = pytz.timezone(settings.TIME_ZONE)
     now = datetime.datetime.now(tz)
     return now
+
 
 def notify(user, courses, adding_ta=True):
     subject = 'TA Activation'
@@ -46,7 +51,7 @@ def notify(user, courses, adding_ta=True):
     text_content = plaintext.render(d)
     html_content = htmly.render(d)
 
-    msg = EmailMultiAlternatives(subject, text_content, 
+    msg = EmailMultiAlternatives(subject, text_content,
                                  from_email, [to_email])
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
@@ -76,21 +81,24 @@ def check_ta(user):
             ta.save()
             notify(user, None, adding_ta=False)
 
+
 def user_confirmed(sender, user, request, **kwargs):
     check_ta(user)
     logger.debug("User {0} confirmed".format(user))
+
 
 def user_created(sender, user, request, **kwargs):
     form = TuftsEmail(request.POST)
     stu, created = Student.objects.get_or_create(usr=user)
     stu.save()
-    user.first_name=form.data['first_name']
-    user.last_name=form.data['last_name']
+    user.first_name = form.data['first_name']
+    user.last_name = form.data['last_name']
     user.save()
     logger.debug("User {0} created".format(user))
 
 user_registered.connect(user_created)
 user_activated.connect(user_confirmed)
+
 
 class TuftsRegistrationView(RegistrationView):
     form_class = TuftsEmail
@@ -106,13 +114,15 @@ def getHelp(request, course=None):
         form = RequestForm(request.POST)
         if form.is_valid():
             rq = form.save(commit=False)
-            stu, create = Student.objects.get_or_create(usr__id=request.user.id)
+            usr_id = request.user.id
+            stu, create = Student.objects.get_or_create(usr__id=usr_id)
             rq.student = stu
             rq.emailed = False
             rq.save()
             d = {
                 'pk': rq.pk,
-                'name': escape('{0} {1}'.format(stu.usr.first_name, stu.usr.last_name[0].upper())),
+                'name': escape('{0} {1}'.format(stu.usr.first_name,
+                                                stu.usr.last_name[0].upper())),
                 'location': escape(rq.whereLocated),
                 'problem': escape(rq.question),
                 'when': rq.whenAsked.strftime('%m/%d %I:%M %p'),
@@ -126,6 +136,7 @@ def getHelp(request, course=None):
 
     data = {'form': form}
     return render(request, 'getHelp.html', data)
+
 
 @login_required()
 def listRequests(request):
@@ -162,17 +173,20 @@ def onlineQueue(request):
     tz = pytz.timezone(settings.TIME_ZONE)
     before = datetime.datetime.now(tz) - datetime.timedelta(hours=3)
 
-    expiredReqs = Request.objects.filter(whenAsked__lt=before).filter(Q(timedOut=False))
+    expiredReqs = Request.objects.filter(whenAsked__lt=before)
+    expiredReqs = expiredReqs.filter(Q(timedOut=False))
     for e in expiredReqs:
         e.timeOut()
 
-    allReqs = Request.objects.filter(whenAsked__gte=before).order_by('whenAsked')
+    allReqs = Request.objects.filter(whenAsked__gte=before)
+    allReqs = allReqs.order_by('whenAsked')
     courses = Course.objects.all().order_by('Number')
     ohs = OfficeHour.objects.on_duty()
     requestData = []
 
     for course in courses:
-        reqs = allReqs.filter(course=course).filter(timedOut=False).filter(solved=False)
+        reqs = allReqs.filter(course=course)
+        reqs = reqs.filter(timedOut=False).filter(solved=False)
         course_hours = ohs.filter(course=course)
         insert = (course, reqs, course_hours)
         requestData.append(insert)
@@ -197,12 +211,12 @@ def resolveRequest(request):
     except TA.DoesNotExist:
         ta = None
     if not rq_id:
-        #TODO: add error message
+        # TODO: add error message
         return HttpResponse(status=400)
     try:
         rq_id = int(rq_id)
     except ValueError:
-        #TODO: add error message
+        # TODO: add error message
         return HttpResponse(status=400)
 
     req = get_object_or_404(Request, pk=rq_id)
@@ -214,23 +228,28 @@ def resolveRequest(request):
     req.whenSolved = _now()
     req.timedOut = False
     req.save()
-    QueueNamespace.emit({'type': 'resolve', 'rq': rq_id, 'course': req.course.Number}, json=True)
+    QueueNamespace.emit({'type': 'resolve',
+                         'rq': rq_id,
+                         'course': req.course.Number},
+                        json=True)
     return HttpResponse(status=200)
+
 
 def is_ta(user):
     return TA.objects.filter(usr=user).exists()
+
 
 @login_required()
 @user_passes_test(is_ta)
 def go_on_duty(request):
     user = request.user
-     
+
     ta = user.ta
     if ta and OfficeHour.objects.on_duty().filter(ta=ta):
         cancel = True
     else:
-        cancel = False 
-     
+        cancel = False
+
     if request.method == 'POST':
         ca_form = CancelHoursForm(request.POST, prefix='ca_form')
         oh_form = OfficeHourForm(request.POST, prefix='oh_form')
@@ -245,7 +264,7 @@ def go_on_duty(request):
             new_hours.save()
             logger.debug(new_hours)
             return HttpResponseRedirect(reverse('taSystem'))
-        
+
         elif ca_form.is_valid() and cancel:
             logger.debug('CA FORM VALID')
             logger.debug(ca_form.cleaned_data)
@@ -264,8 +283,8 @@ def go_on_duty(request):
         logger.debug('NOT POSTED')
         oh_form = OfficeHourForm(prefix='oh_form')
         ca_form = CancelHoursForm(prefix='ca_form')
-    return render(request, 'go_on_duty.html', {'oh_form': oh_form, 
-                                               'ca_form': ca_form, 
+    return render(request, 'go_on_duty.html', {'oh_form': oh_form,
+                                               'ca_form': ca_form,
                                                'cancel': cancel})
 
 
@@ -277,7 +296,7 @@ def cancel_hours(request):
         form = CancelHoursForm(request.POST)
         if form.is_valid():
             if form.cleaned_data['confirm']:
-                oh = OfficeHour.objects.on_duty().filter(ta = user.ta)[0]
+                oh = OfficeHour.objects.on_duty().filter(ta=user.ta)[0]
                 oh.end_time = _now() - timedelta(minutes=1)
                 oh.save()
                 return HttpResponseRedirect(reverse('go_on_duty'))
@@ -290,43 +309,39 @@ def cancel_hours(request):
 
 
 ############################################################################
-##             Socketio Stuff
+#             Socketio Stuff
 ############################################################################
 
 class QueueNamespace(BaseNamespace):
     _connections = {}
-    
+
     def initialize(self, *args, **kwargs):
         self._connections[id(self)] = self
         socket_logger.debug("Adding socket with ID {}".format(id(self)))
         super(QueueNamespace, self).initialize(*args, **kwargs)
-        
+
     def disconnect(self, *args, **kwargs):
         del self._connections[id(self)]
         socket_logger.debug("Deleting socket with ID {}".format(id(self)))
         super(QueueNamespace, self).disconnect(*args, **kwargs)
-                 
+
     def on_remove(self, packet):
         logger.debug(packet)
         self.send({'message': 'Goodbye!'}, json=True)
-   
+
     @staticmethod
     def emit(msg, json=True):
         for connection_id, connection in QueueNamespace._connections.items():
-            logger.debug("Sending {0} to {1} with id {2}".format(msg, connection, connection_id))
+            output_string = "Sending {0} to {1} with id {2}"
+            logger.debug(output_string.format(msg, connection, connection_id))
             connection.send(msg, json)
-   
-    
+
+
 def socketio(request):
     try:
-        socketio_manage(request.environ, 
-                        {
-                            '/taqueue': QueueNamespace,
-                        }, 
-                        request=request
-        )
+        socketio_manage(request.environ, {'/taqueue': QueueNamespace, },
+                        request=request)
     except:
         logger.error("Exception while handling sockets")
 
     return HttpResponse()
-
