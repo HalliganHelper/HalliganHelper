@@ -35,7 +35,7 @@ class TA(models.Model):
     usr = models.OneToOneField(User)
     course = models.ManyToManyField(Course)
     active = models.BooleanField(default=True)
-    
+        
     def __str__(self):
         return "{0}: {1}".format(self.usr, self.usr.get_full_name())
 
@@ -84,6 +84,7 @@ class OfficeHour(models.Model):
     end_time = models.DateTimeField()
     course = models.ForeignKey(Course)
     ta = models.ForeignKey(TA)
+    location = models.CharField(max_length=255)
     objects = OfficeHourManager()
 
 

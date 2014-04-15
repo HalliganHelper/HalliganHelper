@@ -72,7 +72,7 @@ class TARegister(forms.Form):
 class OfficeHourForm(forms.ModelForm):
     class Meta:
         model = OfficeHour
-        fields = ['end_time', 'course']
+        fields = ['end_time', 'course', 'location']
 
 class CancelHoursForm(forms.Form):
     confirm = forms.BooleanField(required=False) 
