@@ -27,12 +27,36 @@ $(function(){
 
 });
 
+$(function() {
+    var course = '';
+    if(sessionStorage && sessionStorage['currentTab']) {
+        console.log(sessionStorage['currentTab']);
+        course = sessionStorage['currentTab'];
+    } else {
+        return;
+    }
+
+    $('#sidebar-nav li').removeClass('active');
+    $('#' + course + 'Nav').addClass('active');
+
+    course = sessionStorage['currentTab'];
+    $('.course').addClass('Hidden');
+    $('.courseTA').addClass('Hidden');
+    $('#' + course).removeClass('Hidden');
+    $('#' + course + 'TA').removeClass('Hidden');
+
+});
+
 $(function(){
     $('#sidebar-nav li').click(function(e){
         var $this = $(this);
         e.preventDefault();
         if (this.id != 'showtas') {
             var course = $this.data('course');
+            console.log(course);
+            if(sessionStorage){
+                sessionStorage['currentTab'] = course;
+            }
             $('#sidebar-nav li').removeClass('active');
             $this.addClass('active');
             $('.course').addClass('Hidden');

@@ -1,0 +1,111 @@
+2014-04-15 12:52:44,844 INFO supervisord started with pid 63657
+2014-04-15 12:52:45,848 INFO spawned: 'gunicorn' with pid 63660
+2014-04-15 12:52:45,856 INFO exited: gunicorn (exit status 127; not expected)
+2014-04-15 12:52:46,861 INFO spawned: 'gunicorn' with pid 63678
+2014-04-15 12:52:46,870 INFO exited: gunicorn (exit status 127; not expected)
+2014-04-15 12:52:48,878 INFO spawned: 'gunicorn' with pid 63679
+2014-04-15 12:52:48,885 INFO exited: gunicorn (exit status 127; not expected)
+2014-04-15 12:52:51,835 WARN received SIGINT indicating exit request
+2014-04-15 12:55:04,057 INFO daemonizing the supervisord process
+2014-04-15 12:55:04,058 INFO supervisord started with pid 63782
+2014-04-15 12:55:05,063 INFO spawned: 'gunicorn_two' with pid 63783
+2014-04-15 12:55:05,072 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:55:06,077 INFO spawned: 'gunicorn_two' with pid 63784
+2014-04-15 12:55:06,085 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:55:08,090 INFO spawned: 'gunicorn_two' with pid 63786
+2014-04-15 12:55:08,097 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:55:08,249 INFO supervisord started with pid 63787
+2014-04-15 12:55:09,254 INFO spawned: 'gunicorn_two' with pid 63791
+2014-04-15 12:55:09,262 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:55:10,266 INFO spawned: 'gunicorn_two' with pid 63792
+2014-04-15 12:55:10,275 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:55:11,107 INFO spawned: 'gunicorn_two' with pid 63793
+2014-04-15 12:55:11,114 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:55:12,116 INFO gave up: gunicorn_two entered FATAL state, too many start retries too quickly
+2014-04-15 12:55:12,281 INFO spawned: 'gunicorn_two' with pid 63794
+2014-04-15 12:55:12,289 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:55:13,427 WARN received SIGINT indicating exit request
+2014-04-15 12:56:02,842 INFO supervisord started with pid 63819
+2014-04-15 12:56:03,848 INFO spawned: 'gunicorn_two' with pid 63822
+2014-04-15 12:56:03,857 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:56:04,862 INFO spawned: 'gunicorn_two' with pid 63825
+2014-04-15 12:56:04,869 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:56:05,235 WARN received SIGINT indicating exit request
+2014-04-15 12:57:26,000 INFO supervisord started with pid 63892
+2014-04-15 12:57:27,004 INFO spawned: 'gunicorn_two' with pid 63895
+2014-04-15 12:57:27,012 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:57:28,017 INFO spawned: 'gunicorn_two' with pid 63896
+2014-04-15 12:57:28,025 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:57:28,588 WARN received SIGINT indicating exit request
+2014-04-15 12:58:01,552 INFO supervisord started with pid 63905
+2014-04-15 12:58:02,555 INFO spawned: 'gunicorn_two' with pid 63908
+2014-04-15 12:58:02,563 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:58:03,567 INFO spawned: 'gunicorn_two' with pid 63925
+2014-04-15 12:58:03,573 INFO exited: gunicorn_two (exit status 127; not expected)
+2014-04-15 12:58:04,044 WARN received SIGINT indicating exit request
+2014-04-15 12:59:50,979 INFO supervisord started with pid 63967
+2014-04-15 12:59:51,983 INFO spawned: 'gunicorn_two' with pid 63970
+2014-04-15 12:59:53,185 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-15 18:25:40,260 WARN received SIGINT indicating exit request
+2014-04-15 18:25:40,261 INFO waiting for gunicorn_two to die
+2014-04-15 18:25:40,375 INFO stopped: gunicorn_two (exit status 0)
+2014-04-15 18:25:42,362 INFO supervisord started with pid 418
+2014-04-15 18:25:43,364 INFO spawned: 'gunicorn_two' with pid 437
+2014-04-15 18:25:44,501 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-15 18:34:45,896 WARN received SIGINT indicating exit request
+2014-04-15 18:34:45,898 INFO waiting for gunicorn_two to die
+2014-04-15 18:34:46,012 INFO stopped: gunicorn_two (exit status 0)
+2014-04-15 18:34:47,052 INFO supervisord started with pid 808
+2014-04-15 18:34:48,056 INFO spawned: 'gunicorn_two' with pid 811
+2014-04-15 18:34:49,187 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-15 18:57:00,865 WARN received SIGINT indicating exit request
+2014-04-15 18:57:00,867 INFO waiting for gunicorn_two to die
+2014-04-15 18:57:00,979 INFO stopped: gunicorn_two (exit status 0)
+2014-04-15 18:57:02,421 INFO supervisord started with pid 1436
+2014-04-15 18:57:03,424 INFO spawned: 'gunicorn_two' with pid 1455
+2014-04-15 18:57:04,583 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-15 18:57:52,079 WARN received SIGINT indicating exit request
+2014-04-15 18:57:52,080 INFO waiting for gunicorn_two to die
+2014-04-15 18:57:52,192 INFO stopped: gunicorn_two (exit status 0)
+2014-04-15 18:57:53,521 INFO supervisord started with pid 1494
+2014-04-15 18:57:54,523 INFO spawned: 'gunicorn_two' with pid 1497
+2014-04-15 18:57:55,654 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-15 18:58:29,873 WARN received SIGINT indicating exit request
+2014-04-15 18:58:29,873 INFO waiting for gunicorn_two to die
+2014-04-15 18:58:29,984 INFO stopped: gunicorn_two (exit status 0)
+2014-04-15 18:58:31,562 INFO supervisord started with pid 1518
+2014-04-15 18:58:32,566 INFO spawned: 'gunicorn_two' with pid 1521
+2014-04-15 18:58:33,715 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-15 18:58:43,590 WARN received SIGINT indicating exit request
+2014-04-15 18:58:43,591 INFO waiting for gunicorn_two to die
+2014-04-15 18:58:43,701 INFO stopped: gunicorn_two (exit status 0)
+2014-04-15 18:58:44,870 INFO supervisord started with pid 1537
+2014-04-15 18:58:45,872 INFO spawned: 'gunicorn_two' with pid 1540
+2014-04-15 18:58:47,024 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-15 18:59:22,344 WARN received SIGINT indicating exit request
+2014-04-15 18:59:22,344 INFO waiting for gunicorn_two to die
+2014-04-15 18:59:22,455 INFO stopped: gunicorn_two (exit status 0)
+2014-04-15 18:59:23,549 INFO supervisord started with pid 1578
+2014-04-15 18:59:24,553 INFO spawned: 'gunicorn_two' with pid 1581
+2014-04-15 18:59:25,678 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-16 10:57:28,929 WARN received SIGINT indicating exit request
+2014-04-16 10:57:28,931 INFO waiting for gunicorn_two to die
+2014-04-16 10:57:29,054 INFO stopped: gunicorn_two (exit status 0)
+2014-04-16 10:57:30,909 INFO supervisord started with pid 2886
+2014-04-16 10:57:31,912 INFO spawned: 'gunicorn_two' with pid 2908
+2014-04-16 10:57:33,163 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-16 11:02:41,764 WARN received SIGINT indicating exit request
+2014-04-16 11:02:41,767 INFO waiting for gunicorn_two to die
+2014-04-16 11:02:41,896 INFO stopped: gunicorn_two (exit status 0)
+2014-04-16 11:02:43,655 INFO supervisord started with pid 3186
+2014-04-16 11:02:44,661 INFO spawned: 'gunicorn_two' with pid 3189
+2014-04-16 11:02:45,876 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-16 11:30:54,574 WARN received SIGINT indicating exit request
+2014-04-16 11:30:54,574 INFO waiting for gunicorn_two to die
+2014-04-16 11:30:54,706 INFO stopped: gunicorn_two (exit status 0)
+2014-04-16 11:30:55,873 INFO supervisord started with pid 3872
+2014-04-16 11:30:56,878 INFO spawned: 'gunicorn_two' with pid 3875
+2014-04-16 11:30:58,107 INFO success: gunicorn_two entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2014-04-16 11:32:17,806 WARN received SIGINT indicating exit request
+2014-04-16 11:32:17,807 INFO waiting for gunicorn_two to die
+2014-04-16 11:32:17,931 INFO stopped: gunicorn_two (exit status 0)
