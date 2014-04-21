@@ -55,6 +55,7 @@ class Request(models.Model):
     timedOut = models.BooleanField(default=False)
     emailed = models.BooleanField(default=False)
     who_solved = models.ForeignKey(TA, null=True)
+    checked_out = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         est = pytz.timezone('US/Eastern')

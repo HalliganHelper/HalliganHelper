@@ -246,6 +246,7 @@ def resolveRequest(request):
     req.solved = True
     req.whenSolved = _now()
     req.timedOut = False
+    req.checked_out = False
     req.save()
     QueueNamespace.emit({'type': 'resolve',
                          'rq': rq_id,
@@ -333,18 +334,24 @@ def cancel_hours(request):
 def take_request(request):
     pk = request.POST.get('pk', None)
     if pk:
-        data = {}
-        data['pk'] = pk
-        data['type'] = 'check_out'
-        QueueNamespace.emit(data, json=True)
-        return HttpResponse(200)
-    else:
-        return HttpResponse(404)
+        try:
+            rq = Request.objects.get(pk=pk)
+            rq.checked_out = True
+            rq.save()
+            data = {}
+            data['pk'] = pk
+            data['type'] = 'check_out'
+            data['ta'] = request.user.get_full_name()
+            QueueNamespace.emit(data, json=True)
+            return HttpResponse(200)
+        except:
+            pass
+    return HttpResponse(404)
+
 
 ############################################################################
 #             Socketio Stuff
 ############################################################################
-
 
 class QueueNamespace(BaseNamespace):
     _connections = {}

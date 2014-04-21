@@ -54,13 +54,28 @@ function hookup_resolve(){
         var jqxhr = $.post('users/resolveRequest', {'requestID': id}, function(data){
         })
         .fail(function(data) {
-            console.log(data);
             $(btn).text('Unauthorized');
-            console.log('Failed to resolve request');
         });
     })
 }
 
+function hookup_checkout(){
+    $('.checkoutBtn').click(function(e){
+        e.preventDefault();
+        var btn = $(this);
+        var id = $(this).data('id');
+        $.post('users/checkoutRequest', {'pk': id}).fail(function(data){
+            console.log(data);
+            $(btn).text('Unauthorized');
+        });
+
+    });
+
+}
+
+$(function(){
+    hookup_checkout();
+});
 
 function remove_row(obj) {
     var rq_id = obj.rq
@@ -90,11 +105,15 @@ function add_row(obj) {
     var wh_td = "<td>" + obj.when + "</td>";
     var re_td = $("<td></td>");
     if(isTA){
-        var btn = $('<div class="medium info btn"></div>');
-        var link = $('<a href="#" class="resolveBtn" data-id="' + obj.pk + '">Resolve</a>');
+        var btn = $('<div class="medium default btn"></div>');
+        var link = $('<a href="#" class="checkoutBtn" data-id="' + obj.pk + '">Check Out</a>');
         $(btn).append($(link));
         $(re_td).append($(btn));
-        console.log("adding as TA");
+
+        var otherBtn = $('<div class="medium info btn"></div>');
+        var otherLink = $('<a href="#" class="resolveBtn" data-id="' + obj.pk + '">Resolve</a>');
+        $(otherBtn).append($(otherLink));
+        $(re_td).append($(otherBtn));
     }
     var new_row = $("<tr data-rqID='" + obj.pk + "'></tr>").append($(nm_td)).append($(lo_td));
     $(new_row).append($(pr_td)).append($(wh_td)).append($(re_td));
@@ -116,12 +135,17 @@ function add_row(obj) {
 
     $(tbdy).append($(new_row));
     hookup_resolve();
+    hookup_checkout();
 }
 
 $(function(){
     hookup_resolve();
 });
 
+
+function check_out(obj) {
+    console.log(obj)
+}
 
 socket = io.connect('/taqueue', {transports: ['xhr-polling']});
 
@@ -132,6 +156,9 @@ socket.on("message", function(obj) {
             break;
         case 'add':
             add_row(obj);
+            break;
+        case 'check_out':
+            check_out(obj);
             break;
     }
 });
