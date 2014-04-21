@@ -1,29 +1,30 @@
-from django.shortcuts import render, render_to_response, HttpResponseRedirect
-from django.utils.html import escape
-from registration.backends.default.views import RegistrationView
-from forms import TuftsEmail, RequestForm, TARegister
-from forms import OfficeHourForm, CancelHoursForm
-from models import Student, Request, TA, Course, OfficeHour
-from django.contrib.auth.admin import User
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required, user_passes_test
-from registration.signals import user_registered, user_activated
-from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.shortcuts import get_object_or_404
-from django.core.urlresolvers import reverse
-import pytz
 import datetime
 import logging
-from django.db.models import Q
-from HalliganAvailability import settings
-from socketio.namespace import BaseNamespace
-from socketio import socketio_manage
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import get_template
-from django.template import Context
-from datetime import timedelta
+import pytz
 import requests
+
+from HalliganAvailability import settings
+from datetime import timedelta
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.mail import EmailMultiAlternatives
+from django.core.urlresolvers import reverse
+from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import render, render_to_response
+from django.shortcuts import HttpResponseRedirect, get_object_or_404
+from django.template import Context
+from django.template.loader import get_template
+from django.utils.html import escape
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from registration.backends.default.views import RegistrationView
+from registration.signals import user_registered, user_activated
+from socketio import socketio_manage
+from socketio.namespace import BaseNamespace
+
+from forms import TuftsEmail, RequestForm, OfficeHourForm, CancelHoursForm
+from models import Student, Request, TA, Course, OfficeHour
 
 
 logger = logging.getLogger(__name__)
@@ -151,20 +152,27 @@ def listRequests(request):
 
 @login_required()
 def profile(request):
-    usr = User.objects.get(email=request.user.email)
-    student = Student.objects.get(usr=usr)
-
-    taForm = TARegister()
-
+    user = request.user
+    data = {}
     try:
-        rqs = Request.objects.filter(student=student)
-        ta = TA.objects.get(usr=usr)
-    except Request.DoesNotExist:
-        rqs = None
+        ta = TA.objects.get(usr__pk=user.pk)
+        data['is_ta'] = True
     except TA.DoesNotExist:
         ta = None
+        data['is_ta'] = False
 
-    data = {'student': student, 'rqs': rqs, 'ta': ta, 'taForm': taForm}
+    page = request.GET.get('page', None)
+    if ta:
+        resolved_requests = ta.request_set.all().order_by('-whenSolved')
+        paginator = Paginator(resolved_requests, 20)
+        try:
+            resolved = paginator.page(page)
+        except PageNotAnInteger:
+            resolved = paginator.page(1)
+        except EmptyPage:
+            resolved = paginator.page(paginator.num_pages)
+        data['resolved'] = resolved
+
     return render(request, 'profile.html', data)
 
 

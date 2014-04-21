@@ -93,7 +93,7 @@
                                         <div class="medium info btn">
                                             <a href="#" class="resolveBtn" data-id="{{ r.pk }}">Resolve</a>
                                         </div>
-                                    {% elif isTA %}
+                                    {% elif is_ta %}
                                         <div class="medium info btn">
                                             <a href="#" class="resolveBtn" data-id="{{ r.pk }}">Resolve</a>
                                         </div>
@@ -133,7 +133,7 @@
                     {% else %}
                         <div class="text-center"> No one is on duty </div>
                     {% endif %}
-                    {% if isTA %}
+                    {% if is_ta %}
                     <div class="text-center">
                         <div class="medium primary btn"> 
                             <a href="{% url 'go_on_duty' %}" class="goOnDuty" data-course="{{ rq.0.pk }}">Go On/Off Duty</a>
