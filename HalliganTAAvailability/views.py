@@ -220,10 +220,13 @@ def resolveRequest(request):
         return HttpResponse(status=400)
 
     req = get_object_or_404(Request, pk=rq_id)
+    is_the_student = req.student.pk == student.pk
 
-    if req.student.pk != student.pk and not ta:
+    if not is_the_student and not ta:
         return HttpResponse(status=401)
 
+    if ta and not is_the_student:
+        req.who_solved = ta
     req.solved = True
     req.whenSolved = _now()
     req.timedOut = False
