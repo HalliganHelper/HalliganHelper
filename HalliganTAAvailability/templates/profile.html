@@ -3,16 +3,78 @@
 {% block content %}
     <div class="row">
         <div class="centered ten columns text-center">
-            <h2>{{ student.usr.first_name }} {{ student.usr.last_name }}'s Profile</h2>
+            <h2>{{ request.user.first_name }} {{ request.user.last_name }}'s Profile</h2>
         </div>
     </div>
-    <div class="row">
-        <div class="centered six columns text-center">
-            <div class="medium secondary btn">
-                <a href="{% url 'auth_password_change' %}">Password Change</a>
+
+    <div class="row sixteen colgrid">
+        <div class="row five columns">
+            <div class="row text-center">
+                <h4>Manage Account</h4>
+            </div>
+            <div class="row centered 3 columns text-center">
+                <div class="medium secondary btn">
+                    <a href="{% url 'auth_password_change' %}">Password Change</a>
+                </div>
             </div>
         </div>
+
+
+        <div class="row eleven columns">
+            {% if is_ta %}
+                <div class="row text-center">
+                    <h4>Requests you've resolved</h4>
+
+                </div>
+                <div class="row text-center">
+                    <table>
+                        <thead>
+                            <tr>
+                                <td> Course </td>
+                                <td> Student </td>
+                                <td> Question </td>
+                                <td> Solved </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in resolved %}
+                                <tr>
+                                    <td> {{ req.course.Number }} </td>
+                                    <td> {{ req.student.usr.first_name|capfirst }} {{req.student.usr.last_name|first|capfirst }}. </td>
+                                    <td> {{ req.question }} </td>
+                                    <td> {{ req.whenSolved|date:"n/j/y" }} </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row">
+                    <div class="one column text-center">
+                        {% if resolved.has_previous %}
+                        {# <div class="medium secondary btn">#}
+                                <a href="?page={{ resolved.previous_page_number }}">Previous</a>
+                                {# </div>#}
+                        {% endif %}
+                    </div>
+                    <div class="nine columns  centered text-center">
+                        {{ resolved.start_index }} - {{ resolved.end_index }} of {{ resolved.paginator.count }}
+                    </div>
+
+                    <div class="one columns text-right">
+                        {% if resolved.has_next %}
+                        {# <div class="medium secondary btn">#}
+                                <a href="?page={{ resolved.next_page_number }}">Next</a>
+                                {# </div>#}
+                        {% endif %}
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
     </div>
-
-
 {% endblock %}
