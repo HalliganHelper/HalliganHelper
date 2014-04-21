@@ -101,6 +101,14 @@ user_registered.connect(user_created)
 user_activated.connect(user_confirmed)
 
 
+def ta_test(user):
+    try:
+        user.ta
+        return True
+    except TA.DoesNotExists:
+        return False
+
+
 class TuftsRegistrationView(RegistrationView):
     form_class = TuftsEmail
 
@@ -319,9 +327,24 @@ def cancel_hours(request):
     return render(request, 'cancel_hours.html', {'form': form})
 
 
+@login_required
+@user_passes_test(ta_test)
+@require_POST
+def take_request(request):
+    pk = request.POST.get('pk', None)
+    if pk:
+        data = {}
+        data['pk'] = pk
+        data['type'] = 'check_out'
+        QueueNamespace.emit(data, json=True)
+        return HttpResponse(200)
+    else:
+        return HttpResponse(404)
+
 ############################################################################
 #             Socketio Stuff
 ############################################################################
+
 
 class QueueNamespace(BaseNamespace):
     _connections = {}
