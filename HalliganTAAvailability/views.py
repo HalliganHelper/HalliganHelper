@@ -191,11 +191,11 @@ def onlineQueue(request):
         insert = (course, reqs, course_hours)
         requestData.append(insert)
 
-    isTA = TA.objects.filter(usr__id=request.user.id).exists()
+    is_ta = TA.objects.filter(usr__id=request.user.id).exists()
 
     responseData = {
         'requestData': requestData,
-        'isTA': isTA
+        'is_ta': is_ta
     }
 
     return render(request, 'taSystem.html', responseData)

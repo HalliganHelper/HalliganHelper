@@ -45,6 +45,23 @@ $.ajaxSetup({
     }
 });
 
+function hookup_resolve(){
+    $('.resolveBtn').click(function(e){
+        e.preventDefault();
+        var btn = $(this);
+        var id = $(this).data('id');
+        var tableID = $(this).parents('table').attr('id');
+        var jqxhr = $.post('users/resolveRequest', {'requestID': id}, function(data){
+        })
+        .fail(function(data) {
+            console.log(data);
+            $(btn).text('Unauthorized');
+            console.log('Failed to resolve request');
+        });
+    })
+}
+
+
 function remove_row(obj) {
     var rq_id = obj.rq
     var el = $("[data-rqID='" + rq_id + "']");
@@ -71,7 +88,14 @@ function add_row(obj) {
     var lo_td = "<td>" + obj.location + "</td>";
     var pr_td = "<td>" + obj.problem + "</td>";
     var wh_td = "<td>" + obj.when + "</td>";
-    var re_td = "<td></td>";
+    var re_td = $("<td></td>");
+    if(isTA){
+        var btn = $('<div class="medium info btn"></div>');
+        var link = $('<a href="#" class="resolveBtn" data-id="' + obj.pk + '">Resolve</a>');
+        $(btn).append($(link));
+        $(re_td).append($(btn));
+        console.log("adding as TA");
+    }
     var new_row = $("<tr data-rqID='" + obj.pk + "'></tr>").append($(nm_td)).append($(lo_td));
     $(new_row).append($(pr_td)).append($(wh_td)).append($(re_td));
 
@@ -91,22 +115,14 @@ function add_row(obj) {
     
 
     $(tbdy).append($(new_row));
+    hookup_resolve();
 }
 
-$(function resolve(){
-    $('.resolveBtn').click(function(e){
-        e.preventDefault();
-        var btn = $(this);
-        var id = $(this).data('id');
-        var tableID = $(this).parents('table').attr('id');
-        var jqxhr = $.post('users/resolveRequest', {'requestID': id}, function(data){
-        })
-        .fail(function() {
-            $(btn).text('Failed?');
-            console.log('Failed to resolve request');
-        });
-    })
-})
+$(function(){
+    hookup_resolve();
+});
+
+
 socket = io.connect('/taqueue', {transports: ['xhr-polling']});
 
 socket.on("message", function(obj) {

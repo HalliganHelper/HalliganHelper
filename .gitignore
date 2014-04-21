@@ -4,6 +4,7 @@ HalliganAvailability/environment.py
 *.pid
 *.log
 *.py[cod]
+supervisord.*
 
 # C extensions
 *.so

@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block header %}
+<script>
+    {% if is_ta %}
+    var isTA = true;
+    {% else %}
+    var isTA = false;
+    {% endif %}
+
+
+</script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js"></script>
 {% endblock %}
 
