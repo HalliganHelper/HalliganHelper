@@ -151,7 +151,19 @@ def getHelp(request, course=None):
                 'when': rq.whenAsked.strftime('%I:%M %p'),
                 'type': 'notify'
             }
-            QueueNamespace.emit_to_ta(d)
+
+            def course_test(conn_id, conn, msg):
+                if conn['user'].is_authenticated():
+                    try:
+                        courses = conn['user'].ta.course.all()
+                        nums = [c.Number for c in courses]
+                        if msg['course'] in nums:
+                            return True
+                    except TA.DoesNotExist:
+                        pass
+                return False
+
+            QueueNamespace.emit_to_test(d, course_test)
             return HttpResponseRedirect(reverse('taSystem'))
     else:
         form = RequestForm()
@@ -405,6 +417,21 @@ class QueueNamespace(BaseNamespace):
     def emit_to_ta(msg, json=True):
         for connection_id, connection in QueueNamespace._connections.items():
             if ta_test(connection['user']):
+                connection['socket'].send(msg, json)
+
+    @staticmethod
+    def emit_to_test(msg, test, json=True):
+        """
+            test is a function that will receive two parameters:
+                connection_id - the id of the socket connectoin
+                connection - a dictionary that has two keys:
+                    socket - the socket object itself
+                    user - the user object. This is the real point of this
+                    msg - the same message passed to emit_to_test
+            test is expected to return True or False
+        """
+        for connection_id, connection in QueueNamespace._connections.items():
+            if test(connection_id, connection, msg):
                 connection['socket'].send(msg, json)
 
 
