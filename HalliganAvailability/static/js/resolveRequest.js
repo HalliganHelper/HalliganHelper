@@ -147,31 +147,45 @@ function check_out(obj) {
     console.log(obj)
 }
 
+function show_notification(obj) {
+    var req_str = obj.when + ': ' + obj.name + ' needs help with ' + obj.problem;
+    req_str += ' in ' + obj.location;
+    var notification = new Notification("Queue Updated", {
+                                        'icon': '',
+                                        'body': req_str
+                                        });
 
-$(function() {
-    if(window.webkitNotifications) {
-        window.webkitNotifications.requestPermission();
-    }
-});
+    $(window).bind('focus', function() {
+        if (notification) {
+            notification.close(),
+            notification = undefined;
+        }
+    }); 
+    window.setTimeout(function() {
+        if (notification) {
+            notification.close();
+            notification = undefined;
+        }
+    }, 300000);
+}
 
 function notification(obj) {
-    var api = window.webkitNotifications;
-    if (api && api.checkPermission() == 0) {
-        var notification = window.webkitNotifications.createNotification(
-            'http://i.stack.imgur.com/dmHl0.png',
-            'HalliganHelper Queue Updated!',
-            'Someone has been added to the Comp ' + obj.number + ' Queue.' 
-        );
+    if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+            show_notification(obj);
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission(function (permission) {
+                if(!('permission' in Notification)) {
+                    Notification.permission = permission;
+                }
 
-        notification.onclick = function () {
-            notification.close();
+                if (permission === "granted") {
+                    show_notification(obj);
+                }
+            });
         }
-        notification.show();
     }
-
     $.titleAlert("Queue Updated");
-
-    
 }
 
 socket = io.connect('/taqueue', {transports: ['xhr-polling']});

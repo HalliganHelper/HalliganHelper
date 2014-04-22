@@ -133,7 +133,7 @@ def getHelp(request, course=None):
             rq.save()
             d = {
                 'pk': rq.pk,
-                'name': escape('{0} {1}'.format(stu.usr.first_name,
+                'name': escape('{0} {1}'.format(stu.usr.first_name.title(),
                                                 stu.usr.last_name[0].upper())),
                 'location': escape(rq.whereLocated),
                 'problem': escape(rq.question),
@@ -144,6 +144,11 @@ def getHelp(request, course=None):
             QueueNamespace.emit(d, json=True)
             d = {
                 'course': rq.course.Number,
+                'problem': escape(rq.question),
+                'location': escape(rq.whereLocated),
+                'name': escape('{0} {1}'.format(stu.usr.first_name.title(),
+                                                stu.usr.last_name[0].upper())),
+                'when': rq.whenAsked.strftime('%I:%M %p'),
                 'type': 'notify'
             }
             QueueNamespace.emit_to_ta(d)
