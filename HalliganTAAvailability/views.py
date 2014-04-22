@@ -102,10 +102,13 @@ user_activated.connect(user_confirmed)
 
 
 def ta_test(user):
-    try:
-        user.ta
-        return True
-    except TA.DoesNotExist:
+    if user.is_authenticated():
+        try:
+            user.ta
+            return True
+        except TA.DoesNotExist:
+            return False
+    else:
         return False
 
 
