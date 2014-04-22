@@ -1,15 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block header %}
-<script>
-    {% if is_ta %}
-    var isTA = true;
-    {% else %}
-    var isTA = false;
-    {% endif %}
-
-
-</script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js"></script>
 {% endblock %}
 
@@ -95,7 +86,7 @@
                                         </div>
                                     {% elif is_ta %}
                                         <div class="medium default btn">
-                                            <a href="#" class="checkoutBtn" data-id="{{ r.pk }}">Check Out</a>
+                                            <a href="#" class="checkoutBtn" data-id="{{ r.pk }}" data-checkedOut={{ r.checked_out|yesno:"true,false" }}>Check Out</a>
                                         </div>
                                         <div class="medium info btn">
                                             <a href="#" class="resolveBtn" data-id="{{ r.pk }}">Resolve</a>

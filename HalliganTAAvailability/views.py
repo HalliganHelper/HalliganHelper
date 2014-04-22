@@ -105,7 +105,7 @@ def ta_test(user):
     try:
         user.ta
         return True
-    except TA.DoesNotExists:
+    except TA.DoesNotExist:
         return False
 
 
@@ -139,6 +139,11 @@ def getHelp(request, course=None):
                 'type': 'add'
             }
             QueueNamespace.emit(d, json=True)
+            d = {
+                'course': rq.course.Number,
+                'type': 'notify'
+            }
+            QueueNamespace.emit_to_ta(d)
             return HttpResponseRedirect(reverse('taSystem'))
     else:
         form = RequestForm()
@@ -339,9 +344,12 @@ def take_request(request):
             rq.checked_out = True
             rq.save()
             data = {}
-            data['pk'] = pk
+            data['pk'] = rq.pk
             data['type'] = 'check_out'
             data['ta'] = request.user.get_full_name()
+            data['checked_out'] = rq.checked_out
+            data['course'] = rq.course.Number
+
             QueueNamespace.emit(data, json=True)
             return HttpResponse(200)
         except:
@@ -356,10 +364,12 @@ def take_request(request):
 class QueueNamespace(BaseNamespace):
     _connections = {}
 
-    def initialize(self, *args, **kwargs):
-        self._connections[id(self)] = self
-        socket_logger.debug("Adding socket with ID {}".format(id(self)))
-        super(QueueNamespace, self).initialize(*args, **kwargs)
+    def recv_connect(self, *args, **kwargs):
+        self._connections[id(self)] = {
+            'socket': self,
+            'user': self.request.user
+        }
+        return super(QueueNamespace, self).recv_connect(*args, **kwargs)
 
     def disconnect(self, *args, **kwargs):
         del self._connections[id(self)]
@@ -373,9 +383,21 @@ class QueueNamespace(BaseNamespace):
     @staticmethod
     def emit(msg, json=True):
         for connection_id, connection in QueueNamespace._connections.items():
+            logger.debug(connection_id)
+            logger.debug(connection)
             output_string = "Sending {0} to {1} with id {2}"
-            logger.debug(output_string.format(msg, connection, connection_id))
-            connection.send(msg, json)
+            logger.debug(output_string.format(msg,
+                                              connection,
+                                              connection_id)
+                         )
+            msg['ta'] = ta_test(connection['user'])
+            connection['socket'].send(msg, json)
+
+    @staticmethod
+    def emit_to_ta(msg, json=True):
+        for connection_id, connection in QueueNamespace._connections.items():
+            if ta_test(connection['user']):
+                connection['socket'].send(msg, json)
 
 
 def socketio(request):

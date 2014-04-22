@@ -104,7 +104,7 @@ function add_row(obj) {
     var pr_td = "<td>" + obj.problem + "</td>";
     var wh_td = "<td>" + obj.when + "</td>";
     var re_td = $("<td></td>");
-    if(isTA){
+    if(obj.ta){
         var btn = $('<div class="medium default btn"></div>');
         var link = $('<a href="#" class="checkoutBtn" data-id="' + obj.pk + '">Check Out</a>');
         $(btn).append($(link));
@@ -147,9 +147,37 @@ function check_out(obj) {
     console.log(obj)
 }
 
+
+$(function() {
+    if(window.webkitNotifications) {
+        window.webkitNotifications.requestPermission();
+    }
+});
+
+function notification(obj) {
+    var api = window.webkitNotifications;
+    if (api && api.checkPermission() == 0) {
+        var notification = window.webkitNotifications.createNotification(
+            'http://i.stack.imgur.com/dmHl0.png',
+            'HalliganHelper Queue Updated!',
+            'Someone has been added to the Comp ' + obj.number + ' Queue.' 
+        );
+
+        notification.onclick = function () {
+            notification.close();
+        }
+        notification.show();
+    }
+
+    $.titleAlert("Queue Updated");
+
+    
+}
+
 socket = io.connect('/taqueue', {transports: ['xhr-polling']});
 
 socket.on("message", function(obj) {
+    console.log(obj);
     switch (obj.type){
         case 'resolve':
             remove_row(obj);
@@ -159,6 +187,9 @@ socket.on("message", function(obj) {
             break;
         case 'check_out':
             check_out(obj);
+            break;
+        case 'notify':
+            notification(obj);
             break;
     }
 });
