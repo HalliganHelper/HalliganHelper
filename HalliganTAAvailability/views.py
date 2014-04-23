@@ -212,7 +212,7 @@ def profile(request):
 @ensure_csrf_cookie
 def onlineQueue(request):
     tz = pytz.timezone(settings.TIME_ZONE)
-    before = datetime.datetime.now(tz) - datetime.timedelta(hours=3)
+    before = datetime.datetime.now(tz) - datetime.timedelta(hours=5)
 
     expiredReqs = Request.objects.filter(whenAsked__lt=before)
     expiredReqs = expiredReqs.filter(Q(timedOut=False))
