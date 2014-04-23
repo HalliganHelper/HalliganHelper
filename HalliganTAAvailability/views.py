@@ -155,10 +155,11 @@ def getHelp(request, course=None):
             def course_test(conn_id, conn, msg):
                 if conn['user'].is_authenticated():
                     try:
-                        courses = conn['user'].ta.course.all()
-                        nums = [c.Number for c in courses]
-                        if msg['course'] in nums:
-                            return True
+                        ta = conn['user'].ta
+                        if ta in [o.ta for o in OfficeHour.objects.on_duty()]:
+                            nums = [c.Number for c in ta.course.all()]
+                            if msg['course'] in nums:
+                                return True
                     except TA.DoesNotExist:
                         pass
                 return False
