@@ -85,9 +85,11 @@
                                             <a href="#" class="resolveBtn" data-id="{{ r.pk }}">Resolve</a>
                                         </div>
                                     {% elif is_ta %}
+                                    {% comment %}
                                         <div class="medium default btn">
                                             <a href="#" class="checkoutBtn" data-id="{{ r.pk }}" data-checkedOut={{ r.checked_out|yesno:"true,false" }}>Check Out</a>
                                         </div>
+                                    {% endcomment %}
                                         <div class="medium info btn">
                                             <a href="#" class="resolveBtn" data-id="{{ r.pk }}">Resolve</a>
                                         </div>

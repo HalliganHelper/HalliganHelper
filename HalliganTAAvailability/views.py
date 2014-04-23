@@ -144,10 +144,10 @@ def getHelp(request, course=None):
             QueueNamespace.emit(d, json=True)
             d = {
                 'course': rq.course.Number,
-                'problem': escape(rq.question),
-                'location': escape(rq.whereLocated),
-                'name': escape('{0} {1}'.format(stu.usr.first_name.title(),
-                                                stu.usr.last_name[0].upper())),
+                'problem': rq.question,
+                'location': rq.whereLocated,
+                'name': '{0} {1}'.format(stu.usr.first_name.title(),
+                                         stu.usr.last_name[0].upper()),
                 'when': rq.whenAsked.strftime('%I:%M %p'),
                 'type': 'notify'
             }
@@ -353,28 +353,28 @@ def cancel_hours(request):
     return render(request, 'cancel_hours.html', {'form': form})
 
 
-@login_required
-@user_passes_test(ta_test)
-@require_POST
-def take_request(request):
-    pk = request.POST.get('pk', None)
-    if pk:
-        try:
-            rq = Request.objects.get(pk=pk)
-            rq.checked_out = True
-            rq.save()
-            data = {}
-            data['pk'] = rq.pk
-            data['type'] = 'check_out'
-            data['ta'] = request.user.get_full_name()
-            data['checked_out'] = rq.checked_out
-            data['course'] = rq.course.Number
-
-            QueueNamespace.emit(data, json=True)
-            return HttpResponse(200)
-        except:
-            pass
-    return HttpResponse(404)
+# @login_required
+# @user_passes_test(ta_test)
+# @require_POST
+# def take_request(request):
+#     pk = request.POST.get('pk', None)
+#     if pk:
+#         try:
+#             rq = Request.objects.get(pk=pk)
+#             rq.checked_out = True
+#             rq.save()
+#             data = {}
+#             data['pk'] = rq.pk
+#             data['type'] = 'check_out'
+#             data['ta'] = request.user.get_full_name()
+#             data['checked_out'] = rq.checked_out
+#             data['course'] = rq.course.Number
+#
+#             QueueNamespace.emit(data, json=True)
+#             return HttpResponse(200)
+#         except:
+#             pass
+#     return HttpResponse(404)
 
 
 ############################################################################

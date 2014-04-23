@@ -58,14 +58,13 @@ function hookup_resolve(){
         });
     })
 }
-
+/*
 function hookup_checkout(){
     $('.checkoutBtn').click(function(e){
         e.preventDefault();
         var btn = $(this);
         var id = $(this).data('id');
         $.post('users/checkoutRequest', {'pk': id}).fail(function(data){
-            console.log(data);
             $(btn).text('Unauthorized');
         });
 
@@ -76,6 +75,7 @@ function hookup_checkout(){
 $(function(){
     hookup_checkout();
 });
+*/
 
 function remove_row(obj) {
     var rq_id = obj.rq
@@ -105,10 +105,12 @@ function add_row(obj) {
     var wh_td = "<td>" + obj.when + "</td>";
     var re_td = $("<td></td>");
     if(obj.ta){
+        /*
         var btn = $('<div class="medium default btn"></div>');
         var link = $('<a href="#" class="checkoutBtn" data-id="' + obj.pk + '">Check Out</a>');
         $(btn).append($(link));
         $(re_td).append($(btn));
+        */
 
         var otherBtn = $('<div class="medium info btn"></div>');
         var otherLink = $('<a href="#" class="resolveBtn" data-id="' + obj.pk + '">Resolve</a>');
@@ -135,17 +137,18 @@ function add_row(obj) {
 
     $(tbdy).append($(new_row));
     hookup_resolve();
-    hookup_checkout();
+    //hookup_checkout();
 }
 
 $(function(){
     hookup_resolve();
 });
 
-
+/*
 function check_out(obj) {
     console.log(obj)
 }
+*/
 
 function show_notification(obj) {
     var req_str = obj.when + ': ' + obj.name + ' needs help with ' + obj.problem;
@@ -191,7 +194,6 @@ function notification(obj) {
 socket = io.connect('/taqueue', {transports: ['xhr-polling']});
 
 socket.on("message", function(obj) {
-    console.log(obj);
     switch (obj.type){
         case 'resolve':
             remove_row(obj);
@@ -199,9 +201,11 @@ socket.on("message", function(obj) {
         case 'add':
             add_row(obj);
             break;
+        /*
         case 'check_out':
             check_out(obj);
             break;
+        */
         case 'notify':
             notification(obj);
             break;
@@ -223,7 +227,6 @@ $(function goOnDuty(){
     $('.goOnDuty').click(function(e) {
         if(localStorage) {
             var course = $(this).data('course');
-            console.log(course);
             localStorage['goOnDuty'] = course;
         }
     });
