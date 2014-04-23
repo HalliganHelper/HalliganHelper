@@ -45,6 +45,38 @@ $.ajaxSetup({
     }
 });
 
+function hookup_resolve(){
+    $('.resolveBtn').click(function(e){
+        e.preventDefault();
+        var btn = $(this);
+        var id = $(this).data('id');
+        var tableID = $(this).parents('table').attr('id');
+        var jqxhr = $.post('users/resolveRequest', {'requestID': id}, function(data){
+        })
+        .fail(function(data) {
+            $(btn).text('Unauthorized');
+        });
+    })
+}
+/*
+function hookup_checkout(){
+    $('.checkoutBtn').click(function(e){
+        e.preventDefault();
+        var btn = $(this);
+        var id = $(this).data('id');
+        $.post('users/checkoutRequest', {'pk': id}).fail(function(data){
+            $(btn).text('Unauthorized');
+        });
+
+    });
+
+}
+
+$(function(){
+    hookup_checkout();
+});
+*/
+
 function remove_row(obj) {
     var rq_id = obj.rq
     var el = $("[data-rqID='" + rq_id + "']");
@@ -71,7 +103,20 @@ function add_row(obj) {
     var lo_td = "<td>" + obj.location + "</td>";
     var pr_td = "<td>" + obj.problem + "</td>";
     var wh_td = "<td>" + obj.when + "</td>";
-    var re_td = "<td></td>";
+    var re_td = $("<td></td>");
+    if(obj.ta){
+        /*
+        var btn = $('<div class="medium default btn"></div>');
+        var link = $('<a href="#" class="checkoutBtn" data-id="' + obj.pk + '">Check Out</a>');
+        $(btn).append($(link));
+        $(re_td).append($(btn));
+        */
+
+        var otherBtn = $('<div class="medium info btn"></div>');
+        var otherLink = $('<a href="#" class="resolveBtn" data-id="' + obj.pk + '">Resolve</a>');
+        $(otherBtn).append($(otherLink));
+        $(re_td).append($(otherBtn));
+    }
     var new_row = $("<tr data-rqID='" + obj.pk + "'></tr>").append($(nm_td)).append($(lo_td));
     $(new_row).append($(pr_td)).append($(wh_td)).append($(re_td));
 
@@ -91,22 +136,61 @@ function add_row(obj) {
     
 
     $(tbdy).append($(new_row));
+    hookup_resolve();
+    //hookup_checkout();
 }
 
-$(function resolve(){
-    $('.resolveBtn').click(function(e){
-        e.preventDefault();
-        var btn = $(this);
-        var id = $(this).data('id');
-        var tableID = $(this).parents('table').attr('id');
-        var jqxhr = $.post('users/resolveRequest', {'requestID': id}, function(data){
-        })
-        .fail(function() {
-            $(btn).text('Failed?');
-            console.log('Failed to resolve request');
-        });
-    })
-})
+$(function(){
+    hookup_resolve();
+});
+
+/*
+function check_out(obj) {
+    console.log(obj)
+}
+*/
+
+function show_notification(obj) {
+    var req_str = obj.when + ': ' + obj.name + ' needs help with ' + obj.problem;
+    req_str += ' in ' + obj.location;
+    var notification = new Notification("Queue Updated", {
+                                        'icon': '',
+                                        'body': req_str
+                                        });
+
+    $(window).bind('focus', function() {
+        if (notification) {
+            notification.close(),
+            notification = undefined;
+        }
+    }); 
+    window.setTimeout(function() {
+        if (notification) {
+            notification.close();
+            notification = undefined;
+        }
+    }, 300000);
+}
+
+function notification(obj) {
+    if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+            show_notification(obj);
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission(function (permission) {
+                if(!('permission' in Notification)) {
+                    Notification.permission = permission;
+                }
+
+                if (permission === "granted") {
+                    show_notification(obj);
+                }
+            });
+        }
+    }
+    $.titleAlert("Queue Updated");
+}
+
 socket = io.connect('/taqueue', {transports: ['xhr-polling']});
 
 socket.on("message", function(obj) {
@@ -116,6 +200,14 @@ socket.on("message", function(obj) {
             break;
         case 'add':
             add_row(obj);
+            break;
+        /*
+        case 'check_out':
+            check_out(obj);
+            break;
+        */
+        case 'notify':
+            notification(obj);
             break;
     }
 });
@@ -135,7 +227,6 @@ $(function goOnDuty(){
     $('.goOnDuty').click(function(e) {
         if(localStorage) {
             var course = $(this).data('course');
-            console.log(course);
             localStorage['goOnDuty'] = course;
         }
     });

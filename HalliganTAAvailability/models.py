@@ -10,11 +10,13 @@ def _now():
     now = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
     return now
 
+
 class Student(models.Model):
     usr = models.OneToOneField(User)
 
     def __str__(self):
         return self.usr.first_name + ' ' + self.usr.last_name
+
 
 admin.site.register(Student)
 
@@ -52,6 +54,9 @@ class Request(models.Model):
     whenSolved = models.DateTimeField(blank=True, null=True)
     timedOut = models.BooleanField(default=False)
     emailed = models.BooleanField(default=False)
+    who_solved = models.ForeignKey(TA, null=True)
+    checked_out = models.BooleanField(default=False)
+
     def save(self, *args, **kwargs):
         est = pytz.timezone('US/Eastern')
         if self.pk is None:
@@ -68,7 +73,8 @@ class Request(models.Model):
         return self.whenSolved - self.whenAsked
 
     def __str__(self):
-        return self.student.usr.first_name + " - Comp " + str(self.course.Number)
+        return '{0} - Comp {1}'.format(self.student.usr.first_name,
+                                       self.course.Number)
 
 admin.site.register(Request)
 
@@ -78,6 +84,7 @@ class OfficeHourManager(models.Manager):
         now = _now()
         qs = self.get_query_set()
         return qs.filter(start_time__lte=now).filter(end_time__gte=now)
+
 
 class OfficeHour(models.Model):
     start_time = models.DateTimeField()

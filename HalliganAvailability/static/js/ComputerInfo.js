@@ -35,4 +35,5 @@ function loaded(){
         }
     )}
 
-$(document).ready(loaded)
+$(document).ready(loaded);
+

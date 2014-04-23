@@ -101,6 +101,17 @@ user_registered.connect(user_created)
 user_activated.connect(user_confirmed)
 
 
+def ta_test(user):
+    if user.is_authenticated():
+        try:
+            user.ta
+            return True
+        except TA.DoesNotExist:
+            return False
+    else:
+        return False
+
+
 class TuftsRegistrationView(RegistrationView):
     form_class = TuftsEmail
 
@@ -122,7 +133,7 @@ def getHelp(request, course=None):
             rq.save()
             d = {
                 'pk': rq.pk,
-                'name': escape('{0} {1}'.format(stu.usr.first_name,
+                'name': escape('{0} {1}'.format(stu.usr.first_name.title(),
                                                 stu.usr.last_name[0].upper())),
                 'location': escape(rq.whereLocated),
                 'problem': escape(rq.question),
@@ -131,6 +142,28 @@ def getHelp(request, course=None):
                 'type': 'add'
             }
             QueueNamespace.emit(d, json=True)
+            d = {
+                'course': rq.course.Number,
+                'problem': rq.question,
+                'location': rq.whereLocated,
+                'name': '{0} {1}'.format(stu.usr.first_name.title(),
+                                         stu.usr.last_name[0].upper()),
+                'when': rq.whenAsked.strftime('%I:%M %p'),
+                'type': 'notify'
+            }
+
+            def course_test(conn_id, conn, msg):
+                if conn['user'].is_authenticated():
+                    try:
+                        courses = conn['user'].ta.course.all()
+                        nums = [c.Number for c in courses]
+                        if msg['course'] in nums:
+                            return True
+                    except TA.DoesNotExist:
+                        pass
+                return False
+
+            QueueNamespace.emit_to_test(d, course_test)
             return HttpResponseRedirect(reverse('taSystem'))
     else:
         form = RequestForm()
@@ -199,11 +232,11 @@ def onlineQueue(request):
         insert = (course, reqs, course_hours)
         requestData.append(insert)
 
-    isTA = TA.objects.filter(usr__id=request.user.id).exists()
+    is_ta = TA.objects.filter(usr__id=request.user.id).exists()
 
     responseData = {
         'requestData': requestData,
-        'isTA': isTA
+        'is_ta': is_ta
     }
 
     return render(request, 'taSystem.html', responseData)
@@ -228,13 +261,17 @@ def resolveRequest(request):
         return HttpResponse(status=400)
 
     req = get_object_or_404(Request, pk=rq_id)
+    is_the_student = req.student.pk == student.pk
 
-    if req.student.pk != student.pk and not ta:
+    if not is_the_student and not ta:
         return HttpResponse(status=401)
 
+    if ta and not is_the_student:
+        req.who_solved = ta
     req.solved = True
     req.whenSolved = _now()
     req.timedOut = False
+    req.checked_out = False
     req.save()
     QueueNamespace.emit({'type': 'resolve',
                          'rq': rq_id,
@@ -316,6 +353,30 @@ def cancel_hours(request):
     return render(request, 'cancel_hours.html', {'form': form})
 
 
+# @login_required
+# @user_passes_test(ta_test)
+# @require_POST
+# def take_request(request):
+#     pk = request.POST.get('pk', None)
+#     if pk:
+#         try:
+#             rq = Request.objects.get(pk=pk)
+#             rq.checked_out = True
+#             rq.save()
+#             data = {}
+#             data['pk'] = rq.pk
+#             data['type'] = 'check_out'
+#             data['ta'] = request.user.get_full_name()
+#             data['checked_out'] = rq.checked_out
+#             data['course'] = rq.course.Number
+#
+#             QueueNamespace.emit(data, json=True)
+#             return HttpResponse(200)
+#         except:
+#             pass
+#     return HttpResponse(404)
+
+
 ############################################################################
 #             Socketio Stuff
 ############################################################################
@@ -323,10 +384,12 @@ def cancel_hours(request):
 class QueueNamespace(BaseNamespace):
     _connections = {}
 
-    def initialize(self, *args, **kwargs):
-        self._connections[id(self)] = self
-        socket_logger.debug("Adding socket with ID {}".format(id(self)))
-        super(QueueNamespace, self).initialize(*args, **kwargs)
+    def recv_connect(self, *args, **kwargs):
+        self._connections[id(self)] = {
+            'socket': self,
+            'user': self.request.user
+        }
+        return super(QueueNamespace, self).recv_connect(*args, **kwargs)
 
     def disconnect(self, *args, **kwargs):
         del self._connections[id(self)]
@@ -340,9 +403,36 @@ class QueueNamespace(BaseNamespace):
     @staticmethod
     def emit(msg, json=True):
         for connection_id, connection in QueueNamespace._connections.items():
+            logger.debug(connection_id)
+            logger.debug(connection)
             output_string = "Sending {0} to {1} with id {2}"
-            logger.debug(output_string.format(msg, connection, connection_id))
-            connection.send(msg, json)
+            logger.debug(output_string.format(msg,
+                                              connection,
+                                              connection_id)
+                         )
+            msg['ta'] = ta_test(connection['user'])
+            connection['socket'].send(msg, json)
+
+    @staticmethod
+    def emit_to_ta(msg, json=True):
+        for connection_id, connection in QueueNamespace._connections.items():
+            if ta_test(connection['user']):
+                connection['socket'].send(msg, json)
+
+    @staticmethod
+    def emit_to_test(msg, test, json=True):
+        """
+            test is a function that will receive two parameters:
+                connection_id - the id of the socket connectoin
+                connection - a dictionary that has two keys:
+                    socket - the socket object itself
+                    user - the user object. This is the real point of this
+                    msg - the same message passed to emit_to_test
+            test is expected to return True or False
+        """
+        for connection_id, connection in QueueNamespace._connections.items():
+            if test(connection_id, connection, msg):
+                connection['socket'].send(msg, json)
 
 
 def socketio(request):
