@@ -4,10 +4,15 @@ from HalliganComputerAvailability import urls as ComputerURLS
 from HalliganTAAvailability import urls as TAURLS
 from tastypie.api import Api
 from HalliganComputerAvailability.api import CourseUsageInfoResource, RoomInfoResource
+from HalliganComputerAvailability.api import LabResource, ComputerResource
+from HalliganComputerAvailability.api import ServerResource
 
 v1_api = Api(api_name='v2')
 v1_api.register(CourseUsageInfoResource())
 v1_api.register(RoomInfoResource())
+v1_api.register(LabResource())
+v1_api.register(ComputerResource())
+v1_api.register(ServerResource())
 
 
 

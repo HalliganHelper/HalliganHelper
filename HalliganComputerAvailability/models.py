@@ -1,17 +1,18 @@
 from django.db import models
 from datetime import datetime
 import datetime as dt
-from django.utils import timezone
 from django.contrib import admin
 import pytz
 from django.conf import settings
 
 # Create your models here.
 
+
 def _now():
     tz = pytz.timezone(settings.TIME_ZONE)
     now = dt.datetime.now(tz=tz)
     return now
+
 
 class Computer(models.Model):
     OFF = 'OFF'
@@ -28,15 +29,15 @@ class Computer(models.Model):
         (ERROR, 'Error')
     )
     ComputerNumber = models.CharField(max_length=7,
-                                      primary_key=True)#Primary Key
+                                      primary_key=True)
     RoomNumber = models.IntegerField()
     Status = models.CharField(max_length=9,
                               choices=STATUS_CHOICES,
                               default=AVAILABLE)
     used_for = models.CharField(max_length=40, null=True)
     LastUpdate = models.DateTimeField(auto_now=True)
-    
-    #TODO: Foreign Key to computers in TA System?
+
+    # TODO: Foreign Key to computers in TA System?
 admin.site.register(Computer)
 
 
@@ -50,11 +51,16 @@ class RoomInfo(models.Model):
     updateTime = models.DateTimeField()
 
     def save(self, *args, **kwargs):
-        self.updateTime = _now() 
+        self.updateTime = _now()
         return super(RoomInfo, self).save(*args, **kwargs)
 
     def __str__(self):
-        return '{5}: {0} has {1} machine(s) reporting: {2} available {3} unavailable and {4} broken'.format(self.lab, self.numReporting, self.num_available, self.num_unavailable, self.num_error, self.updateTime)
+        format_str = '{5}: {0} has {1} machine(s) reporting: '
+        format_str += '{2} available {3} unavailable and {4} broken'
+        return format_str.format(self.lab, self.numReporting,
+                                 self.num_available,
+                                 self.num_unavailable,
+                                 self.num_error, self.updateTime)
 admin.site.register(RoomInfo)
 
 
@@ -62,16 +68,18 @@ class CourseUsageInfo(models.Model):
     room = models.ForeignKey(RoomInfo, related_name='cuis')
     course = models.CharField(max_length=20)
     num_machines = models.IntegerField()
-    
+
     def save(self, *args, **kwargs):
         if self.course is None:
             self.course = 'Other'
         return super(CourseUsageInfo, self).save(*args, **kwargs)
-    
+
     def __str__(self):
-        return "{0} has {1} machine(s) in room {2}".format(self.course,
-                                                        self.num_machines,
-                                                        self.room.lab)
+        format_str = '{0} has {1} machine(s) in room {2}'
+        return format_str.format(self.course, self.num_machines,
+                                 self.room.lab)
+
+
 class ComputerInfo(models.Model):
     OFF = 'OFF'
     INUSE = 'INUSE'
@@ -86,7 +94,7 @@ class ComputerInfo(models.Model):
         (AVAILABLE, 'Available'),
         (ERROR, 'Error')
     )
-    
+
     def __init__(self, *args, **kwargs):
         super(models.Model, self).__init__(*args, **kwargs)
         print "\n\nDON'T ACTUALLY USE THIS MODEL: ComputerInfo\n\n"
@@ -111,7 +119,7 @@ class Server(models.Model):
         (ON, 'On'),
         (ERROR, 'Error')
     )
-   
+
     ComputerName = models.CharField(max_length=20,
                                     primary_key=True)
     NumUsers = models.IntegerField()
@@ -170,6 +178,7 @@ class Lab(models.Model):
         else:
             return long(self.DayOfWeek)
 
+    @property
     def is_lab_in_session(self):
         """
         Returns whether a lab is currently in session
@@ -193,7 +202,6 @@ class Lab(models.Model):
         CurrTime = datetime.now().time()
         CurrDate = datetime.now().date()
         CurrDay = datetime.now().weekday()
-        StartTime = self.StartTime
         delta = dt.timedelta(hours=3)
 
         ModdedStartTime = (datetime.combine(dt.date(10, 10, 10), self.StartTime) - delta).time()
@@ -201,13 +209,10 @@ class Lab(models.Model):
         if(self.StartDate < CurrDate < self.EndDate
             and self.DayOfWeek == CurrDay
             and self.EndTime > CurrTime > ModdedStartTime
-            and not self.is_lab_in_session()):
+                and not self.is_lab_in_session()):
 
                 return True
 
         return False
 
 admin.site.register(Lab)
-
-
-    

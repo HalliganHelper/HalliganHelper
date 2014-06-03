@@ -1,18 +1,18 @@
 # Create your views here.
 from django.http import HttpResponse
-from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response, render
-from models import Lab, Computer, Server, ServerInfo, ComputerInfo, RoomInfo
+from models import Lab, Computer, Server, ServerInfo, RoomInfo
 from models import CourseUsageInfo
 import json
 from django.core.cache import cache
 from django.core import serializers
-from django.template import RequestContext
 import operator
 from dateutil import tz
 import datetime as dt
 from collections import defaultdict
+
 
 def ApiDocs(request):
     return render_to_response('ApiDocs.html')
@@ -26,7 +26,6 @@ def AllComps(request):
             return obj.isoformat()
         else:
             raise TypeError, 'Object of type %s with value of %s is not JSON serializable' %(type(obj), repr(obj))
-
 
     response = {}
 
@@ -64,11 +63,7 @@ def AllComps(request):
     return HttpResponse(json.dumps(response, default=SerializeHandler), content_type="application/json")
 
 
-
-
-
 @require_GET
-
 def labInformation(request):
     room = request.GET.get('room', None)
     current = request.GET.get('current', False)
@@ -83,7 +78,6 @@ def labInformation(request):
                 response.append(lab.for_response())
 
         return HttpResponse(json.dumps(response), content_type="application/json")
-
 
     now = dt.datetime.now().date()
     if not room:
@@ -127,7 +121,7 @@ def SpecificRoom(request, RmNum):
 
     response['machines'] = {}
     for c in Comps:
-        time  = c.LastUpdate.astimezone(tz.gettz('America/New_York'))
+        time = c.LastUpdate.astimezone(tz.gettz('America/New_York'))
         response['machines'][c.ComputerNumber] = {}
         response['machines'][c.ComputerNumber]['Status'] = c.get_Status_display()
         response['machines'][c.ComputerNumber]['LastUpdated'] = time.strftime('%m/%d/%y %I:%M %p')
@@ -200,10 +194,10 @@ def UpdateStatus(request, MchID, NewStatus):
 def UpdateAllStatus(request):
     #available, course, computer, user(Always 'None'), error#
     data = json.loads(request.body)
-   
+
     room_data = defaultdict(lambda: defaultdict(int))
     room_available_info = defaultdict(lambda: defaultdict(int))
-     
+
     for comp in data:
         MchID = comp['computer'].lower()
         RoomNum = int(MchID[3:6])
@@ -215,7 +209,7 @@ def UpdateAllStatus(request):
                 course = course.lower()
             else:
                 course = None
-            
+
 
             available = comp['available']
             if available:
@@ -227,9 +221,9 @@ def UpdateAllStatus(request):
 
             cmptr.used_for = course
             cmptr.Status = status
-            
+
             room_data[room_key][course] += 1
-            
+
         else:
             cmptr.Status = 'ERROR'
             room_available_info[room_key]['error'] += 1
@@ -254,7 +248,7 @@ def UpdateAllStatus(request):
             c_u_i.save()
 
 
-    return HttpResponse(status=200) 
+    return HttpResponse(status=200)
 
 @require_POST
 @csrf_exempt
@@ -439,4 +433,3 @@ def ServerList(request):
 
 def GridPage(request):
     return render_to_response('GridPage.html')
-

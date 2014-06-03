@@ -1,3 +1,6 @@
+*.key
+*.crt
+*.csr
 HalliganAvailability/environment.py
 *.sw[o|p]
 .db/
