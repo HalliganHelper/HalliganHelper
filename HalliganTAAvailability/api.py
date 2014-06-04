@@ -14,9 +14,9 @@ class CourseResource(ModelResource):
     class Meta:
         queryset = Course.objects.all()
         filtering = {
-            'Name': ['exact', 'iexact', ],
+            'Name': ['exact', 'iexact', 'startswith', ],
             'Number': ['exact', 'lte', 'lt', 'gte', 'gt', ],
-            'Professor': ['exact', 'iexact', ],
+            'Professor': ['exact', 'iexact', 'startswith', ],
         }
         resource_name = 'course'
         fields = ['Name', 'Number', 'Professor', 'students']
