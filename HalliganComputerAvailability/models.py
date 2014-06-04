@@ -79,6 +79,7 @@ class CourseUsageInfo(models.Model):
         return format_str.format(self.course, self.num_machines,
                                  self.room.lab)
 
+admin.site.register(CourseUsageInfo)
 
 class ComputerInfo(models.Model):
     OFF = 'OFF'

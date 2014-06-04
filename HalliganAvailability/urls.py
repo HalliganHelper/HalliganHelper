@@ -3,16 +3,31 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from HalliganComputerAvailability import urls as ComputerURLS
 from HalliganTAAvailability import urls as TAURLS
 from tastypie.api import Api
+
+# Computer Availability api
 from HalliganComputerAvailability.api import CourseUsageInfoResource, RoomInfoResource
 from HalliganComputerAvailability.api import LabResource, ComputerResource
 from HalliganComputerAvailability.api import ServerResource
 
+#TA Availability api
+from HalliganTAAvailability.api import CourseResource, OfficeHourResource
+from HalliganTAAvailability.api import TAResource
+
+
+
 v1_api = Api(api_name='v2')
+
+#Computer Availability api
 v1_api.register(CourseUsageInfoResource())
 v1_api.register(RoomInfoResource())
 v1_api.register(LabResource())
 v1_api.register(ComputerResource())
 v1_api.register(ServerResource())
+
+#TA Availability api
+v1_api.register(CourseResource())
+v1_api.register(OfficeHourResource())
+v1_api.register(TAResource())
 
 
 

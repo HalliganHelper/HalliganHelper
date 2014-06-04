@@ -7,6 +7,23 @@ from HalliganComputerAvailability.models import RoomInfo, CourseUsageInfo
 from HalliganComputerAvailability.models import Lab, Computer, Server
 
 
+class ComputerResource(ModelResource):
+
+    class Meta:
+        queryset = Computer.objects.all()
+        filtering = {
+            'ComputerNumber': ['exact', ],
+            'RoomNumber': ['exact', ],
+            'Status': ['exact', 'iexact', ],
+            'used_for': ['exact', 'iexact'],
+        }
+        resource_name = 'computer'
+        fields = ['ComputerNumber', 'RoomNumber', 'Status', 'used_for',
+                  'LastUpdate']
+        allowed_methods = ['get']
+        authorization = DjangoAuthorization()
+
+
 class RoomInfoResource(ModelResource):
     cuis = fields.ToManyField(
         'HalliganComputerAvailability.api.CourseUsageInfoResource',
@@ -34,6 +51,21 @@ class CourseUsageInfoResource(ModelResource):
         authorization = DjangoAuthorization()
 
 
+class ServerResource(ModelResource):
+
+    class Meta:
+        queryset = Server.objects.all()
+        filtering = {
+            'ComputerName': ['exact', 'iexact'],
+            'NumUsers': ['exact', ],
+            'Status': ['exact', 'iexact', ],
+        }
+        resource_name = 'server'
+        fields = ['ComputerName', 'NumUsers', 'Status', 'LastUpdated']
+        allowed_methods = ['get']
+        authorization = DjangoAuthorization()
+
+
 class LabResource(ModelResource):
 
     class Meta:
@@ -52,37 +84,5 @@ class LabResource(ModelResource):
         resource_name = 'lab'
         fields = ['ClassName', 'RoomNumber', 'StartTime', 'EndTime',
                   'StartDate', 'EndDate', 'DayOfWeek', 'is_lab_in_session']
-        allowed_methods = ['get']
-        authorization = DjangoAuthorization()
-
-
-class ComputerResource(ModelResource):
-
-    class Meta:
-        queryset = Computer.objects.all()
-        filtering = {
-            'ComputerNumber': ['exact', ],
-            'RoomNumber': ['exact', ],
-            'Status': ['exact', 'iexact', ],
-            'used_for': ['exact', 'iexact'],
-        }
-        resource_name = 'computer'
-        fields = ['ComputerNumber', 'RoomNumber', 'Status', 'used_for',
-                  'LastUpdate']
-        allowed_methods = ['get']
-        authorization = DjangoAuthorization()
-
-
-class ServerResource(ModelResource):
-
-    class Meta:
-        queryset = Server.objects.all()
-        filtering = {
-            'ComputerName': ['exact', 'iexact'],
-            'NumUsers': ['exact', ],
-            'Status': ['exact', 'iexact', ],
-        }
-        resource_name = 'server'
-        fields = ['ComputerName', 'NumUsers', 'Status', 'LastUpdated']
         allowed_methods = ['get']
         authorization = DjangoAuthorization()
