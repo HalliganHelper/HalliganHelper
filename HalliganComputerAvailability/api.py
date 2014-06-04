@@ -51,7 +51,7 @@ class LabResource(ModelResource):
 
         resource_name = 'lab'
         fields = ['ClassName', 'RoomNumber', 'StartTime', 'EndTime',
-                  'StartDate', 'EndDate', 'DayOfWeek']
+                  'StartDate', 'EndDate', 'DayOfWeek', 'is_lab_in_session']
         allowed_methods = ['get']
         authorization = DjangoAuthorization()
 

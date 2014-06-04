@@ -178,7 +178,6 @@ class Lab(models.Model):
         else:
             return long(self.DayOfWeek)
 
-    @property
     def is_lab_in_session(self):
         """
         Returns whether a lab is currently in session
@@ -203,8 +202,10 @@ class Lab(models.Model):
         CurrDate = datetime.now().date()
         CurrDay = datetime.now().weekday()
         delta = dt.timedelta(hours=3)
+        start_time = dt.date(10, 10, 10)
+        combined = datetime.combine(start_time, self.StartTime)
 
-        ModdedStartTime = (datetime.combine(dt.date(10, 10, 10), self.StartTime) - delta).time()
+        ModdedStartTime = (combined - delta).time()
 
         if(self.StartDate < CurrDate < self.EndDate
             and self.DayOfWeek == CurrDay
