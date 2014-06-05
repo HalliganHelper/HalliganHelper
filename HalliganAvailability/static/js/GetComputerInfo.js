@@ -47,7 +47,7 @@ function GetComputerInfo(room) {
 
             $(row).append($('<td></td>').text('Computer Number'));
             $(row).append($('<td></td>').text('Status'));
-            //$(row).append($('<td></td>').text('Last Updated'));
+            //$(row).append($('<td></td>').text('Last last_updated'));
 
             var lastUpdatedTD = $('<td></td>').text('Last Updated');
             var RefreshButton = $('<i></i>').addClass('icon-arrows-ccw');
@@ -75,7 +75,7 @@ function GetComputerInfo(room) {
             for (mch in MachinesArray) {
                 var machine = MachinesArray[mch];
                 row = $('<tr></tr>');
-                switch (machine.Status) {
+                switch (machine.status) {
                     case "In Use":
                         $(row).addClass('InUse');
                         break;
@@ -89,9 +89,9 @@ function GetComputerInfo(room) {
                         $(row).addClass('Error');
                         break;
                 }
-                $(row).append($('<td></td>').text(machine.ComputerName));
-                $(row).append($('<td></td>').text(machine.Status));
-                $(row).append($('<td></td>').text(machine.LastUpdated));
+                $(row).append($('<td></td>').text(machine.name));
+                $(row).append($('<td></td>').text(machine.status));
+                $(row).append($('<td></td>').text(machine.last_updated));
 
 
 
