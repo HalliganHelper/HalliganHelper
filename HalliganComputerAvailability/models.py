@@ -5,8 +5,6 @@ from django.contrib import admin
 import pytz
 from django.conf import settings
 
-# Create your models here.
-
 
 def _now():
     tz = pytz.timezone(settings.TIME_ZONE)
@@ -28,14 +26,14 @@ class Computer(models.Model):
         (AVAILABLE, 'Available'),
         (ERROR, 'Error')
     )
-    ComputerNumber = models.CharField(max_length=7,
-                                      primary_key=True)
-    RoomNumber = models.IntegerField()
-    Status = models.CharField(max_length=9,
+    number = models.CharField(max_length=7,
+                              primary_key=True)
+    room_number = models.IntegerField()
+    status = models.CharField(max_length=9,
                               choices=STATUS_CHOICES,
                               default=AVAILABLE)
     used_for = models.CharField(max_length=40, null=True)
-    LastUpdate = models.DateTimeField(auto_now=True)
+    last_update = models.DateTimeField(auto_now=True)
 
     # TODO: Foreign Key to computers in TA System?
 admin.site.register(Computer)
@@ -43,24 +41,24 @@ admin.site.register(Computer)
 
 class RoomInfo(models.Model):
     lab = models.CharField(max_length=10)
-    numReporting = models.IntegerField()
+    num_reporting = models.IntegerField()
     num_available = models.IntegerField()
     num_unavailable = models.IntegerField()
     num_error = models.IntegerField()
 
-    updateTime = models.DateTimeField()
+    last_updated = models.DateTimeField()
 
     def save(self, *args, **kwargs):
-        self.updateTime = _now()
+        self.last_updated = _now()
         return super(RoomInfo, self).save(*args, **kwargs)
 
     def __str__(self):
         format_str = '{5}: {0} has {1} machine(s) reporting: '
         format_str += '{2} available {3} unavailable and {4} broken'
-        return format_str.format(self.lab, self.numReporting,
+        return format_str.format(self.lab, self.num_reporting,
                                  self.num_available,
                                  self.num_unavailable,
-                                 self.num_error, self.updateTime)
+                                 self.num_error, self.last_updated)
 admin.site.register(RoomInfo)
 
 
@@ -81,31 +79,32 @@ class CourseUsageInfo(models.Model):
 
 admin.site.register(CourseUsageInfo)
 
-class ComputerInfo(models.Model):
-    OFF = 'OFF'
-    INUSE = 'INUSE'
-    AVAILABLE = 'AVAILABLE'
-    ERROR = 'ERROR'
-
-    CHOICES = [OFF, INUSE, AVAILABLE, ERROR]
-
-    STATUS_CHOICES = (
-        (OFF, 'Off'),
-        (INUSE, 'In Use'),
-        (AVAILABLE, 'Available'),
-        (ERROR, 'Error')
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(models.Model, self).__init__(*args, **kwargs)
-        print "\n\nDON'T ACTUALLY USE THIS MODEL: ComputerInfo\n\n"
-
-    RoomNumber = models.IntegerField()
-    ComputerNumber = models.CharField(max_length=7)
-    Updated = models.DateTimeField(auto_now=True)
-    ComputerStatus = models.CharField(max_length=10,
-                                      choices=STATUS_CHOICES,
-                                      default=AVAILABLE)
+#
+# class ComputerInfo(models.Model):
+#     OFF = 'OFF'
+#     INUSE = 'INUSE'
+#     AVAILABLE = 'AVAILABLE'
+#     ERROR = 'ERROR'
+#
+#     CHOICES = [OFF, INUSE, AVAILABLE, ERROR]
+#
+#     STATUS_CHOICES = (
+#         (OFF, 'Off'),
+#         (INUSE, 'In Use'),
+#         (AVAILABLE, 'Available'),
+#         (ERROR, 'Error')
+#     )
+#
+#     def __init__(self, *args, **kwargs):
+#         super(models.Model, self).__init__(*args, **kwargs)
+#         print "\n\nDON'T ACTUALLY USE THIS MODEL: ComputerInfo\n\n"
+#
+#     room_number = models.IntegerField()
+#     computer_number = models.CharField(max_length=7)
+#     updated = models.DateTimeField(auto_now=True)
+#     status = models.CharField(max_length=10,
+#                                       choices=STATUS_CHOICES,
+#                                       default=AVAILABLE)
 
 
 class Server(models.Model):
@@ -121,48 +120,48 @@ class Server(models.Model):
         (ERROR, 'Error')
     )
 
-    ComputerName = models.CharField(max_length=20,
-                                    primary_key=True)
-    NumUsers = models.IntegerField()
+    name = models.CharField(max_length=20,
+                            primary_key=True)
+    num_users = models.IntegerField()
 
-    Status = models.CharField(max_length=40,
+    status = models.CharField(max_length=40,
                               choices=STATUS_CHOICES,
                               default=ON)
 
-    LastUpdated = models.DateTimeField(auto_now=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
 admin.site.register(Server)
 
 
 class ServerInfo(models.Model):
-    ComputerName = models.CharField(max_length=20)
-    Updated = models.DateTimeField(auto_now=True)
-    NumUsers = models.IntegerField()
+    name = models.CharField(max_length=20)
+    last_updated = models.DateTimeField(auto_now=True)
+    num_users = models.IntegerField()
 
 
 class Lab(models.Model):
-    ClassName = models.CharField(max_length=30)
-    RoomNumber = models.IntegerField()
-    StartTime = models.TimeField()
-    EndTime = models.TimeField()
-    StartDate = models.DateField()
-    EndDate = models.DateField()
-    DayOfWeek = models.IntegerField(max_length=1)
+    course_name = models.CharField(max_length=30)
+    room_number = models.IntegerField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+    day_of_week = models.IntegerField(max_length=1)
 
     def for_response(self):
         response = {
-            'ClassName': self.ClassName,
-            'RoomNumber': self.RoomNumber,
-            'StartTime': self.StartTime.strftime('%I:%M %p'),
-            'EndTime': self.EndTime.strftime('%I:%M %p'),
-            'DayOfWeek': self.day_of_week(),
+            'course_name': self.course_name,
+            'room_number': self.room_number,
+            'start_time': self.start_time.strftime('%I:%M %p'),
+            'end_time': self.end_time.strftime('%I:%M %p'),
+            'day_of_week': self.day_of_week_name(),
             'InSession': self.is_lab_in_session(),
             'ComingUp': self.is_lab_coming_up(),
-            'DayOfWeek_AsNum': self.DayOfWeek
+            'DayOfWeek_AsNum': self.day_of_week
         }
         return response
 
-    def day_of_week(self, short_name=False):
+    def day_of_week_name(self, short_name=False):
         def long(x):
             return {
                 0: 'Monday',
@@ -175,9 +174,9 @@ class Lab(models.Model):
             }[x]
 
         if short_name:
-            return long(self.DayOfWeek)[0:3]
+            return long(self.day_of_week)[0:3]
         else:
-            return long(self.DayOfWeek)
+            return long(self.day_of_week)
 
     def is_lab_in_session(self):
         """
@@ -187,9 +186,9 @@ class Lab(models.Model):
         CurrDate = datetime.now().date()
         CurrDay = datetime.now().weekday()
 
-        if(self.StartDate < CurrDate < self.EndDate
-           and self.StartTime < CurrTime < self.EndTime
-           and self.DayOfWeek == CurrDay):
+        if(self.start_date < CurrDate < self.end_date
+           and self.start_time < CurrTime < self.end_time
+           and self.day_of_week == CurrDay):
             return True
 
         return False
@@ -204,16 +203,16 @@ class Lab(models.Model):
         CurrDay = datetime.now().weekday()
         delta = dt.timedelta(hours=3)
         start_time = dt.date(10, 10, 10)
-        combined = datetime.combine(start_time, self.StartTime)
+        combined = datetime.combine(start_time, self.start_time)
 
         ModdedStartTime = (combined - delta).time()
 
-        if(self.StartDate < CurrDate < self.EndDate
-            and self.DayOfWeek == CurrDay
-            and self.EndTime > CurrTime > ModdedStartTime
+        if(self.start_date < CurrDate < self.end_date
+            and self.day_of_week == CurrDay
+            and self.end_time > CurrTime > ModdedStartTime
                 and not self.is_lab_in_session()):
 
-                return True
+            return True
 
         return False
 

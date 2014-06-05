@@ -89,20 +89,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for comp in Room116|dictsort:'ComputerNumber' %}
+                        {% for comp in Room116|dictsort:'number' %}
 
-                            {% if comp.Status == "AVAILABLE" %}
+                            {% if comp.status == "AVAILABLE" %}
                                 <tr class="Available">
-                            {% elif comp.Status == "INUSE" %}
+                            {% elif comp.status == "INUSE" %}
                                 <tr class="InUse">
-                            {% elif comp.Status == "OFF" %}
+                            {% elif comp.status == "OFF" %}
                                 <tr class="Off">
-                            {% elif comp.Status == "ERROR" %}
+                            {% elif comp.status == "ERROR" %}
                                 <tr class="Error">
                             {% endif %}
-                                    <td>{{ comp.ComputerNumber }}</td>
-                                    <td>{{ comp.get_Status_display }}</td>
-                                    <td>{{ comp.LastUpdate }}</td>
+                                    <td>{{ comp.number }}</td>
+                                    <td>{{ comp.get_status_display }}</td>
+                                    <td>{{ comp.last_update }}</td>
                                 </tr>
 
                     {% endfor %}
@@ -141,7 +141,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for comp in Room118|dictsort:'ComputerNumber' %}
+                        {% for comp in Room118|dictsort:'number' %}
 
                             {% if comp.Status == "AVAILABLE" %}
                                 <tr class="Available">
@@ -187,7 +187,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for comp in Room120|dictsort:'ComputerNumber' %}
+                        {% for comp in Room120|dictsort:'number' %}
 
                             {% if comp.Status == "AVAILABLE" %}
                                 <tr class="Available">
@@ -264,7 +264,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for server in servers|dictsort:'ComputerName'  %}
+                        {% for server in servers|dictsort:'name'  %}
                             {% if server.Status == "ON" %}
                             <tr class="ServerOn">
                             {% elif server.Status == "OFF" %}
@@ -281,7 +281,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                {% for server in servers|dictsort:'ComputerName' %}
+                {% for server in servers|dictsort:'name' %}
                     <div class="modal" id="modal_{{ server.ComputerName }}">
                         <div class="content">
                             <div id="ChartFor{{ server.ComputerName }}"></div>
@@ -291,9 +291,9 @@
                             {% comment %}
                             <div class="row">
                                 <div class="ten columns centered text-center">
-                                    <div id="ChartFor{{ server.ComputerName }}"></div>
+                                    <div id="ChartFor{{ server.name }}"></div>
                                     <p class="btn primary medium">
-                                        <a href="#" class="switch" gumby-trigger="|#modal_{{ server.ComputerName }}">Close</a>
+                                        <a href="#" class="switch" gumby-trigger="|#modal_{{ server.name }}">Close</a>
                                     </p>
                                 </div>
                             </div>

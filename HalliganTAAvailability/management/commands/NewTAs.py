@@ -15,7 +15,7 @@ class Command(BaseCommand):
     help = 'Update TAs from Bruce Molays list of TA emails'
 
     def notify(self, user, courses=None, adding_ta=True):
-        subject = 'Halligan Helper TA Status'
+        subject = 'Halligan Helper TA status'
         from_email = 'halliganhelper@tylerlubeck.com'
         to_email = user.email
         if adding_ta:

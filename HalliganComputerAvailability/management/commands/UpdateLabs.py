@@ -42,7 +42,7 @@ class Command(BaseCommand):
             course = row[2]
             course = course.split('|')[0]
 
-            #print RmNum, DayOfWeek, StartTime, EndTime, prof, course
+            #print RmNum, day_of_week, start_time, end_time, prof, course
 
             StartHour = int(StartTime.split(':')[0])
             EndHour = int(EndTime.split(':')[0])
@@ -71,10 +71,10 @@ class Command(BaseCommand):
             l.save()
 
             # class Lab(models.Model):
-#     ClassName = models.CharField(max_length=10)
-#     RoomNumber = models.IntegerField()
-#     StartTime = models.TimeField()
-#     EndTime = models.TimeField()
-#     StartDate = models.DateField()
-#     EndDate = models.DateField()
-#     DayOfWeek = models.IntegerField(max_length=1)
+#     course_name = models.CharField(max_length=10)
+#     room_number = models.IntegerField()
+#     start_time = models.TimeField()
+#     end_time = models.TimeField()
+#     start_date = models.DateField()
+#     end_date = models.DateField()
+#     day_of_week = models.IntegerField(max_length=1)

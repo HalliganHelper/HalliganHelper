@@ -11,15 +11,16 @@ class ComputerResource(ModelResource):
 
     class Meta:
         queryset = Computer.objects.all()
+        limit = 0
         filtering = {
-            'ComputerNumber': ['exact', ],
-            'RoomNumber': ['exact', ],
-            'Status': ['exact', 'iexact', ],
+            'number': ['exact', ],
+            'room_number': ['exact', ],
+            'status': ['exact', 'iexact', ],
             'used_for': ['exact', 'iexact'],
         }
         resource_name = 'computer'
-        fields = ['ComputerNumber', 'RoomNumber', 'Status', 'used_for',
-                  'LastUpdate']
+        fields = ['number', 'room_number', 'status', 'used_for',
+                  'last_update']
         allowed_methods = ['get']
         authorization = DjangoAuthorization()
 
@@ -31,13 +32,13 @@ class RoomInfoResource(ModelResource):
         )
 
     class Meta:
-        queryset = RoomInfo.objects.all().order_by('-updateTime')
+        queryset = RoomInfo.objects.all().order_by('-last_updated')
         filtering = {
             'lab': ['exact', ],
         }
         resource_name = 'roominfo'
-        fields = ['lab', 'numReporting', 'num_available', 'num_unavailable',
-                  'num_error', 'updateTime']
+        fields = ['lab', 'num_reporting', 'num_available', 'num_unavailable',
+                  'num_error', 'last_updated']
         allowed_methods = ['get']
         limit = 100
         authorization = DjangoAuthorization()
@@ -56,12 +57,12 @@ class ServerResource(ModelResource):
     class Meta:
         queryset = Server.objects.all()
         filtering = {
-            'ComputerName': ['exact', 'iexact'],
-            'NumUsers': ['exact', ],
-            'Status': ['exact', 'iexact', ],
+            'name': ['exact', 'iexact'],
+            'num_users': ['exact', ],
+            'status': ['exact', 'iexact', ],
         }
         resource_name = 'server'
-        fields = ['ComputerName', 'NumUsers', 'Status', 'LastUpdated']
+        fields = ['name', 'num_users', 'status', 'last_updated']
         allowed_methods = ['get']
         authorization = DjangoAuthorization()
 
@@ -71,18 +72,18 @@ class LabResource(ModelResource):
     class Meta:
         queryset = Lab.objects.all()
         filtering = {
-            'RoomNumber': ['exact', ],
-            'ClassName': ['exact', ],
-            'StartDate': ['lt', 'lte', 'gt', 'gte', ],
-            'EndDate': ['lt', 'lte', 'gt', 'gte', ],
-            'StartTime': ['lt', 'lte', 'gt', 'gte', ],
-            'EndTime': ['lt', 'lte', 'gt', 'gte', ],
+            'room_number': ['exact', ],
+            'course_name': ['exact', ],
+            'start_date': ['lt', 'lte', 'gt', 'gte', ],
+            'end_date': ['lt', 'lte', 'gt', 'gte', ],
+            'start_time': ['lt', 'lte', 'gt', 'gte', ],
+            'end_time': ['lt', 'lte', 'gt', 'gte', ],
             # 'in_session': ['exact', ],
             # 'coming_up': ['exact', ],
         }
 
         resource_name = 'lab'
-        fields = ['ClassName', 'RoomNumber', 'StartTime', 'EndTime',
-                  'StartDate', 'EndDate', 'DayOfWeek', 'is_lab_in_session']
+        fields = ['course_name', 'room_number', 'start_time', 'end_time',
+                  'start_date', 'end_date', 'day_of_week', 'is_lab_in_session']
         allowed_methods = ['get']
         authorization = DjangoAuthorization()
