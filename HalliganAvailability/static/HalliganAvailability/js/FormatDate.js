@@ -7,6 +7,11 @@ function formatDate(dateObject) {
         AMorPM = "AM",
         retVal = "";
 
+    minute = minute + "";
+    if ( minute.length == 1 ) {
+        minute = "0" + minute;
+    }
+
     month = month + "";
     if ( month.length == 1) {
         month = "0" + month;
@@ -35,6 +40,11 @@ function formatTime(timeStr) {
         hour = time_pieces[0],
         minute = time_pieces[1],
         AMorPM = "AM";
+
+    minute = minute + "";
+    if ( minute.length == 1 ) {
+        minute = "0" + minute;
+    }
 
     if (hour > 12) {
         hour = hour - 12;
