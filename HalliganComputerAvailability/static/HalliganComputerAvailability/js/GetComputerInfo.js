@@ -10,33 +10,6 @@ function compareComputers(compOne, compTwo) {
     return 0;
 }
 
-function formatDate(dateObject) {
-    var hour = dateObject.getHours(),
-        minute = dateObject.getMinutes(),
-        day = dateObject.getDate(),
-        month = 1 + dateObject.getMonth(), 
-        year = dateObject.getFullYear().toString().substr(2,2),
-        AMorPM = "AM";
-
-    month = month + "";
-    if ( month.length == 1) {
-        month = "0" + month;
-    }
-
-    day = day + "";
-    if ( day.length == 1) {
-        day = "0" + day;
-    }
-
-    if (hour > 12) {
-        hour = 24 - hour;
-        AMorPM = "PM";
-    } else {
-        AMorPM = "AM";
-    }
-
-    return month + "/" + day + "/" + year + " " + hour + ":" + minute + " " + AMorPM 
-}
 
 function GetComputerInfo(roomNumber) {
     $.get('/api/v2/computer/?format=json&room_number=' + roomNumber, function(data) {

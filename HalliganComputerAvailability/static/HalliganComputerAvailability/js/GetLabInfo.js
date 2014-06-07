@@ -26,7 +26,9 @@ function GetLabInfo() {
         $(row).append($('<td/>').text('Day'))
               .append($('<td/>').text('Start Time'))
               .append($('<td/>').text('End Time'))
-              .append($('<td/>').text('Room'));
+              .append($('<td/>').text('Room'))
+              .append($('<td/>').text('Course'));
+        $(head).append(row);
 
         $(refreshText).html(updateStr);
         $(refreshLink).append(refreshButton)
@@ -39,7 +41,9 @@ function GetLabInfo() {
 
         for(var i = 0; i < numLabs; i++) {
             var lab = labs[i],
-                row = $('<tr/>');
+                row = $('<tr/>'),
+                start_time = formatTime(lab.start_time),
+                end_time = formatTime(lab.end_time);
 
             if (lab.coming_up) {
                 $(row).addClass('ComingUp');
@@ -49,8 +53,8 @@ function GetLabInfo() {
             }
             
             $(row).append($('<td/>').text(lab.day_of_week))
-                  .append($('<td/>').text(lab.start_time))
-                  .append($('<td/>').text(lab.end_time))
+                  .append($('<td/>').text(start_time))
+                  .append($('<td/>').text(end_time))
                   .append($('<td/>').text(lab.room_number))
                   .append($('<td/>').text(lab.course_name));
             $(body).append(row);
