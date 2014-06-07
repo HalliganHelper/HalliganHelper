@@ -16,10 +16,10 @@ function CreateGraph(where, room) {
         var c11 = [], c15 = [], c40 = [], c20 = [], c23 = [],
             c105 = [], other=[];
 
-        FirstTime = py2jsDate(ret[0].updateTime).toString();
+        FirstTime = (new Date(ret[0].updateTime)).toString();
         for (var i in ret) {
             var obj = ret[i];
-            var t = (py2jsDate(obj.updateTime)).toString();
+            var t = (new Date(obj.updateTime)).toString();
             var appended = [false, false, false, false, false, false, false];
             for (var indx in obj.cuis) {
                 var cui = obj.cuis[indx];

@@ -49,6 +49,7 @@ class CourseUsageInfoResource(ModelResource):
 
     class Meta:
         queryset = CourseUsageInfo.objects.all()
+        allowed_methods = ['get']
         authorization = DjangoAuthorization()
 
 
@@ -69,8 +70,13 @@ class ServerResource(ModelResource):
 
 class LabResource(ModelResource):
 
+    day_of_week_str = fields.CharField(attribute='day_of_week_name')
+    in_session = fields.BooleanField(attribute='is_lab_in_session')
+    coming_up = fields.BooleanField(attribute='is_lab_coming_up')
+
     class Meta:
-        queryset = Lab.objects.all()
+        queryset = Lab.objects.all().order_by('day_of_week', 'start_time')
+        allowed_methods = ['get']
         filtering = {
             'room_number': ['exact', ],
             'course_name': ['exact', ],

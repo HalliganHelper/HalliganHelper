@@ -9,7 +9,7 @@
 function GetLabInfo() {
     $.get('/api/v2/lab/?format=json', function(data) {
         var labContainer = $('#LabContainer'),
-            table = $('<table/>').addClass('striped rounded'),
+            table = $('<table id="labs"/>').addClass('striped rounded'),
             head = $('<thead/>'),
             body = $('<tbody/>'),
             row = $('<tr/>'),
@@ -52,7 +52,7 @@ function GetLabInfo() {
                 $(row).addClass('InSession');
             }
             
-            $(row).append($('<td/>').text(lab.day_of_week))
+            $(row).append($('<td/>').text(lab.day_of_week_str))
                   .append($('<td/>').text(start_time))
                   .append($('<td/>').text(end_time))
                   .append($('<td/>').text(lab.room_number))

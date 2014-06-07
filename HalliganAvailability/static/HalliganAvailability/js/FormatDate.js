@@ -26,6 +26,8 @@ function formatDate(dateObject) {
     
     retVal = month + "/" + day + "/" + year + " ";
     retVal += hour + ":" + minute + " " + AMorPM;
+
+    return retVal;
 }
 
 function formatTime(timeStr) {
