@@ -44,7 +44,7 @@ class Migration(SchemaMigration):
 
         # Deleting field 'RoomInfo.updateTime'
         db.rename_column(u'HalliganComputerAvailability_roominfo',
-                         'updateTime', 'update_time')
+                         'updateTime', 'last_updated')
 
         # Deleting field 'RoomInfo.numReporting'
         db.rename_column(u'HalliganComputerAvailability_roominfo',
@@ -132,7 +132,7 @@ class Migration(SchemaMigration):
 
         # Deleting field 'RoomInfo.updateTime'
         db.rename_column(u'HalliganComputerAvailability_roominfo',
-                         'update_time', 'updateTime')
+                         'last_updated', 'updateTime')
 
         # Deleting field 'RoomInfo.numReporting'
         db.rename_column(u'HalliganComputerAvailability_roominfo',
