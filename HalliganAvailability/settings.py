@@ -1,7 +1,6 @@
 # Django settings for HalliganAvailability project.
 import os
 from secret import *
-print SECRET_KEY
 
 ADMINS = (
     ('Tyler Lubeck', 'Tyler@tylerlubeck.com'),
