@@ -1,6 +1,7 @@
 Django==1.5
 South==0.8.2
 argparse==1.2.1
+defusedxml==0.4.1
 dj-database-url==0.2.2
 dj-static==0.0.5
 django-allauth==0.13.0
@@ -19,6 +20,7 @@ gevent-socketio==0.3.6
 gevent-websocket==0.9.3
 greenlet==0.4.2
 gunicorn==18.0
+lxml==3.3.5
 manifesto==0.5
 meld3==1.0.0
 mimeparse==0.1.3
