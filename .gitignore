@@ -1,3 +1,4 @@
+HalliganAvailability/secret.py
 *.key
 *.crt
 *.csr

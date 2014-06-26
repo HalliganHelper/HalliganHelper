@@ -1,48 +1,15 @@
 # Django settings for HalliganAvailability project.
 import os
-DEBUG = False
-try:
-    os.environ['ON_HEROKU']
-    print "On Prod Server, debug mode is OFF"
-    DEBUG = False
-except KeyError:
-    print "On Dev Server, Debug mode is ON"
-    DEBUG = True
-
-
-
-#try:
-#    from environment import *
-#except ImportError:
-#    print "No local environment"
-
-import dj_database_url
-DATABASES = {
-    'default': dj_database_url.config(default='postgres://django_login:***REMOVED***@localhost:5432/django_db')
-}
-
-EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
-EMAIL_HOST_PASSWORD = '***REMOVED***'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = True
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/static/'
-
-TEMPLATE_DEBUG = DEBUG
+from secret import *
+print SECRET_KEY
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ('Tyler Lubeck', 'Tyler@tylerlubeck.com'),
+    ('Tyler Lubeck', 'halliganhelper@tylerlubeck.com'),
 )
 
 MANAGERS = ADMINS
 
-# Hosts/domain names that are valid for this site; required if DEBUG is False
-# See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -76,13 +43,6 @@ MEDIA_ROOT = ''
 # Examples: "http://example.com/media/", "http://media.example.com/"
 MEDIA_URL = ''
 
-# Additional locations of static files
-STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-)
-
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
@@ -90,9 +50,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
-
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 'n&s--ctvb1%_)3zmqzja9!f_(&n^k04&*l=bf$igqds&ezaekf'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -125,7 +82,6 @@ ROOT_URLCONF = 'HalliganAvailability.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'HalliganAvailability.wsgi.application'
 
-import os
 TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), '..', 'templates').replace('\\','/'),)
 TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),)
 
@@ -136,9 +92,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Uncomment the next line to enable the admin:
     'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'HalliganComputerAvailability',
     'HalliganTAAvailability',
@@ -154,22 +108,8 @@ INSTALLED_APPS = (
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
-
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Allow all host headers
-ALLOWED_HOSTS = ['*']
-
-# Static asset configuration
-import os
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/static/'
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
 
 def get_cache():
   import os
@@ -194,22 +134,10 @@ def get_cache():
 
 CACHES = get_cache()
 
-
-#EMAIL SETTINGS
-#EMAIL_HOST_PASSWORD = '***REMOVED***'
-#EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
-#EMAIL_HOST = 'smtp.gmail.com'
-#EMAIL_PORT = 587
-#EMAIL_USE_TLS = True
-#EMAIL_USE_SSL = True
-#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
 LOGIN_REDIRECT_URL = '/'
 
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = True
-
-
 
 LOGGING = {
     'version': 1,
