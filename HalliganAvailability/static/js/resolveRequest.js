@@ -191,7 +191,7 @@ function notification(obj) {
     $.titleAlert("Queue Updated");
 }
 
-socket = io.connect('/taqueue', {transports: ['xhr-polling']});
+socket = io.connect('/taqueue', {transports: ['websocket', 'xhr-polling']});
 
 socket.on("message", function(obj) {
     switch (obj.type){
