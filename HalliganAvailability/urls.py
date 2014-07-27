@@ -9,7 +9,7 @@ from HalliganComputerAvailability.api import ServerResource, RoomInfoResource
 
 # TA Availability api
 from HalliganTAAvailability.api import CourseResource, OfficeHourResource
-from HalliganTAAvailability.api import TAResource, UserResource
+from HalliganTAAvailability.api import TAResource
 
 
 v1_api = Api(api_name='v2')
@@ -25,7 +25,6 @@ v1_api.register(ServerResource())
 v1_api.register(CourseResource())
 v1_api.register(OfficeHourResource())
 v1_api.register(TAResource())
-v1_api.register(UserResource())
 
 
 # Uncomment the next two lines to enable the admin:
@@ -38,6 +37,7 @@ urlpatterns = patterns('',
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^api/', include('HalliganComputerAvailability.urls')),
                        url(r'^api/', include(v1_api.urls)),
+                       url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
                        url(r'^', include('HalliganTAAvailability.urls')),
                        url(r'^$', 'HalliganComputerAvailability.views.ModularHomePage', name='ModularHomePage'),
                        )

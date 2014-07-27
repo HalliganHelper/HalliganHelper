@@ -98,8 +98,9 @@ INSTALLED_APPS = (
     'registration',
     'widget_tweaks',
     'django_extensions',
-    'tastypie'
-
+    'tastypie',
+    'provider',
+    'provider.oauth2',
 )
 
 

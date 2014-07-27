@@ -1,15 +1,21 @@
 from tastypie import fields
 from tastypie.resources import ModelResource
-# from tastypie.authentication import BasicAuthentication, ApiKeyAuthentication
-# from tastypie.authentication import MultiAuthentication
+from tastypie.authentication import MultiAuthentication, SessionAuthentication
 from tastypie.authorization import DjangoAuthorization
 from HalliganComputerAvailability.models import RoomInfo, CourseUsageInfo
 from HalliganComputerAvailability.models import Lab, Computer, Server
+from HalliganAvailability.authentication import OAuth20Authentication
+
+
+class CommonMeta:
+    authorization = DjangoAuthorization()
+    authentication = MultiAuthentication(OAuth20Authentication(),
+                                         SessionAuthentication())
 
 
 class ComputerResource(ModelResource):
 
-    class Meta:
+    class Meta(CommonMeta):
         queryset = Computer.objects.all()
         limit = 0
         filtering = {
@@ -22,7 +28,6 @@ class ComputerResource(ModelResource):
         fields = ['number', 'room_number', 'status', 'used_for',
                   'last_update']
         allowed_methods = ['get']
-        authorization = DjangoAuthorization()
 
 
 class RoomInfoResource(ModelResource):
