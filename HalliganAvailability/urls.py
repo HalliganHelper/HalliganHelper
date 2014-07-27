@@ -9,7 +9,7 @@ from HalliganComputerAvailability.api import ServerResource, RoomInfoResource
 
 # TA Availability api
 from HalliganTAAvailability.api import CourseResource, OfficeHourResource
-from HalliganTAAvailability.api import TAResource
+from HalliganTAAvailability.api import TAResource, UserResource
 
 
 v1_api = Api(api_name='v2')
@@ -25,6 +25,7 @@ v1_api.register(ServerResource())
 v1_api.register(CourseResource())
 v1_api.register(OfficeHourResource())
 v1_api.register(TAResource())
+v1_api.register(UserResource())
 
 
 # Uncomment the next two lines to enable the admin:

@@ -1,18 +1,21 @@
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from django.conf.urls import url
-from tastypie.http import HttpUnauthorized, HttpForbidden
-from tastypie.utils import trailing_slash
 from tastypie import fields
 # from tastypie.authentication import BasicAuthentication, ApiKeyAuthentication
 # from tastypie.authentication import MultiAuthentication
 from tastypie.authorization import DjangoAuthorization
+from tastypie.authentication import MultiAuthentication, SessionAuthentication
 from tastypie.resources import ModelResource
 from .models import Course, TA, OfficeHour
 # from .models import Request, Student
 from HalliganAvailability.authentication import OAuth20Authentication
 import logging
 logger = logging.getLogger('api')
+
+
+class CommonMeta:
+    authorization = DjangoAuthorization()
+    authentication = MultiAuthentication(OAuth20Authentication(),
+                                         SessionAuthentication())
 
 
 class CourseResource(ModelResource):
@@ -66,3 +69,11 @@ class OfficeHourResource(ModelResource):
         authorization = DjangoAuthorization()
 
 
+class UserResource(ModelResource):
+    class Meta(CommonMeta):
+        queryset = User.objects.all()
+        resource_name = 'user'
+        fields = ['email', 'first_name', 'last_name', 'date_joined']
+
+    def authorized_read_list(self, object_list, bundle):
+        return object_list.filter(pk=bundle.request.user.pk)
