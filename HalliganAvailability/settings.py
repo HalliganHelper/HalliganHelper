@@ -172,6 +172,10 @@ LOGGING = {
         'HalliganComputerAvailability.views': {
             'handlers' : ['console'],
             'level': 'DEBUG'
+        },
+        'api': {
+            'handlers' : ['console'],
+            'level': 'DEBUG'
         }
     }
 }
