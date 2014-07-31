@@ -438,6 +438,7 @@ class QueueNamespace(BaseNamespace):
 
 def socketio(request):
     try:
+        logger.error("STARTING socketio: {0}".format(request))
         socketio_manage(request.environ, {'/taqueue': QueueNamespace, },
                         request=request)
     except:

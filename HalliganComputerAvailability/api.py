@@ -79,7 +79,7 @@ class LabResource(ModelResource):
     in_session = fields.BooleanField(attribute='is_lab_in_session')
     coming_up = fields.BooleanField(attribute='is_lab_coming_up')
 
-    class Meta:
+    class Meta(CommonMeta):
         queryset = Lab.objects.all().order_by('day_of_week', 'start_time')
         allowed_methods = ['get']
         filtering = {
@@ -97,4 +97,3 @@ class LabResource(ModelResource):
         fields = ['course_name', 'room_number', 'start_time', 'end_time',
                   'start_date', 'end_date', 'day_of_week', 'is_lab_in_session']
         allowed_methods = ['get']
-        authorization = DjangoAuthorization()
