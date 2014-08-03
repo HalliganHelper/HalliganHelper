@@ -79,34 +79,6 @@ class CourseUsageInfo(models.Model):
 
 admin.site.register(CourseUsageInfo)
 
-#
-# class ComputerInfo(models.Model):
-#     OFF = 'OFF'
-#     INUSE = 'INUSE'
-#     AVAILABLE = 'AVAILABLE'
-#     ERROR = 'ERROR'
-#
-#     CHOICES = [OFF, INUSE, AVAILABLE, ERROR]
-#
-#     STATUS_CHOICES = (
-#         (OFF, 'Off'),
-#         (INUSE, 'In Use'),
-#         (AVAILABLE, 'Available'),
-#         (ERROR, 'Error')
-#     )
-#
-#     def __init__(self, *args, **kwargs):
-#         super(models.Model, self).__init__(*args, **kwargs)
-#         print "\n\nDON'T ACTUALLY USE THIS MODEL: ComputerInfo\n\n"
-#
-#     room_number = models.IntegerField()
-#     computer_number = models.CharField(max_length=7)
-#     updated = models.DateTimeField(auto_now=True)
-#     status = models.CharField(max_length=10,
-#                                       choices=STATUS_CHOICES,
-#                                       default=AVAILABLE)
-
-
 class Server(models.Model):
     OFF = 'OFF'
     ON = 'ON'

@@ -2,6 +2,8 @@
 import os
 from secret import *
 
+PROJECT_ROOT = os.path.join(os.path.dirname(__file__), '..')
+
 ADMINS = (
     ('Tyler Lubeck', 'Tyler@tylerlubeck.com'),
     ('Tyler Lubeck', 'halliganhelper@tylerlubeck.com'),
@@ -46,14 +48,14 @@ MEDIA_URL = ''
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'djangobower.finders.BowerFinder',
+    'compressor.finders.CompressorFinder',
 )
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -80,7 +82,9 @@ ROOT_URLCONF = 'HalliganAvailability.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'HalliganAvailability.wsgi.application'
 
-TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), '..', 'templates').replace('\\','/'),)
+# TEMPLATE_DIRS = (
+#     os.path.join(PROJECT_ROOT, 'templates').replace('\\', '/'),
+# )
 TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),)
 
 INSTALLED_APPS = (
@@ -101,8 +105,9 @@ INSTALLED_APPS = (
     'tastypie',
     'provider',
     'provider.oauth2',
+    'djangobower',
+    'compressor',
 )
-
 
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
@@ -110,26 +115,27 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+
 def get_cache():
-  import os
-  try:
-    os.environ['MEMCACHE_SERVERS'] = os.environ['MEMCACHIER_SERVERS'].replace(',', ';')
-    os.environ['MEMCACHE_USERNAME'] = os.environ['MEMCACHIER_USERNAME']
-    os.environ['MEMCACHE_PASSWORD'] = os.environ['MEMCACHIER_PASSWORD']
-    return {
-      'default': {
-        'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
-        'TIMEOUT': 500,
-        'BINARY': True,
-        'OPTIONS': { 'tcp_nodelay': True }
-      }
-    }
-  except:
-    return {
-      'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
-      }
-    }
+    import os
+    try:
+        os.environ['MEMCACHE_SERVERS'] = os.environ['MEMCACHIER_SERVERS'].replace(',', ';')
+        os.environ['MEMCACHE_USERNAME'] = os.environ['MEMCACHIER_USERNAME']
+        os.environ['MEMCACHE_PASSWORD'] = os.environ['MEMCACHIER_PASSWORD']
+        return {
+            'default': {
+                'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
+                'TIMEOUT': 500,
+                'BINARY': True,
+                'OPTIONS': {'tcp_nodelay': True}
+            }
+        }
+    except:
+        return {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+            }
+        }
 
 CACHES = get_cache()
 
@@ -167,16 +173,32 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'sockets': {
-            'handlers' : ['console'],
+            'handlers': ['console'],
             'level': 'DEBUG'
         },
         'HalliganComputerAvailability.views': {
-            'handlers' : ['console'],
+            'handlers': ['console'],
             'level': 'DEBUG'
         },
         'api': {
-            'handlers' : ['console'],
+            'handlers': ['console'],
             'level': 'DEBUG'
         }
     }
 }
+
+BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
+
+BOWER_INSTALLED_APPS = (
+    'foundation',
+)
+
+
+COMPRESS_PRECOMPILERS = (
+    ('text/x-sass', 'sass --compass "{infile}" "{outfile}"'),
+    ('text/x-scss', 'sass --scss --compass -I "%s/bower_components/foundation/scss" "{infile}" "{outfile}"' % BOWER_COMPONENTS_ROOT),
+)
+
+# COMPRESS_URL = '/static/'
+
+TASTYPIE_DEFAULT_FORMATS = ['json']

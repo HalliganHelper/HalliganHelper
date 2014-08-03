@@ -1,0 +1,117 @@
+@import "foundation";
+@import "compass";
+
+$warning-color: rgba(215, 44, 44, 0.6);
+$alert-color: rgba(215, 165, 44, 0.6);
+$available-color: rgba(0, 116, 0, 0.6);
+
+body {
+    background: #FAFAFA;
+}
+
+.custom-sidenav {
+    @include side-nav();
+}
+
+.custom-sidenav li {
+    padding-left: 13px;
+}
+
+.custom-sidenav li.heading {
+    padding: 0px;
+}
+
+.fullWidth {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: initial;
+}
+
+.card {
+    padding: 1rem;
+    box-shadow: 0 1px 2px #aaa;
+    background: white;
+    margin: 0 0rem 0.5rem;
+    border-radius: 12px;
+    position: relative;
+    z-index: 2;
+}
+
+.sidebar {
+    @extend .card;
+    margin: 2rem 0rem 0.5rem;
+}
+
+h1 {
+    margin-top: 20px;
+}
+
+.custom-sidenav li.heading {
+    display: block;
+    color: $primary-color;
+    margin: 0;
+    padding: 0.4375rem 0.875rem;
+}
+
+.row.lab {
+    @extend .card;
+}
+.row.lab.lab-coming-up {
+    background: $warning-color;
+}
+
+.row.lab.lab-in-session {
+    background: $alert-color;
+}
+
+.content {
+    margin-top: 2rem;
+}
+
+.row.computer {
+    @extend .card;
+}
+
+.row.computer.computer-status-error {
+   background: $warning-color; 
+}
+
+.row.computer.computer-status-in-use {
+   background: $alert-color; 
+}
+
+.row.computer.computer-status-available {
+    background: $available-color;
+}
+
+.computer-number {
+    font-weight: bold;
+}
+
+@mixin header() {
+    background: $primary-color;
+    padding: 1rem 1rem;
+    box-shadow: 3px 4px 5px;
+    z-index: 5;
+}
+
+.row.computer-header {
+    @extend .card;
+    @include header();
+}
+
+.computer-number-header {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.row.lab-header {
+    @extend .card;
+    @include header();
+}
+
+.active {
+    background: rgba(0, 0, 0, 0.025);
+    color: #1cc7ff
+}

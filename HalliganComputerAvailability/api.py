@@ -95,5 +95,6 @@ class LabResource(ModelResource):
 
         resource_name = 'lab'
         fields = ['course_name', 'room_number', 'start_time', 'end_time',
-                  'start_date', 'end_date', 'day_of_week', 'is_lab_in_session']
+                  'start_date', 'end_date', 'day_of_week', 'is_lab_in_session',
+                  'id']
         allowed_methods = ['get']

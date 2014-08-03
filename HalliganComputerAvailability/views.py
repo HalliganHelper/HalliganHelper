@@ -3,11 +3,11 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response, render
-from .models import Lab, Computer, Server, RoomInfo, ServerInfo
+from .models import Lab, Computer, Server, RoomInfo
 from .models import CourseUsageInfo
+from HalliganTAAvailability.models import Course
 import json
 from django.core.cache import cache
-from django.core import serializers
 import operator
 from dateutil import tz
 import datetime as dt
@@ -20,61 +20,6 @@ logger = logging.getLogger(__name__)
 
 def ApiDocs(request):
     return render_to_response('ApiDocs.html')
-
-
-@require_GET
-def AllComps(request):
-
-    def SerializeHandler(obj):
-        if hasattr(obj, 'isoformat'):
-            return obj.isoformat()
-        else:
-            raise TypeError(
-                'Object of type %s with value of %s is not JSON serializable' %
-                (type(obj), repr(obj)))
-
-    response = {}
-
-    try:
-        Comps = Computer.objects.all()
-    except Computer.DoesNotExist:
-        response['success'] = False
-        return HttpResponse(
-            json.dumps(
-                response,
-                default=SerializeHandler),
-            content_type="application/json")
-
-    try:
-        Labs = Lab.objects.all()
-    except Lab.DoesNotExist:
-        pass
-
-    response['rooms'] = {}
-
-    # response['rooms'][c.room_number] =
-    for c in Comps:
-        if c.room_number not in response['rooms']:
-            response['rooms'][c.room_number] = {'classRoom': c.room_number}
-            response['rooms'][c.room_number]['machines'] = {}
-            response['rooms'][c.room_number]['inLab'] = False
-        response['rooms'][c.room_number]['machines'][c.number] = c.status
-
-    for lab in Labs:
-        if lab.is_lab_in_session() and lab.room_number in response['rooms']:
-            response['rooms'][lab.room_number]['inLab'] = True
-            response['rooms'][lab.room_number]['labInfo'] = {
-                'class': lab.course_name,
-                'startTime': lab.start_time,
-                'endTime': lab.end_time
-            }
-
-    response['success'] = True
-    return HttpResponse(
-        json.dumps(
-            response,
-            default=SerializeHandler),
-        content_type="application/json")
 
 
 @require_GET
@@ -303,35 +248,6 @@ def UpdateLab(request):
     return HttpResponse(status=200)
 
 
-# @require_GET
-# def GetRoomInfo(request):
-#     logger.debug('GET ROOM INFO')
-#     labName = request.GET.get('lab', default=None)
-#     if labName is None:
-#         return HttpResponse(status=400)
-#
-#     try:
-#         labs = RoomInfo.objects.filter(lab=labName)
-#         if not labs.exists():
-#             return HttpResponse(status=404)
-#         data = serializers.serialize(
-#             'json',
-#             labs,
-#             fields=(
-#                 'lab',
-#                 'num_reporting',
-#                 'last_updated',
-#                 'num_available',
-#                 'num_unavailable',
-#                 'num_error',
-#                 'courseusageinfo'))
-#
-#     except RoomInfo.DoesNotExist:
-#         return HttpResponse(status=404)
-#
-#     return HttpResponse(data, content_type="application/json")
-
-
 @require_POST
 @csrf_exempt
 def UpdateServer(request, MchID, NewStatus, NumUsers):
@@ -375,98 +291,25 @@ def UpdateServer(request, MchID, NewStatus, NumUsers):
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 
-# @require_GET
-# def ServerInfoView(request):
-#     # roomNums = Computer.objects.values_list('room_number', flat=True)
-#     logger.debug('SERVER INFO VIEW')
-#     servers = ServerInfo.objects.values_list('name', flat=True)
-#     result = {}
-#     NumDataPoints = request.GET.get('NumDataPoints', '10')
-#     NumDataPoints = int(NumDataPoints)
-#     for server in servers:
-#         DataPoints = ServerInfo.objects.filter(ComputerName=server)
-#         TotalDataPoints = DataPoints.count()
-#         StartingFrom = TotalDataPoints - NumDataPoints
-#         if StartingFrom < 0:
-#             StartingFrom = 0
-#         DataPoints = DataPoints[StartingFrom:]
-#         result[server] = serializers.serialize('json', DataPoints)
-#
-#     # create json dump and then clean it up
-#     jsonStr = json.dumps(result)
-#     jsonStr = jsonStr.replace('\\', '')
-#     jsonStr = jsonStr.replace('"[', '[')
-#     jsonStr = jsonStr.replace(']"', ']')
-#     return HttpResponse(jsonStr, content_type="application/json")
-
-
-# def HomePage(request):
-#
-#     retVal = cache.get("HOMEPAGE")
-#     if not retVal or retVal:
-#         TemplateParams = {}
-#         LabsInSession = {}
-#         comps = {}
-#         rooms = {}
-#         roomNums = Computer.objects.values_list('room_number', flat=True)
-#         roomNums = sorted(list(set(roomNums)))
-#
-#         for roomNum in roomNums:
-#             index = "Room" + str(roomNum)
-#             rooms[index] = {}
-#             rooms[index]['inSession'] = False
-#             labs = Lab.objects.filter(room_number=int(roomNum))
-#             rooms[index]['UpcomingLabs'] = []
-#             if not labs.count() == 0:
-#                 for lab in labs:
-#
-#                     if lab.is_lab_in_session():
-#                         rooms[index]['inSession'] = True
-#                         rooms[index]['lab'] = lab
-#                     if lab.is_lab_coming_up():
-#                         rooms[index]['UpcomingLabs'].append(lab)
-#
-#         TemplateParams['labInfo'] = rooms
-#         TemplateParams['allRooms'] = roomNums
-#         TemplateParams['allLabs'] = Lab.objects.all()
-#
-#         TemplateParams['servers'] = Server.objects.all()
-#
-#         Room116 = Computer.objects.filter(room_number=116)
-#         Room116.order_by('number')
-#         Room118 = Computer.objects.filter(room_number=118)
-#         Room118.order_by('number')
-#         Room120 = Computer.objects.filter(room_number=120)
-#         Room120.order_by('number')
-#
-#         TemplateParams['Room116'] = Room116
-#         TemplateParams['Room118'] = Room118
-#         TemplateParams['Room120'] = Room120
-#
-#         TemplateParams['comps'] = comps
-#         TemplateParams['labs'] = LabsInSession
-#         retVal = render(request, 'ComputerInfo.html', TemplateParams)
-#         cache.set("HOMEPAGE", retVal)
-#
-#     return retVal
-
-
 ROOMS_CACHE_KEY = "ROOMS_CACHE_KEY"
 LABS_CACHE_KEY = "LABS_CACHE_KEY"
 
 
 def ModularHomePage(request):
-    TemplateParams = {}
+    template_params = {}
 
-    Rooms = cache.get(ROOMS_CACHE_KEY)
-    if not Rooms or Rooms:
-        Rooms = Computer.objects.values_list('room_number', flat=True)
-        Rooms = sorted(list(set(Rooms)))
-        cache.set(ROOMS_CACHE_KEY, Rooms)
+    rooms = cache.get(ROOMS_CACHE_KEY)
+    if not rooms or rooms:
+        rooms = Computer.objects.values_list('room_number', flat=True)
+        rooms = sorted(list(set(rooms)))
+        cache.set(ROOMS_CACHE_KEY, rooms)
 
-    TemplateParams['Rooms'] = Rooms
+    courses = Course.objects.values_list('Number', flat=True)
 
-    return render(request, 'AjaxHomePage.html', TemplateParams)
+    template_params['rooms'] = rooms
+    template_params['courses'] = courses
+
+    return render(request, 'AjaxHomePage.html', template_params)
 
 
 @require_GET
@@ -486,4 +329,3 @@ def ServerList(request):
     response.sort(key=operator.itemgetter('name'))
 
     return HttpResponse(json.dumps(response), content_type="application/json")
-

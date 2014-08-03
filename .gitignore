@@ -1,3 +1,6 @@
+components/
+.sass-cache/
+*.bak
 gunicorn.py
 HalliganAvailability/secret.py
 *.key
