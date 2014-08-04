@@ -195,8 +195,8 @@ BOWER_INSTALLED_APPS = (
 
 
 COMPRESS_PRECOMPILERS = (
-    ('text/x-sass', 'sass --compass "{infile}" "{outfile}"'),
-    ('text/x-scss', 'sass --scss --compass -I "%s/bower_components/foundation/scss" "{infile}" "{outfile}"' % BOWER_COMPONENTS_ROOT),
+    ('text/x-sass', 'sass --compass -E "UTF-8" "{infile}" "{outfile}"'),
+    ('text/x-scss', 'sass --scss --compass -E "UTF-8" -I "%s/bower_components/foundation/scss" "{infile}" "{outfile}"' % BOWER_COMPONENTS_ROOT),
 )
 
 # COMPRESS_URL = '/static/'
