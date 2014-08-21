@@ -139,8 +139,6 @@ def get_cache():
 
 CACHES = get_cache()
 
-LOGIN_REDIRECT_URL = '/'
-
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = True
 

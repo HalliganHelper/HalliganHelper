@@ -32,8 +32,8 @@ body {
     padding: 1rem;
     box-shadow: 0 1px 2px #aaa;
     background: white;
-    margin: 0 0rem 0.5rem;
-    border-radius: 12px;
+    margin: 0 10px 0.5rem;
+    border-radius: 3px;
     position: relative;
     z-index: 2;
 }
@@ -74,11 +74,11 @@ h1 {
 }
 
 .row.computer.computer-status-error {
-   background: $warning-color; 
+    background: $warning-color; 
 }
 
 .row.computer.computer-status-in-use {
-   background: $alert-color; 
+    background: $alert-color; 
 }
 
 .row.computer.computer-status-available {
@@ -92,8 +92,10 @@ h1 {
 @mixin header() {
     background: $primary-color;
     padding: 1rem 1rem;
-    box-shadow: 3px 4px 5px;
+    box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 5px;
     z-index: 5;
+    margin: 0 0rem 0.5rem;
+    border-radius: 0px;
 }
 
 .row.computer-header {
@@ -115,3 +117,46 @@ h1 {
     background: rgba(0, 0, 0, 0.025);
     color: #1cc7ff
 }
+
+
+$size: 10em;
+
+.circle {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    border-radius: 50%;
+    z-index: 1;
+    @include transform(translate(-50%, -50%));
+    @include transition(all 200ms ease);
+
+    $duration: 1s;
+
+    &:nth-child(1){
+        z-index: 2;
+        background: #e74c3c;
+        animation-name: explode;
+        animation-duration: $duration;
+        animation-timing-function: ease;
+        animation-delay: 0;
+        animation-iteration-count: infinite;
+        //animation-direction: alternate;
+    }
+
+    &:nth-child(2){
+        background: #34495e;
+        animation-name: explode;
+        animation-duration: $duration;
+        animation-timing-function: ease;
+        animation-delay: 0.5s;
+        animation-iteration-count: infinite;
+        //animation-direction: alternate;
+    }
+}
+
+@keyframes explode {
+    0% { width: 0; height: 0; z-index: 1 }
+    50% { width: $size; height: $size; z-index: 1 }
+    100% { display: none; }
+}
+

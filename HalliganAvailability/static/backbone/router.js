@@ -7,46 +7,77 @@ var AppRouter = Backbone.Router.extend({
     }
 });
 
+
+Backbone.View.prototype.showWaiting = function() {
+    var circleOne = $('<div class="circle"/>'),
+        circleTwo = circleOne.clone();
+    this.$el.append(circleOne).append(circleTwo);
+    this.$el.append("Loading...");
+};
+
+_.each(["Model", "Collection"], function(name) {
+    var ctor = Backbone[name];
+    var fetch = ctor.prototype.fetch;
+    ctor.prototype.fetch = function() {
+        this.trigger("fetch", this);
+        return fetch.apply(this, arguments);
+    };
+});
+
+function checkXhrAndAbort() {
+    if (Boolean(app.fetchXhr) && app.fetchXhr.readyState > 0
+        && app.fetchXhr.readyState < 4) {
+        app.fetchXhr.abort();
+    }
+}
+
 $(function() {
     var app_router = new AppRouter();
+    app.currentRoomNumber = null;
+    app.currentView = null;
 
     app_router.on('route:roomRoute', function(roomNum) {
+        if(app.currentRoomNumber == roomNum) {
+            return;
+        }
+
+        app.currentRoomNumber = roomNum;
+        checkXhrAndAbort();
         $('.custom-sidenav > li > a').removeClass('active');
         $('#room'+roomNum).addClass('active');
-        console.log("Going to room " + roomNum);
         $('#content').fadeOut(100, function() {
             $('#content').empty();      
-            console.log('Animation complete');
-            new app.ComputersView([], {'roomNum': roomNum, 'el': '#content'});
+            app.currentView = new app.ComputersView([], {'roomNum': roomNum, 'el': '#content'});
             $('#content').fadeIn(100);
         });
     });
 
     app_router.on('route:taQueueRoute', function(courseNum) {
+        app.currentRoomNumber = null;
+        checkXhrAndAbort();
         $('.custom-sidenav > li > a').removeClass('active');
         $('#queue'+courseNum).addClass('active');
-        console.log('Going to the queue for ' + courseNum);
         $('#content').fadeOut(100, function() {
-            console.log('Animation complete');
             $('#content').empty();      
             $('#content').fadeIn(100);
         });
     });
 
     app_router.on('route:defaultRoute', function(actions) {
+        app.currentRoomNumber = null;
+        checkXhrAndAbort();
         $('.custom-sidenav > li > a').removeClass('active');
         $('#home').addClass('active');
-        console.log("Default route. Actions: " + actions);
     });
 
     app_router.on('route:labRoute', function(actions) {
+        app.currentRoomNumber = null;
+        checkXhrAndAbort();
         $('.custom-sidenav > li > a').removeClass('active');
         $('#labs').addClass('active');
-        console.log("Going to Labs");
         $('#content').fadeOut(100, function() {
-            console.log('Animation complete');
             $('#content').empty();      
-            new app.LabsView();
+            app.currentView = new app.LabsView();
             $('#content').fadeIn(100);
         });
     });
