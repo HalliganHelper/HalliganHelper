@@ -4,7 +4,7 @@ app.LabsView = Backbone.View.extend({
     el: '#content',
     initialize: function() {
         this.collection = new app.Labs();
-        this.collection.fetch({reset: true});
+        app.fetchXhr = this.collection.fetch({reset: true});
 
         this.listenTo(this.collection, 'add', this.renderLab);
         this.listenTo(this.collection, 'reset', this.render);

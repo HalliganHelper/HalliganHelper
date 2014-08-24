@@ -7,7 +7,7 @@
     {% load compress %}
 
     {% compress css %}
-    <link href="{% static 'HalliganAvailability/scss/extend_foundation.scss' %}" rel="stylesheet" type="text/x-scss"/>
+        <link href="{% static 'HalliganAvailability/scss/extend_foundation.scss' %}" rel="stylesheet" type="text/x-scss"/>
     {% endcompress %}
 
     <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -22,135 +22,18 @@
         <script src="{% static 'js/jquery.titlealert.js' %}"></script>
     {% endcompress %}
 
-    <script src="{% static 'backbone/app.js' %}"></script>
-    <script src="{% static 'backbone/TastyPie_Backbone_Shim.js' %}"></script>
-    <script id="roomTemplate" type="text/template"><h1>SOME SHIT</h1></script>
-
-    <script id="computerHeaderTemplate" type="text/template">
-        <div class="row computer-header">
-            <div class="large-2 medium-2 small-1 columns computer-number-header"><h4>Number</h4></div>
-            <div class="large-2 medium-2 small-1 columns computer-status-header"><h4>Status</h4></div>
-            <div class="large-3 medium-3 small-2 columns computer-last-update-header"><h4>Last Updated</h4></div>
-        </div>
-    </script>
-
-    <script id="computerTemplate" type="text/template">
-            <% if (status === 'INUSE') { %>
-                <div class="row computer computer-status-in-use">
-            <% } else if (status === 'AVAILABLE') { %>
-                <div class="row computer computer-status-available">
-            <% } else if (status === 'ERROR')  { %>
-                <div class="row computer computer-status-error">
-            <% } else if (status === 'OFF')  { %>
-                <div class="row computer computer-status-available">
-            <% } %>
-            <div class="large-2 medium-2 small-1 columns computer-number"><%= number %></div>
-            <% if (status === 'INUSE') { %>
-                <div class="large-2 medium-2 small-1 columns">In Use</div>
-            <% } else if (status === 'AVAILABLE') { %>
-                <div class="large-2 medium-2 small-1 columns">Available</div>
-            <% } else if (status === 'ERROR')  { %>
-                <div class="large-2 medium-2 small-1 columns">Error</div>
-            <% } else if (status === 'OFF')  { %>
-                <div class="large-2 medium-2 small-1 columns">Off</div>
-            <% } %>
-            <div data-livestamp="<%= last_update %>" class="large-3 medium-3 small-2 columns computer-last-update"><%= moment(last_update).format("h:mm a D/MM/YY") %></div>
-        </div>
-    </script>
-
-    <script id="labHeaderTemplate" type="text/template">
-        <div class="row lab-header">
-            <div class="large-2 medium-2 small-1 columns lab-week-day-header"><h4>Day</h4></div>
-            <div class="large-2 medium-2 small-1 columns lab-start-time-header"><h4>Start Time</h4></div>
-            <div class="large-2 medium-2 small-1 columns lab-end-time-header"><h4>End Time</h4></div>
-            <div class="large-2 medium-2 small-1 columns lab-room-num-header"><h4>Room Number</h4></div>
-            <div class="large-3 medium-3 small-3 columns lab-course-name-header"><h4>Course</h4></div>
-            <div class="large-1 medium-1"></div>
-        </div>
-    </script>
-
-    <script id="labTemplate" type="text/template">
-        <% if (coming_up) { %>
-            <div class="row lab lab-coming-up">
-        <% } else if (in_session) { %>
-            <div class="row lab lab-in-session">
-        <% } else { %>
-            <div class="row lab">
-        <% } %>
-                <div class="large-2 medium-2 small-1 columns lab-week-day"><%= day_of_week_str %></div>
-                <div class="large-2 medium-2 small-1 columns lab-start-time"><%= moment(start_time, "HH:mm:ss").format("h:mm a") %></div>
-                <div class="large-2 medium-2 small-1 columns lab-end-time"><%= moment(end_time, "HH:mm:ss").format("h:mm a") %></div>
-                <div class="large-2 medium-2 small-1 columns lab-room-num"><%= room_number %></div>
-                <div class="large-3 medium-3 small-3 columns lab-course-name"><%= course_name %></div>
-                <div class="large-1 medium-1"></div>
-            </div>
-    </script>
-
-    <script src="{% static 'HalliganComputerAvailability/backbone/views/ComputerView.js' %}"></script>
-    <script src="{% static 'HalliganComputerAvailability/backbone/views/LabView.js' %}"></script>
-    <script src="{% static 'HalliganComputerAvailability/backbone/views/RoomView.js' %}"></script>
-
-    <script src="{% static 'HalliganComputerAvailability/backbone/views/ComputersView.js' %}"></script>
-    <script src="{% static 'HalliganComputerAvailability/backbone/views/LabsView.js' %}"></script>
-    <script src="{% static 'HalliganComputerAvailability/backbone/views/RoomsView.js' %}"></script>
-
-    <script src="{% static 'HalliganComputerAvailability/backbone/models/Room.js' %}"></script>
-    <script src="{% static 'HalliganComputerAvailability/backbone/models/Lab.js' %}"></script>
-    <script src="{% static 'HalliganComputerAvailability/backbone/models/Computer.js' %}"></script>
-
-    <script src="{% static 'HalliganComputerAvailability/backbone/collections/Rooms.js' %}"></script>
-    <script src="{% static 'HalliganComputerAvailability/backbone/collections/Labs.js' %}"></script>
-    <script src="{% static 'HalliganComputerAvailability/backbone/collections/Computers.js' %}"></script>
-
-    <script src="{% static 'backbone/router.js' %}"></script>
 
     {% block header %}{% endblock %}
 </head>
 <body>
-    <nav class="top-bar" data-topbar>
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/">Halligan Helper</a></h1>
-            </li>
-            <li class="toggle-topbar icon"><a href="#">Menu</a></li>
-        </ul>
-        <section class="top-bar-section">
-            <ul class="right">
-                <li><a href="#">Name</a></li>
-            </ul>
-        </section>
-    </nav>
-    <section role="main" class="scroll-container">
-        <div class="row fullWidth">
-            <div class="large-2 medium-3 columns"> 
-                <div class="hide-for-small">
-                    <div class="sidebar">
-                        <nav>
-                            <ul class="custom-sidenav">
-                                <li class="heading"><h5>Halligan Helper</h5></li>
-                                <li><a href="#" id="home">Home</a></li>
-                                <li class="heading">Rooms</li>
-                                {% for room_num in rooms %}
-                                <li> <a href="#room/{{ room_num }}" id="room{{room_num}}">Lab {{ room_num }}</a></li>
 
-                                {% endfor %}
-                                <li class="heading">TA Queue</li>
-                                {% for course in courses %}
-                                <li><a href="#/ta/queue/{{ course }}" id="queue{{course}}">Comp {{ course }}</a></li>
-                                {% endfor %}
-                                <li class="heading">More</li>
-                                <li><a href="#/labs" id="labs">Lab Schedule</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-            <div class="large-10 medium-9 columns content" id="content">
-            </div>
-        </div>
-    </section>
+    {% block content %}
+    {% endblock %}
 
     <script>
         $(document).foundation();
     </script>
+
+    {% block endscripts %}
+    {% endblock %}
 </body>

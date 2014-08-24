@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response, render
+from django.contrib.auth.decorators import login_required
 from .models import Lab, Computer, Server, RoomInfo
 from .models import CourseUsageInfo
 from HalliganTAAvailability.models import Course
@@ -295,6 +296,7 @@ ROOMS_CACHE_KEY = "ROOMS_CACHE_KEY"
 LABS_CACHE_KEY = "LABS_CACHE_KEY"
 
 
+@login_required
 def ModularHomePage(request):
     template_params = {}
 

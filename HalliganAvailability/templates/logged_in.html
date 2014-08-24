@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block header %}
+    {% include "backbone_scripts.html" %}
+    {% include "backbone_templates.html" %}
+{% endblock %}
+
+{% block content %}
+    <section role="main" class="scroll-container">
+        <div class="row fullWidth">
+            <div class="large-2 medium-3 columns"> 
+                <div class="hide-for-small">
+                    <div class="sidebar">
+                        <nav>
+                            <ul class="custom-sidenav">
+                                <li class="heading"><h5>Halligan Helper</h5></li>
+                                <li><a href="#" id="home">Home</a></li>
+                                <li class="heading">Rooms</li>
+                                {% for room_num in rooms %}
+                                <li> <a href="#room/{{ room_num }}" id="room{{room_num}}">Lab {{ room_num }}</a></li>
+
+                                {% endfor %}
+                                <li class="heading">TA Queue</li>
+                                {% for course in courses %}
+                                <li><a href="#/ta/queue/{{ course }}" id="queue{{course}}">Comp {{ course }}</a></li>
+                                {% endfor %}
+                                <li class="heading">More</li>
+                                <li><a href="#/labs" id="labs">Lab Schedule</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div class="large-10 medium-9 columns content" id="content">
+            </div>
+        </div>
+    </section>
+    
+{% endblock %}

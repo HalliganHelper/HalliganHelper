@@ -1,0 +1,59 @@
+<script id="computerHeaderTemplate" type="text/template">
+    <div class="row computer-header">
+        <div class="large-2 medium-2 small-1 columns computer-number-header"><h4>Number</h4></div>
+        <div class="large-2 medium-2 small-1 columns computer-status-header"><h4>Status</h4></div>
+        <div class="large-3 medium-3 small-2 columns computer-last-update-header"><h4>Last Updated</h4></div>
+    </div>
+</script>
+
+<script id="computerTemplate" type="text/template">
+        <% if (status === 'INUSE') { %>
+            <div class="row computer computer-status-in-use">
+        <% } else if (status === 'AVAILABLE') { %>
+            <div class="row computer computer-status-available">
+        <% } else if (status === 'ERROR')  { %>
+            <div class="row computer computer-status-error">
+        <% } else if (status === 'OFF')  { %>
+            <div class="row computer computer-status-available">
+        <% } %>
+        <div class="large-2 medium-2 small-1 columns computer-number"><%= number %></div>
+        <% if (status === 'INUSE') { %>
+            <div class="large-2 medium-2 small-1 columns">In Use</div>
+        <% } else if (status === 'AVAILABLE') { %>
+            <div class="large-2 medium-2 small-1 columns">Available</div>
+        <% } else if (status === 'ERROR')  { %>
+            <div class="large-2 medium-2 small-1 columns">Error</div>
+        <% } else if (status === 'OFF')  { %>
+            <div class="large-2 medium-2 small-1 columns">Off</div>
+        <% } %>
+        <div data-livestamp="<%= last_update %>" class="large-3 medium-3 small-2 columns computer-last-update"><%= moment(last_update).format("h:mm a D/MM/YY") %></div>
+    </div>
+</script>
+
+<script id="labHeaderTemplate" type="text/template">
+    <div class="row lab-header">
+        <div class="large-2 medium-2 small-1 columns lab-week-day-header"><h4>Day</h4></div>
+        <div class="large-2 medium-2 small-1 columns lab-start-time-header"><h4>Start Time</h4></div>
+        <div class="large-2 medium-2 small-1 columns lab-end-time-header"><h4>End Time</h4></div>
+        <div class="large-2 medium-2 small-1 columns lab-room-num-header"><h4>Room Number</h4></div>
+        <div class="large-3 medium-3 small-3 columns lab-course-name-header"><h4>Course</h4></div>
+        <div class="large-1 medium-1"></div>
+    </div>
+</script>
+
+<script id="labTemplate" type="text/template">
+    <% if (coming_up) { %>
+        <div class="row lab lab-coming-up">
+    <% } else if (in_session) { %>
+        <div class="row lab lab-in-session">
+    <% } else { %>
+        <div class="row lab">
+    <% } %>
+            <div class="large-2 medium-2 small-1 columns lab-week-day"><%= day_of_week_str %></div>
+            <div class="large-2 medium-2 small-1 columns lab-start-time"><%= moment(start_time, "HH:mm:ss").format("h:mm a") %></div>
+            <div class="large-2 medium-2 small-1 columns lab-end-time"><%= moment(end_time, "HH:mm:ss").format("h:mm a") %></div>
+            <div class="large-2 medium-2 small-1 columns lab-room-num"><%= room_number %></div>
+            <div class="large-3 medium-3 small-3 columns lab-course-name"><%= course_name %></div>
+            <div class="large-1 medium-1"></div>
+        </div>
+</script>
