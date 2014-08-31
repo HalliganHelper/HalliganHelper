@@ -16,6 +16,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/livestamp/1.1.2/livestamp.min.js"></script>
     {% compress js %}
+        <script src="{% static 'HalliganAvailability/js/jquery.js' %}"></script>
         <script src="{% static 'modernizr/modernizr.js' %}"></script>
         <script src="{% static 'fastclick/lib/fastclick.js' %}"></script>
         <script src="{% static 'foundation/js/foundation.min.js' %}"></script>
@@ -29,6 +30,11 @@
 
     {% block content %}
     {% endblock %}
+    <div class="row">
+        <div class="card text-center">
+            Created by <a href="mailto:tyler@tylerlubeck.com">Tyler Lubeck</a>
+        </div>
+    </div>
 
     <script>
         $(document).foundation();

@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% block header %}
-    {% include "backbone_scripts.html" %}
     {% include "backbone_templates.html" %}
+    {% include "backbone_scripts.html" %}
 {% endblock %}
 
 {% block content %}
     <section role="main" class="scroll-container">
         <div class="row fullWidth">
-            <div class="large-2 medium-3 columns"> 
+            <div class="large-2 medium-3 small-1 columns"> 
                 <div class="hide-for-small">
                     <div class="sidebar">
                         <nav>
                             <ul class="custom-sidenav">
-                                <li class="heading"><h5>Halligan Helper</h5></li>
+                                <li class="heading"><h6>Hello {{user.first_name}}!</h6></li>
                                 <li><a href="#" id="home">Home</a></li>
                                 <li class="heading">Rooms</li>
                                 {% for room_num in rooms %}
@@ -30,9 +30,8 @@
                     </div>
                 </div>
             </div>
-            <div class="large-10 medium-9 columns content" id="content">
+            <div class="large-10 medium-9 small-9 columns content" id="content">
             </div>
         </div>
     </section>
-    
 {% endblock %}

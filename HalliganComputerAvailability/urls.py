@@ -2,7 +2,6 @@ __author__ = 'tyler'
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('HalliganComputerAvailability.views',
-                       url(r'^$', 'ApiDocs', name='docs'),
                        url(r'^room/(?P<RmNum>.+)/$',
                            'SpecificRoom',
                            name='SpecificRoom'),

@@ -354,6 +354,9 @@ def cancel_hours(request):
     return render(request, 'cancel_hours.html', {'form': form})
 
 
+def login_or_register(request):
+    return render(request, 'HalliganTAAvailability/login_or_register.html')
+
 # @login_required
 # @user_passes_test(ta_test)
 # @require_POST

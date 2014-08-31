@@ -32,7 +32,7 @@ body {
     padding: 1rem;
     box-shadow: 0 1px 2px #aaa;
     background: white;
-    margin: 0 10px 0.5rem;
+    margin: 0px 0px 0.5rem 0px;
     border-radius: 3px;
     position: relative;
     z-index: 2;
@@ -141,22 +141,41 @@ $size: 10em;
         animation-delay: 0;
         animation-iteration-count: infinite;
         //animation-direction: alternate;
-    }
+}
 
-    &:nth-child(2){
-        background: #34495e;
-        animation-name: explode;
-        animation-duration: $duration;
-        animation-timing-function: ease;
-        animation-delay: 0.5s;
-        animation-iteration-count: infinite;
-        //animation-direction: alternate;
-    }
+&:nth-child(2){
+    background: #34495e;
+    animation-name: explode;
+    animation-duration: $duration;
+    animation-timing-function: ease;
+    animation-delay: 0.5s;
+    animation-iteration-count: infinite;
+    //animation-direction: alternate;
+}
 }
 
 @keyframes explode {
     0% { width: 0; height: 0; z-index: 1 }
     50% { width: $size; height: $size; z-index: 1 }
     100% { display: none; }
+}
+
+.login-card {
+    @extend .card;
+    /*opacity: 0.95;*/
+    opacity: .93;
+}
+
+.login-card.right {
+    right: -3px;
+}
+
+.login-card.left {
+    left: -3px;
+}
+
+.login-card > .button.expand {
+    margin: 0px;
+    border: 1px solid white;
 }
 

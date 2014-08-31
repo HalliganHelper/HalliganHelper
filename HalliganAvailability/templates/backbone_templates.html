@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <script id="computerHeaderTemplate" type="text/template">
     <div class="row computer-header">
         <div class="large-2 medium-2 small-1 columns computer-number-header"><h4>Number</h4></div>
@@ -7,15 +8,15 @@
 </script>
 
 <script id="computerTemplate" type="text/template">
-        <% if (status === 'INUSE') { %>
-            <div class="row computer computer-status-in-use">
-        <% } else if (status === 'AVAILABLE') { %>
-            <div class="row computer computer-status-available">
-        <% } else if (status === 'ERROR')  { %>
-            <div class="row computer computer-status-error">
-        <% } else if (status === 'OFF')  { %>
-            <div class="row computer computer-status-available">
-        <% } %>
+    <% if (status === 'INUSE') { %>
+        <div class="row computer computer-status-in-use">
+    <% } else if (status === 'AVAILABLE') { %>
+        <div class="row computer computer-status-available">
+    <% } else if (status === 'ERROR')  { %>
+        <div class="row computer computer-status-error">
+    <% } else if (status === 'OFF')  { %>
+        <div class="row computer computer-status-available">
+    <% } %>
         <div class="large-2 medium-2 small-1 columns computer-number"><%= number %></div>
         <% if (status === 'INUSE') { %>
             <div class="large-2 medium-2 small-1 columns">In Use</div>
@@ -56,4 +57,8 @@
             <div class="large-3 medium-3 small-3 columns lab-course-name"><%= course_name %></div>
             <div class="large-1 medium-1"></div>
         </div>
+</script>
+
+<script id="roomTemplate" type="text/template">
+
 </script>

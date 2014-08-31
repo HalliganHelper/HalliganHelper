@@ -2,7 +2,7 @@
 from django.http import HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import Lab, Computer, Server, RoomInfo
 from .models import CourseUsageInfo
@@ -17,10 +17,6 @@ from collections import defaultdict
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-def ApiDocs(request):
-    return render_to_response('ApiDocs.html')
 
 
 @require_GET
@@ -311,7 +307,7 @@ def ModularHomePage(request):
     template_params['rooms'] = rooms
     template_params['courses'] = courses
 
-    return render(request, 'AjaxHomePage.html', template_params)
+    return render(request, 'logged_in.html', template_params)
 
 
 @require_GET
