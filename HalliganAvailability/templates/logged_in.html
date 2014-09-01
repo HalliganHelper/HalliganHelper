@@ -19,12 +19,13 @@
                                 <li> <a href="#room/{{ room_num }}" id="room{{room_num}}">Lab {{ room_num }}</a></li>
 
                                 {% endfor %}
-                                <li class="heading">TA Queue</li>
+                                <li class="heading">TA Queues</li>
                                 {% for course in courses %}
                                 <li><a href="#/ta/queue/{{ course }}" id="queue{{course}}">Comp {{ course }}</a></li>
                                 {% endfor %}
                                 <li class="heading">More</li>
                                 <li><a href="#/labs" id="labs">Lab Schedule</a></li>
+                                <li><a href="/accounts/logout?next=/">Logout</a></li>
                             </ul>
                         </nav>
                     </div>
@@ -34,4 +35,12 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block footer_bar %}
+    <div class="row fullWidth">
+        <div class="card text-center">
+            Created by <a href="mailto:tyler@tylerlubeck.com">Tyler Lubeck</a>
+        </div>
+    </div>
 {% endblock %}

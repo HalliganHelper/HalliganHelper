@@ -3,7 +3,7 @@ from django.conf.urls import patterns, include, url
 from views import TuftsRegistrationView
 
 urlpatterns = patterns('HalliganTAAvailability.views',
-    url(r'^accounts/register/$', TuftsRegistrationView.as_view()),
+    url(r'^accounts/register/$', TuftsRegistrationView.as_view(), name='register'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^taSystem$', 'onlineQueue', name='taSystem'),
     url(r'^users$', 'profile', name='userProfile'),

@@ -4,21 +4,21 @@
 {% block content %}
 <div class="row">
     <div class="login-card text-center">
-        <img src="{% static 'HalliganTAAvailability/imgs/ice_mountains_wallpaper.jpg' %}" alt="Halligan Helper logo" width=100 height=100/>
+        <img src="{% static 'HalliganTAAvailability/imgs/HH_Logo.jpg' %}" alt="Halligan Helper logo" width=150 height=115/>
         <h1>Halligan Helper</h1>
     </div>
 </div>
 <div class="row show-for-small">
-    <div class=" medium-6 small-12 columns login-card left">
-        <a href="#" class="button expand"> Login </a>
+    <div class="medium-6 small-12 columns login-card left">
+        <a href="#" data-reveal-id="login-modal" class="button expand"> Login </a>
     </div>
     <div class="medium-6 small-12 columns login-card right">
-        <a href="#" class="button expand success">Sign Up</a>
+        <a href="#" data-reveal-id="signup-modal" class="button expand success">Sign Up</a>
     </div>
 </div>
 <div class="row">
     <div class="medium-6 small-12 columns login-card left">
-        <h3 class="text-center">What is it?</h3>
+        <h3 class="text-center">What is this?</h3>
         <h4>A TA System</h4>
         <p>
         Halligan Helper allows Teacher's Assistants to quickly and easily
@@ -39,12 +39,67 @@
 </div>
 <div class="row hide-for-small">
     <div class="medium-6 small-12 columns login-card left">
-        <a href="#" class="button expand"> Login </a>
+        <a href="#" data-reveal-id="login-modal" class="button expand"> Login </a>
     </div>
     <div class="medium-6 small-12 columns login-card right">
-        <a href="#" class="button expand success">Sign Up</a>
+        <a href="#" data-reveal-id="signup-modal" class="button expand success">Sign Up</a>
     </div>
 </div>
+<div id="login-modal" class="reveal-modal" data-reveal>
+    <h2 class="text-center">Welcome back!</h2>
+    <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+        {% for field in login %}
+        <div class="row collapse">
+            <div class="small-4 columns">
+                <span class="prefix">{{ field.label }}</span>
+            </div>
+            <div class="small-8 columns">
+                {{ field }} 
+            </div>
+        </div>
+        {% endfor %}
+        <div class="row">
+            <div class="small-4 small-centered columns">
+                <input type="submit" value="Login" class="button extend"/>
+            </div>
+        </div>
+        <input type="hidden" name="next" value="{{ next }}" />
+        {% csrf_token %}
+    </form>
+    <a class="close-reveal-modal">&#215;</a>
+</div>
+<div id="signup-modal" class="reveal-modal" data-reveal>
+    <h2 class="text-center">Welcome!</h2>
+    <form method="post" action="{% url 'register' %}">
+        {% for field in register %}
+        <div class="row collapse">
+            <div class="small-4 columns">
+                <span class="prefix">{{ field.label }}</span>
+            </div>
+            <div class="small-8 columns">
+                {{ field }} 
+            </div>
+        </div>
+        {% endfor %}
+        <div class="row">
+            <div class="small-4 small-centered columns">
+                <input type="submit" value="Sign Up" class="button success extend"/>
+            </div>
+        </div>
+        <input type="hidden" name="next" value="{{ next }}" />
+        {% csrf_token %}
+    </form>
+
+    <a class="close-reveal-modal">&#215;</a>
+</div>
+{% endblock %}
+
+{% block footer_bar %}
+    <div class="row">
+        <div class="small-12 columns login-card text-center">
+            Created by <a href="mailto:tyler@tylerlubeck.com">Tyler Lubeck</a>
+        </div>
+    </div>
 {% endblock %}
 
 {% block endscripts %}

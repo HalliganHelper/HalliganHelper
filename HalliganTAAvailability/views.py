@@ -6,6 +6,7 @@ import requests
 from HalliganAvailability import settings
 from datetime import timedelta
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -355,7 +356,19 @@ def cancel_hours(request):
 
 
 def login_or_register(request):
-    return render(request, 'HalliganTAAvailability/login_or_register.html')
+    if request.method == 'POST':
+        register_form = TuftsEmail(request.POST)
+        login_form = AuthenticationForm(request.POST)
+    else:
+        register_form = TuftsEmail()
+        login_form = AuthenticationForm()
+    template_vars = {
+        'register': register_form,
+        'login': login_form
+    }
+    return render(request,
+                  'HalliganTAAvailability/login_or_register.html',
+                  template_vars)
 
 # @login_required
 # @user_passes_test(ta_test)
