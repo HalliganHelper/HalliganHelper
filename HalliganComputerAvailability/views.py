@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import Lab, Computer, Server, RoomInfo
 from .models import CourseUsageInfo
-from HalliganTAAvailability.models import Course
+from HalliganTAAvailability.models import Course, Request
 import json
 from django.core.cache import cache
 import operator
@@ -303,9 +303,17 @@ def ModularHomePage(request):
         cache.set(ROOMS_CACHE_KEY, rooms)
 
     courses = Course.objects.values_list('Number', flat=True)
+    course_data = []
+    for course in courses:
+        data = {
+            'num': course,
+            'count': Request.display_objects.filter(course__Number=course).count()
+        }
+        course_data.append(data)
 
+    course_data = sorted(course_data, key=lambda k: k['num'])
     template_params['rooms'] = rooms
-    template_params['courses'] = courses
+    template_params['courses'] = course_data
 
     return render(request, 'logged_in.html', template_params)
 

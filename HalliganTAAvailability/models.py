@@ -44,6 +44,12 @@ class TA(models.Model):
 admin.site.register(TA)
 
 
+class RequestDisplayManager(models.Manager):
+    def get_query_set(self):
+        qs = super(RequestDisplayManager, self).get_query_set()
+        return qs.filter(cancelled=False, solved=False)
+
+
 class Request(models.Model):
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
@@ -54,8 +60,12 @@ class Request(models.Model):
     whenSolved = models.DateTimeField(blank=True, null=True)
     timedOut = models.BooleanField(default=False)
     emailed = models.BooleanField(default=False)
-    who_solved = models.ForeignKey(TA, null=True)
+    who_solved = models.ForeignKey(TA, null=True, blank=True)
     checked_out = models.BooleanField(default=False)
+    cancelled = models.BooleanField(default=False, blank=True)
+
+    objects = models.Manager()
+    display_objects = RequestDisplayManager()
 
     def save(self, *args, **kwargs):
         est = pytz.timezone('US/Eastern')

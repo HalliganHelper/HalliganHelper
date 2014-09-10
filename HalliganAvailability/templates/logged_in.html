@@ -1,5 +1,11 @@
 {% extends "base.html" %}
-{% block header %}
+{% load static %}
+{% block endscripts %}
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href='https://code.jquery.com/ui/1.11.0-beta.1/themes/base/jquery-ui.css'/>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.4.5/jquery-ui-timepicker-addon.min.js'></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.0-beta.1/themes/base/jquery-ui.css"/>
     {% include "backbone_templates.html" %}
     {% include "backbone_scripts.html" %}
 {% endblock %}
@@ -7,21 +13,33 @@
 {% block content %}
     <section role="main" class="scroll-container">
         <div class="row fullWidth">
-            <div class="large-2 medium-3 small-1 columns"> 
+            <div class="large-2 medium-3 small-1 columns hide-for-small"> 
                 <div class="hide-for-small">
                     <div class="sidebar">
                         <nav>
                             <ul class="custom-sidenav">
-                                <li class="heading"><h6>Hello {{user.first_name}}!</h6></li>
-                                <li><a href="#" id="home">Home</a></li>
+                                <li class="heading text-center">
+                                    <a href="#" id="home">
+                                        <img src="{% static 'HalliganTAAvailability/imgs/HH_Logo.jpg' %}" width=100 height=100 alt=logo/>
+                                        <h6>Halligan Helper</h6>
+                                    </a>
+                                </li>
                                 <li class="heading">Rooms</li>
                                 {% for room_num in rooms %}
-                                <li> <a href="#room/{{ room_num }}" id="room{{room_num}}">Lab {{ room_num }}</a></li>
+                                <li> <a href="#room/{{ room_num }}" id="room{{room_num}}">Lab {{ room_num }}</a> <span</li>
 
                                 {% endfor %}
                                 <li class="heading">TA Queues</li>
                                 {% for course in courses %}
-                                <li><a href="#/ta/queue/{{ course }}" id="queue{{course}}">Comp {{ course }}</a></li>
+                                <li><a href="#/ta/queue/{{ course.num }}" id="queue{{course.num}}">
+                                    Comp {{ course.num }}
+                                    {% if course.count <= 20 %}
+                                        <span class="round success label float-right" id="{{course.num}}-count">{{ course.count}}</span>
+                                    {% else %}
+                                        <span class="round alert label float-right" id="{{course.num}}-count">{{ course.count}}</span>
+                                    {% endif %}
+                                </a>
+                                </li>
                                 {% endfor %}
                                 <li class="heading">More</li>
                                 <li><a href="#/labs" id="labs">Lab Schedule</a></li>
@@ -31,7 +49,9 @@
                     </div>
                 </div>
             </div>
-            <div class="large-10 medium-9 small-9 columns content" id="content">
+            <div class="large-10 medium-9 small-12 columns content" id="content">
+            </div>
+            <div class="large-10 medium-9 small-12 columns content" id="footer-content">
             </div>
         </div>
     </section>
@@ -40,7 +60,8 @@
 {% block footer_bar %}
     <div class="row fullWidth">
         <div class="card text-center">
-            Created by <a href="mailto:tyler@tylerlubeck.com">Tyler Lubeck</a>
+            Created by <a href="mailto:tyler@tylerlubeck.com">Tyler Lubeck</a><br/>
+            Questions? Comments? Obscenities? Please keep them to yourself.
         </div>
     </div>
 {% endblock %}

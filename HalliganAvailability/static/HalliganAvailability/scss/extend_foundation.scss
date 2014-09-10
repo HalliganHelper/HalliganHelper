@@ -35,7 +35,7 @@ body {
     margin: 0px 0px 0.5rem 0px;
     border-radius: 3px;
     position: relative;
-    z-index: 2;
+    z-index: 0;
 }
 
 .sidebar {
@@ -58,11 +58,11 @@ h1 {
     @extend .card;
 }
 .row.lab.lab-coming-up {
-    background: $warning-color;
+    background: $alert-color;
 }
 
 .row.lab.lab-in-session {
-    background: $alert-color;
+    background: $warning-color;
 }
 
 .content {
@@ -93,7 +93,7 @@ h1 {
     background: $primary-color;
     padding: 1rem 1rem;
     box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 5px;
-    z-index: 5;
+    z-index: 0;
     margin: 0 0rem 0.5rem;
     border-radius: 0px;
 }
@@ -109,6 +109,11 @@ h1 {
 }
 
 .row.lab-header {
+    @extend .card;
+    @include header();
+}
+
+.row.queue-header {
     @extend .card;
     @include header();
 }
@@ -162,7 +167,6 @@ $size: 10em;
 
 .login-card {
     @extend .card;
-    /*opacity: 0.95;*/
     opacity: .93;
 }
 
@@ -179,3 +183,72 @@ $size: 10em;
     border: 1px solid white;
 }
 
+.slick-slider {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.slick-prev:before, .slick-next:before {
+    color: black;
+}
+
+.row.request {
+    @extend .card;
+}
+
+.row.office-hour {
+    @extend .card;
+}
+
+.row.office-hour-header {
+    @extend .card;
+    @include header();
+}
+
+.get-help {
+    @extend .card;
+    background-color: #C0C0C0;
+}
+
+h4 {
+    color: white;
+}
+
+@media only screen and (max-width: 40em) {
+    span.show-for-small-only {
+        display: inline !important;
+    }
+}
+
+span.float-right {
+    float: right;
+}
+
+.taCard {
+    @extend .card;
+    padding-top: 12px !important;
+}
+
+.taCard > .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.taCard {
+    margin-right: 5px;
+}
+
+@media only screen and (min-width: 40em) {
+    .medium-block-grid-3 > li {
+        width: 32%;
+    }
+}
+
+.queue-course-header {
+    @extend .queue-header;
+    background-color: $success-color;
+}
+
+.queue-course-header > .small-12 > h3 {
+    color: white;
+}

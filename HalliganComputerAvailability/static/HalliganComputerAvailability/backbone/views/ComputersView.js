@@ -13,7 +13,6 @@ app.ComputersView = Backbone.View.extend({
     },
     template: _.template( $('#computerHeaderTemplate').html() ),
     render: function() {
-        console.log("RENDERING COMPUTERS");
         this.$el.empty();
         this.$el.append( this.template() );
         this.collection.each(function(item) {

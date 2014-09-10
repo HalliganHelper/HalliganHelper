@@ -2,6 +2,7 @@ import datetime
 import logging
 import pytz
 import requests
+import json
 
 from HalliganAvailability import settings
 from datetime import timedelta
@@ -64,7 +65,6 @@ def check_ta(user):
     url = "http://www.cs.tufts.edu/~molay/compta/isata.cgi/{0}"
     r = requests.get(url.format(email))
     is_ta = r.text.strip() != 'NONE'
-    logger.debug(r.text)
     if is_ta:
         course_nums = r.text.strip().split(' ')
         courses = Course.objects.filter(Number__in=course_nums)
@@ -300,21 +300,16 @@ def go_on_duty(request):
     if request.method == 'POST':
         ca_form = CancelHoursForm(request.POST, prefix='ca_form')
         oh_form = OfficeHourForm(request.POST, prefix='oh_form')
-        logger.debug('POSTED')
         if oh_form.is_valid():
-            logger.debug('OH FORM VALID')
             my_tz = pytz.timezone(settings.TIME_ZONE)
             new_hours = oh_form.save(commit=False)
             new_hours.end_time = new_hours.end_time.astimezone(my_tz)
             new_hours.ta = user.ta
             new_hours.start_time = _now()
             new_hours.save()
-            logger.debug(new_hours)
             return HttpResponseRedirect(reverse('taSystem'))
 
         elif ca_form.is_valid() and cancel:
-            logger.debug('CA FORM VALID')
-            logger.debug(ca_form.cleaned_data)
             if ca_form.cleaned_data['confirm']:
                 try:
                     oh = OfficeHour.objects.on_duty().filter(ta=user.ta)[0]
@@ -327,7 +322,6 @@ def go_on_duty(request):
             else:
                 return HttpResponseRedirect(reverse('taSystem'))
     else:
-        logger.debug('NOT POSTED')
         oh_form = OfficeHourForm(prefix='oh_form')
         ca_form = CancelHoursForm(prefix='ca_form')
     return render(request, 'go_on_duty.html', {'oh_form': oh_form,
@@ -404,7 +398,8 @@ class QueueNamespace(BaseNamespace):
     def recv_connect(self, *args, **kwargs):
         self._connections[id(self)] = {
             'socket': self,
-            'user': self.request.user
+            'user': self.request.user,
+            'request': self.request
         }
         return super(QueueNamespace, self).recv_connect(*args, **kwargs)
 
@@ -414,19 +409,45 @@ class QueueNamespace(BaseNamespace):
         super(QueueNamespace, self).disconnect(*args, **kwargs)
 
     def on_remove(self, packet):
-        logger.debug(packet)
         self.send({'message': 'Goodbye!'}, json=True)
+
+    @staticmethod
+    def emit_single_request(request, rq_id, json_parse=True):
+        from api import RequestResource
+        base_resource = RequestResource()
+        json_resource = {
+            'type': 'add'
+        }
+        for connection_id, connection in QueueNamespace._connections.items():
+            resource = base_resource.get_detail(connection['request'], id=rq_id)
+            resource = json.loads(resource.content)
+            json_resource['resource'] = resource
+            connection['socket'].send(json_resource, json_parse)
+
+
+    @staticmethod
+    def emit_cancel_request(rq_id, json_parse=True):
+        json_resource = {
+            'type': 'remove',
+            'id': rq_id
+        }
+        for connection_id, connection in QueueNamespace._connections.items():
+            connection['socket'].send(json_resource, json_parse)
+
+    @staticmethod
+    def emit_update_request(rq_id, question, location, json_parse=True):
+        json_resource = {
+            'type': 'update',
+            'id': rq_id,
+            'question': question,
+            'location': location
+        }
+        for connection_id, connection in QueueNamespace._connections.items():
+            connection['socket'].send(json_resource, json_parse)
 
     @staticmethod
     def emit(msg, json=True):
         for connection_id, connection in QueueNamespace._connections.items():
-            logger.debug(connection_id)
-            logger.debug(connection)
-            output_string = "Sending {0} to {1} with id {2}"
-            logger.debug(output_string.format(msg,
-                                              connection,
-                                              connection_id)
-                         )
             msg['ta'] = ta_test(connection['user'])
             connection['socket'].send(msg, json)
 
@@ -452,11 +473,51 @@ class QueueNamespace(BaseNamespace):
                 connection['socket'].send(msg, json)
 
 
+class AnnouncementNamespace(BaseNamespace):
+    _connections = {}
+
+    def recv_connect(self, *args, **kwargs):
+        self._connections[id(self)] = {
+            'socket': self,
+        }
+        return super(AnnouncementNamespace, self).recv_connect(*args, **kwargs)
+
+    def disconnect(self, *args, **kwargs):
+        del self._connections[id(self)]
+        super(AnnouncementNamespace, self).disconnect(*args, **kwargs)
+
+    @staticmethod
+    def send_request_update(course_num, json=True):
+        num_requests = Request.display_objects.all()
+        num_requests = num_requests.filter(course__Number=course_num).count()
+        msg = {
+            'type': 'request_update',
+            'course_number': course_num,
+            'num_requests': num_requests
+        }
+        for _, connection in AnnouncementNamespace._connections.items():
+            connection['socket'].send(msg, json)
+
+    @staticmethod
+    def send_ta_update(course_number, office_hour, json=True):
+        from api import OfficeHou
+
+        msg = {
+            'type': 'ta_update',
+            'course_number': course_number,
+            'office_hour': office_hour
+        }
+        json_resource =
+        for _, connection in AnnouncementNamespace._connections.items():
+            connection['socket'].send(msg, json)
+
+
 def socketio(request):
     try:
-        logger.error("STARTING socketio: {0}".format(request))
-        socketio_manage(request.environ, {'/taqueue': QueueNamespace, },
-                        request=request)
+        socketio_manage(request.environ, {
+            '/taqueue': QueueNamespace,
+            '/announcements': AnnouncementNamespace
+        }, request=request)
     except:
         logger.error("Exception while handling sockets")
 

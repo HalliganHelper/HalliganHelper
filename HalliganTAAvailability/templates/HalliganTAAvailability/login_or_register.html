@@ -16,16 +16,16 @@
         <a href="#" data-reveal-id="signup-modal" class="button expand success">Sign Up</a>
     </div>
 </div>
-<div class="row">
-    <div class="medium-6 small-12 columns login-card left">
-        <h3 class="text-center">What is this?</h3>
-        <h4>A TA System</h4>
+<div class="row" data-equalizer>
+    <div class="medium-6 small-12 columns login-card left" data-equalizer-watch>
+        <h2 class="text-center">What is this?</h2>
+        <h3>A TA System</h3>
         <p>
         Halligan Helper allows Teacher's Assistants to quickly and easily
         locate and help students. A digital wait list updates in real time, 
         enabling TAs to focus on helping students rather than organizing them.
         </p>
-        <h4>An Availability System</h4>
+        <h3>An Availability System</h3>
         <p>
         Gone are the days of arriving in the computer labs, only to find that 
         all of the machines are taken! Halligan Helper keeps track of when computers
@@ -33,8 +33,11 @@
         determine if there is space available for them to work.
         </p>
     </div>
-    <div class="medium-6 small-12 columns login-card right">
-        some picture
+    <div class="medium-6 small-12 columns login-card right" data-equalizer-watch>
+        <div class="ta-slider">
+            <div>Something</div>
+            <div>Something Else</div>
+        </div>
     </div>
 </div>
 <div class="row hide-for-small">
@@ -59,7 +62,7 @@
         </div>
         {% endfor %}
         <div class="row">
-            <div class="small-4 small-centered columns">
+            <div class="small-1 small-centered columns">
                 <input type="submit" value="Login" class="button extend"/>
             </div>
         </div>
@@ -70,6 +73,7 @@
 </div>
 <div id="signup-modal" class="reveal-modal" data-reveal>
     <h2 class="text-center">Welcome!</h2>
+    <p class="text-center">Fill out this form and we'll get you started.</p>
     <form method="post" action="{% url 'register' %}">
         {% for field in register %}
         <div class="row collapse">
@@ -82,7 +86,7 @@
         </div>
         {% endfor %}
         <div class="row">
-            <div class="small-4 small-centered columns">
+            <div class="small-1 small-centered columns">
                 <input type="submit" value="Sign Up" class="button success extend"/>
             </div>
         </div>
@@ -102,13 +106,22 @@
     </div>
 {% endblock %}
 
-{% block endscripts %}
-<script src="{% static 'HalliganComputerAvailability/js/jquery.vegas.min.js' %}"></script>
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.3.7/slick.css"/>
 <link href="{% static 'HalliganComputerAvailability/css/jquery.vegas.min.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block endscripts %}
+<script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.3.7/slick.min.js"></script>
+<script src="{% static 'HalliganComputerAvailability/js/jquery.vegas.min.js' %}"></script>
 <script>
     $(function() {
         $.vegas({
-            src: "{% static 'HalliganTAAvailability/imgs/ice_mountains_wallpaper.jpg' %}"
+            src: "{% static 'HalliganTAAvailability/imgs/Halligan_Background.jpg' %}"
+        });
+
+        $('.ta-slider').slick({
+            'dots': true            
         });
     });
 </script>
