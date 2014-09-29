@@ -80,7 +80,7 @@
 
         <div class="large-4 medium-4 small-12 columns queue-problem" data-object-id="<%= id %>"><span class="show-for-small-only">Question: </span><%= question %></div>
         <% if (allow_resolve && allow_edit) { %>
-            <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked, "HH:mm:ss").format("MM/DD h:mm a") %></div>
+            <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
             <div class="large-2 medium-2 small-12 columns end queue-resolve text-center" data-object-id="<%= id %>">
                 <div class="tiny secondary button edit-button" data-object-id="<%= id %>">
                     Edit
@@ -90,14 +90,14 @@
                 </div>
             </div>
         <% } else if (allow_resolve) { %>
-            <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked, "HH:mm:ss").format("MM/DD h:mm a") %></div>
+            <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
             <div class="large-2 medium-2 small-12 columns end text-center queue-resolve">
                 <div class="tiny button resolve-button" data-object-id="<%= id %>">
                     Resolve
                 </div>
             </div>
         <% } else { %> 
-            <div class="large-2 medium-2 small-12 columns end queue-when-asked"><span class="show-for-small-only">Asled at: </span><%= moment(whenAsked, "HH:mm:ss").format("MM/DD h:mm a") %></div>
+            <div class="large-2 medium-2 small-12 columns end queue-when-asked"><span class="show-for-small-only">Asled at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
         <% } %>
     </div>
 </script>
@@ -143,7 +143,7 @@
     <div class="row text-center"><img width=100 height=100 alt="headshot" src="<%= image_url %>"/></div>
     <div class="row text-center"><%= ta.name %></div>
     <div class="row text-center"><%= location %></div>
-    <div class="row text-center">Off Duty <span class="moment" data-time='<%= end_time %>'><%= moment(end_time, "YYYY-MM-DD HH:mm:ss").fromNow() %></span></div>
+    <div class="row text-center">Off Duty <span class="moment" data-time='<%= end_time %>'><%= moment(end_time).fromNow() %></span></div>
 </script>
 
 <script id="goOnDutyTemplate" type="text/template">

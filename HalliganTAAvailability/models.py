@@ -45,9 +45,15 @@ admin.site.register(TA)
 
 
 class RequestDisplayManager(models.Manager):
-    def get_query_set(self):
+    def not_resolved(self):
         qs = super(RequestDisplayManager, self).get_query_set()
         return qs.filter(cancelled=False, solved=False)
+
+    def still_open(self):
+        three_hours = datetime.timedelta(hours=5)
+        now = _now()
+        now -= three_hours
+        return self.get_query_set().filter(whenAsked__gte=now)
 
 
 class Request(models.Model):
@@ -64,8 +70,7 @@ class Request(models.Model):
     checked_out = models.BooleanField(default=False)
     cancelled = models.BooleanField(default=False, blank=True)
 
-    objects = models.Manager()
-    display_objects = RequestDisplayManager()
+    objects = RequestDisplayManager()
 
     def save(self, *args, **kwargs):
         est = pytz.timezone('US/Eastern')

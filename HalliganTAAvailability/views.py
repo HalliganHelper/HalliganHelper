@@ -424,7 +424,6 @@ class QueueNamespace(BaseNamespace):
             json_resource['resource'] = resource
             connection['socket'].send(json_resource, json_parse)
 
-
     @staticmethod
     def emit_cancel_request(rq_id, json_parse=True):
         json_resource = {
@@ -472,6 +471,37 @@ class QueueNamespace(BaseNamespace):
             if test(connection_id, connection, msg):
                 connection['socket'].send(msg, json)
 
+    @staticmethod
+    def send_ta_update(course_number, office_hour_id, json_parse=True):
+        from api import OfficeHourResource
+        br = OfficeHourResource()
+
+        msg = {
+            'type': 'add_oh',
+            'course_number': course_number,
+        }
+
+        logger.debug("Looking for resource id: {0}".format(office_hour_id))
+        for _, connection in QueueNamespace._connections.items():
+            # basic_bundle = br.build_bundle(request=connection['request'])
+            # oh = br.obj_get(basic_bundle, pk=office_hour_id)
+            # oh_bundle = br.build_bundle(obj=oh, request=connection['request'])
+            # logging.error(oh_bundle)
+            o = OfficeHour.objects.get(id=office_hour_id)
+            logger.debug("{}: {}".format(o.pk, o.location))
+            resource = br.build_bundle(obj=o, request=connection['request'])
+            data = br.full_dehydrate(resource)
+            srl = br.serialize(None, data, 'application/json')
+            logger.debug(srl)
+            # resource = br.get_detail(connection['request'], id=office_hour_id)
+            # logging.error(resource)
+            # resource = json.loads(resource.content)
+
+
+
+            msg['resource'] = json.loads(srl)
+            connection['socket'].send(msg, json_parse)
+
 
 class AnnouncementNamespace(BaseNamespace):
     _connections = {}
@@ -488,26 +518,13 @@ class AnnouncementNamespace(BaseNamespace):
 
     @staticmethod
     def send_request_update(course_num, json=True):
-        num_requests = Request.display_objects.all()
+        num_requests = Request.objects.still_open()
         num_requests = num_requests.filter(course__Number=course_num).count()
         msg = {
             'type': 'request_update',
             'course_number': course_num,
             'num_requests': num_requests
         }
-        for _, connection in AnnouncementNamespace._connections.items():
-            connection['socket'].send(msg, json)
-
-    @staticmethod
-    def send_ta_update(course_number, office_hour, json=True):
-        from api import OfficeHou
-
-        msg = {
-            'type': 'ta_update',
-            'course_number': course_number,
-            'office_hour': office_hour
-        }
-        json_resource =
         for _, connection in AnnouncementNamespace._connections.items():
             connection['socket'].send(msg, json)
 

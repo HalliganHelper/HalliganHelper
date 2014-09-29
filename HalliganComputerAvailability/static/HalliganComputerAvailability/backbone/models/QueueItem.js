@@ -11,6 +11,6 @@ app.QueueItem = Backbone.TastypieModel.extend({
         allow_edit: false,
     },
     url: function() {
-        return Boolean(this.url) ? this.url : '/api/v2/request/' + this.id;
+        return Boolean(this.url) ? this.url : location.origin + '/api/v2/request/' + this.id;
     },
 });

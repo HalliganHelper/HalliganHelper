@@ -307,7 +307,7 @@ def ModularHomePage(request):
     for course in courses:
         data = {
             'num': course,
-            'count': Request.display_objects.filter(course__Number=course).count()
+            'count': Request.objects.still_open().filter(course__Number=course).count()
         }
         course_data.append(data)
 

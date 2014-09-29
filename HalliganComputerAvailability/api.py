@@ -11,6 +11,7 @@ class CommonMeta:
     authorization = DjangoAuthorization()
     authentication = MultiAuthentication(OAuth20Authentication(),
                                          SessionAuthentication())
+    limit = 0
 
 
 class ComputerResource(ModelResource):
@@ -36,7 +37,7 @@ class RoomInfoResource(ModelResource):
         'cuis', full=True
         )
 
-    class Meta:
+    class Meta(CommonMeta):
         queryset = RoomInfo.objects.all().order_by('-last_updated')
         filtering = {
             'lab': ['exact', ],
@@ -46,21 +47,19 @@ class RoomInfoResource(ModelResource):
                   'num_error', 'last_updated']
         allowed_methods = ['get']
         limit = 100
-        authorization = DjangoAuthorization()
 
 
 class CourseUsageInfoResource(ModelResource):
     room = fields.ToOneField(RoomInfoResource, 'room')
 
-    class Meta:
+    class Meta(CommonMeta):
         queryset = CourseUsageInfo.objects.all()
         allowed_methods = ['get']
-        authorization = DjangoAuthorization()
 
 
 class ServerResource(ModelResource):
 
-    class Meta:
+    class Meta(CommonMeta):
         queryset = Server.objects.all()
         filtering = {
             'name': ['exact', 'iexact'],
@@ -70,7 +69,6 @@ class ServerResource(ModelResource):
         resource_name = 'server'
         fields = ['name', 'num_users', 'status', 'last_updated']
         allowed_methods = ['get']
-        authorization = DjangoAuthorization()
 
 
 class LabResource(ModelResource):
