@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 import datetime
 import pytz
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFit
 from HalliganAvailability import settings
 
 
@@ -37,6 +39,11 @@ class TA(models.Model):
     usr = models.OneToOneField(User)
     course = models.ManyToManyField(Course)
     active = models.BooleanField(default=True)
+    headshot = ProcessedImageField(upload_to='headshots',
+                                   processors=ResizeToFit(100,100),
+                                   format='JPEG',
+                                   options={'quality': 60},
+                                   default='headshots/None/ming.jpg')
 
     def __str__(self):
         return "{0}: {1}".format(self.usr, self.usr.get_full_name())

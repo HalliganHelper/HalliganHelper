@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from tastypie.api import Api
+from django.conf import settings
+from django.conf.urls.static import static
 
 # Computer Availability api
 from HalliganComputerAvailability.api import CourseUsageInfoResource
@@ -45,3 +47,5 @@ urlpatterns = patterns('',
                        )
 
 urlpatterns += staticfiles_urlpatterns()
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

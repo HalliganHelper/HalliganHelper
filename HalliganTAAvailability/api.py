@@ -61,7 +61,7 @@ class TAResource(ModelResource):
         filtering = {
             'active': ['exact', ],
         }
-        fields = ['active']
+        fields = ['active', 'headshot']
         resource_name = 'ta'
         allowed_methods = ['get']
         authorization = DjangoAuthorization()

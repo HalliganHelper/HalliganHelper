@@ -14,8 +14,15 @@ class CommonMeta:
     limit = 0
 
 
-class ComputerResource(ModelResource):
+class ComputerUpdateResource(ModelResource):
+    class Meta(CommonMeta):
+        queryset = Computer.objects.all()
+        resource_name = 'computer_update'
+        allowed_methods = ['post']
+        fields = ['number', 'room_number', 'status', 'used_for']
 
+
+class ComputerResource(ModelResource):
     class Meta(CommonMeta):
         queryset = Computer.objects.all()
         limit = 0
