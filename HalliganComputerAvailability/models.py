@@ -36,6 +36,13 @@ class Computer(models.Model):
     last_update = models.DateTimeField(auto_now=True)
 
     # TODO: Foreign Key to computers in TA System?
+
+    def __str__(self):
+        return str(self.number)
+
+    def __repr__(self):
+        return self.__str__()
+
 admin.site.register(Computer)
 
 

@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 from HalliganComputerAvailability.api import CourseUsageInfoResource
 from HalliganComputerAvailability.api import LabResource, ComputerResource
 from HalliganComputerAvailability.api import ServerResource, RoomInfoResource
+from HalliganComputerAvailability.api import ComputerUpdateResource
 
 # TA Availability api
 from HalliganTAAvailability.api import CourseResource, OfficeHourResource
@@ -21,6 +22,7 @@ v1_api.register(CourseUsageInfoResource())
 v1_api.register(RoomInfoResource())
 v1_api.register(LabResource())
 v1_api.register(ComputerResource())
+v1_api.register(ComputerUpdateResource())
 v1_api.register(ServerResource())
 
 # TA Availability api

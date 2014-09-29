@@ -1,10 +1,55 @@
 from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
+from tastypie.authentication import Authentication
 from tastypie.authorization import DjangoAuthorization
+from tastypie.authorization import Authorization
+from tastypie.exceptions import Unauthorized
 from HalliganComputerAvailability.models import RoomInfo, CourseUsageInfo
 from HalliganComputerAvailability.models import Lab, Computer, Server
 from HalliganAvailability.authentication import OAuth20Authentication
+
+
+class UpdateAuthorization(Authorization):
+    def read_list(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return object_list
+
+    def read_detail(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return True
+
+    def create_list(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return object_list
+
+    def create_detail(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return True
+
+    def update_list(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return object_list
+
+    def update_detail(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return True
+
+    def delete_list(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return object_list
+
+    def delete_detail(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return True
 
 
 class CommonMeta:
@@ -15,7 +60,9 @@ class CommonMeta:
 
 
 class ComputerUpdateResource(ModelResource):
-    class Meta(CommonMeta):
+    class Meta():
+        authentication = Authentication()
+        authorization = Authorization() #UpdateAuthorization()
         queryset = Computer.objects.all()
         resource_name = 'computer_update'
         allowed_methods = ['post']

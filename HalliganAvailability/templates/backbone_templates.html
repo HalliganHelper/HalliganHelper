@@ -140,7 +140,7 @@
 </script>
 
 <script id="officeHourTemplate" type="text/template">
-    <div class="row text-center"><img width=100 height=100 alt="headshot" src="<%= ta.headshot %>"/></div>
+    <div class="row text-center"><img width=100 height=100 alt="<%= ta.name %> headshot" src="<%= ta.headshot %>"/></div>
     <div class="row text-center"><%= ta.name %></div>
     <div class="row text-center"><%= location %></div>
     <div class="row text-center">Off Duty <span class="moment" data-time='<%= end_time %>'><%= moment(end_time).fromNow() %></span></div>
