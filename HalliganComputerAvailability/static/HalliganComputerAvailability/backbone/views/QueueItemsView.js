@@ -135,9 +135,9 @@ app.queueItemsView = Backbone.View.extend({
             target = $(ev.currentTarget),
             objectId = $(target).data('object-id'),
             loc = $('div').find(".queue-location[data-object-id='" + objectId + "']"),
-            oldLoc = loc[0].innerText,
+            oldLoc = _this.collection.get(objectId).get('whereLocated'),
             ques = $('div').find(".queue-problem[data-object-id='" + objectId + "']"),
-            oldQues = ques[0].innerText,
+            oldQues = this.collection.get(objectId).get('question'),
             resolveBlock = $('div').find(".queue-resolve[data-object-id='" + objectId + "']"),
             oldResolveHtml = resolveBlock.html();
 

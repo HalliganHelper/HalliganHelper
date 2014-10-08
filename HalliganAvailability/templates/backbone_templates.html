@@ -1,9 +1,9 @@
 {% load staticfiles %}
 <script id="computerHeaderTemplate" type="text/template">
     <div class="row computer-header">
-        <div class="large-2 medium-2 small-1 columns computer-number-header"><h4>Number</h4></div>
-        <div class="large-2 medium-2 small-1 columns computer-status-header"><h4>Status</h4></div>
-        <div class="large-3 medium-3 small-2 columns computer-last-update-header"><h4>Last Updated</h4></div>
+        <div class="small-4 columns computer-number-header"><h4>Number</h4></div>
+        <div class="small-4 columns computer-status-header"><h4>Status</h4></div>
+        <div class="small-4 columns computer-last-update-header"><h4>Last Updated</h4></div>
     </div>
 </script>
 
@@ -17,28 +17,30 @@
     <% } else if (status === 'OFF')  { %>
         <div class="row computer computer-status-available">
     <% } %>
-        <div class="large-2 medium-2 small-1 columns computer-number"><%= number %></div>
+        <div class="small-4 columns computer-number"><%= number %></div>
         <% if (status === 'INUSE') { %>
-            <div class="large-2 medium-2 small-1 columns">In Use</div>
+            <div class="small-4 columns">In Use</div>
         <% } else if (status === 'AVAILABLE') { %>
-            <div class="large-2 medium-2 small-1 columns">Available</div>
+            <div class="small-4 columns">Available</div>
         <% } else if (status === 'ERROR')  { %>
-            <div class="large-2 medium-2 small-1 columns">Error</div>
+            <div class="small-4 columns">Error</div>
         <% } else if (status === 'OFF')  { %>
-            <div class="large-2 medium-2 small-1 columns">Off</div>
+            <div class="small-4 columns">Off</div>
         <% } %>
-        <div data-livestamp="<%= last_update %>" class="large-3 medium-3 small-2 columns computer-last-update"><%= moment(last_update).format("h:mm a D/MM/YY") %></div>
+        <div data-livestamp="<%= last_update %>" class="small-4 columns computer-last-update"><%= moment(last_update).format("h:mm a D/MM/YY") %></div>
     </div>
 </script>
 
 <script id="labHeaderTemplate" type="text/template">
     <div class="row lab-header">
-        <div class="large-2 medium-2 small-1 columns lab-week-day-header"><h4>Day</h4></div>
-        <div class="large-2 medium-2 small-1 columns lab-start-time-header"><h4>Start Time</h4></div>
-        <div class="large-2 medium-2 small-1 columns lab-end-time-header"><h4>End Time</h4></div>
-        <div class="large-2 medium-2 small-1 columns lab-room-num-header"><h4>Room Number</h4></div>
-        <div class="large-3 medium-3 small-3 columns lab-course-name-header"><h4>Course</h4></div>
-        <div class="large-1 medium-1"></div>
+        <div class="small-12 text-center"><h3>Lab Schedule</h3></div>
+    </div>
+    <div class="row lab-header hide-for-small">
+        <div class="large-2 medium-2 small-2 columns lab-week-day-header"><h4>Day</h4></div>
+        <div class="large-2 medium-2 small-2 columns lab-start-time-header"><h4>Start Time</h4></div>
+        <div class="large-2 medium-2 small-2 columns lab-end-time-header"><h4>End Time</h4></div>
+        <div class="large-2 medium-2 small-3 columns lab-room-num-header"><h4>Room Number</h4></div>
+        <div class="large-3 medium-3 small-2 columns end lab-course-name-header"><h4>Course</h4></div>
     </div>
 </script>
 
@@ -50,12 +52,11 @@
     <% } else { %>
         <div class="row lab">
     <% } %>
-            <div class="large-2 medium-2 small-1 columns lab-week-day"><%= day_of_week_str %></div>
-            <div class="large-2 medium-2 small-1 columns lab-start-time"><%= moment(start_time, "HH:mm:ss").format("h:mm a") %></div>
-            <div class="large-2 medium-2 small-1 columns lab-end-time"><%= moment(end_time, "HH:mm:ss").format("h:mm a") %></div>
-            <div class="large-2 medium-2 small-1 columns lab-room-num"><%= room_number %></div>
-            <div class="large-3 medium-3 small-3 columns lab-course-name"><%= course_name %></div>
-            <div class="large-1 medium-1"></div>
+            <div class="large-2 medium-2 small-12 columns lab-week-day"><span class="show-for-small-only">Day: </span><%= day_of_week_str %></div>
+            <div class="large-2 medium-2 small-12 columns lab-start-time"><span class="show-for-small-only">Start Time: </span><%= moment(start_time, "HH:mm:ss").format("h:mm a") %></div>
+            <div class="large-2 medium-2 small-12 columns lab-end-time"><span class="show-for-small-only">End Time: </span><%= moment(end_time, "HH:mm:ss").format("h:mm a") %></div>
+            <div class="large-2 medium-2 small-12 columns lab-room-num"><span class="show-for-small-only">Room Number: </span><%= room_number %></div>
+            <div class="large-3 medium-3 small-12 columns end lab-course-name"><span class="show-for-small-only">Course: </span><%= course_name %></div>
         </div>
 </script>
 
@@ -65,10 +66,10 @@
 
 <script id="queueItemHeaderTemplate" type="text/template">
     <div class="row queue-header hide-for-small">
-        <div class="large-2 medium-2 small-1 columns queue-name-header"><h4>Name</h4></div>
-        <div class="large-2 medium-2 small-1 columns queue-location-header"><h4>Location</h4></div>
-        <div class="large-4 medium-4 small-1 columns queue-problem-header"><h4>Problem</h4></div>
-        <div class="large-2 medium-2 small-1 columns end queue-when-asked-header"><h4>Asked At</h4></div>
+        <div class="small-3 columns queue-name-header"><h4>Name</h4></div>
+        <div class="small-3 columns queue-location-header"><h4>Location</h4></div>
+        <div class="small-3 columns queue-problem-header"><h4>Problem</h4></div>
+        <div class="small-3 columns queue-when-asked-header"><h4>Asked At</h4></div>
     </div>
 </script>
 
@@ -101,7 +102,7 @@
                 </div>
             </div>
         <% } else { %> 
-            <div class="large-2 medium-2 small-12 columns end queue-when-asked"><span class="show-for-small-only">Asled at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
+            <div class="large-2 medium-2 small-12 columns end queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
         <% } %>
     </div>
 </script>

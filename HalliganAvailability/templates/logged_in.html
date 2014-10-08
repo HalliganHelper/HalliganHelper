@@ -11,8 +11,45 @@
 {% endblock %}
 
 {% block content %}
+    {# Nav bar for phones #}
+    <nav class="top-bar show-for-small" data-topbar role="navigation">
+        <ul class="title-area">
+            <li class="name">
+                <h1><a href="/">Halligan Helper</a></h1>
+            </li>
+            <li class="toggle-topbar menu-icon"><a href><span>Menu</span></a></li>
+        </ul>
+        <section class="top-bar-section">
+        <!-- Right Nav Section -->
+        <ul>
+          <li class="has-dropdown">
+            <a href="#">Rooms</a>
+            <ul class="dropdown">
+                {% for room_num in rooms %}
+                    <li> <a href="#room/{{ room_num }}" id="room{{room_num}}">Lab {{ room_num }}</a></li>
+                {%  endfor %}
+            </ul>
+          </li>
+            <li class="has-dropdown">
+                <a href="#">TA Queues</a>
+                <ul class="dropdown">
+                    {% for course in courses %}
+                    <li><a href="#/ta/queue/{{ course.num }}" id="queue{{course.num}}">Comp {{ course.num }}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li class="has-dropdown">
+                <a href="#">More</a>
+                <ul class="dropdown">
+                    <li><a href="#/labs" id="labs">Lab Schedule</a></li>
+                    <li><a href="/accounts/logout?next=/">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
     <section role="main" class="scroll-container">
         <div class="row fullWidth">
+            {# Nav Bar for normal screens #}
             <div class="large-2 medium-3 small-1 columns hide-for-small"> 
                 <div class="hide-for-small">
                     <div class="sidebar">
@@ -26,7 +63,7 @@
                                 </li>
                                 <li class="heading">Rooms</li>
                                 {% for room_num in rooms %}
-                                <li> <a href="#room/{{ room_num }}" id="room{{room_num}}">Lab {{ room_num }}</a> <span</li>
+                                <li> <a href="#room/{{ room_num }}" id="room{{room_num}}">Lab {{ room_num }}</a></li>
 
                                 {% endfor %}
                                 <li class="heading">TA Queues</li>
