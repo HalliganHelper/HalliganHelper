@@ -73,7 +73,11 @@
 </script>
 
 <script id="queueTemplate" type="text/template">
-    <div class="row request" data-main-object-id="<%= id %>">
+    <% if ( checked_out ) { %>
+        <div class="row request checked_out" data-main-object-id="<%= id %>">
+    <% } else { %>
+        <div class="row request" data-main-object-id="<%= id %>">
+    <% } %>
         <div class="large-2 medium-2 small-12 columns queue-name"><span class="show-for-small-only">Name: </span><%= student.usr.first_name %> <%= student.usr.last_name[0] %>.</div>
 
         <div class="large-2 medium-2 small-12 columns queue-location" data-object-id="<%= id %>"><span class="show-for-small-only">Location: </span><%= whereLocated %></div>

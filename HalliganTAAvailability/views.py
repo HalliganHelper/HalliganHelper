@@ -4,7 +4,7 @@ import pytz
 import requests
 import json
 
-from HalliganAvailability import settings
+from django.conf import settings
 from datetime import timedelta
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
@@ -26,6 +26,7 @@ from socketio import socketio_manage
 from socketio.namespace import BaseNamespace
 
 from forms import TuftsEmail, RequestForm, OfficeHourForm, CancelHoursForm
+from forms import TAPhotoChangeForm
 from models import Student, Request, TA, Course, OfficeHour
 
 
@@ -105,8 +106,7 @@ user_activated.connect(user_confirmed)
 def ta_test(user):
     if user.is_authenticated():
         try:
-            user.ta
-            return True
+            return user.ta.active
         except TA.DoesNotExist:
             return False
     else:
@@ -283,7 +283,10 @@ def resolveRequest(request):
 
 
 def is_ta(user):
-    return TA.objects.filter(usr=user).exists()
+    try:
+        return user.ta.active
+    except Exception:
+        return False
 
 
 @login_required()
@@ -364,29 +367,28 @@ def login_or_register(request):
                   'HalliganTAAvailability/login_or_register.html',
                   template_vars)
 
-# @login_required
-# @user_passes_test(ta_test)
-# @require_POST
-# def take_request(request):
-#     pk = request.POST.get('pk', None)
-#     if pk:
-#         try:
-#             rq = Request.objects.get(pk=pk)
-#             rq.checked_out = True
-#             rq.save()
-#             data = {}
-#             data['pk'] = rq.pk
-#             data['type'] = 'check_out'
-#             data['ta'] = request.user.get_full_name()
-#             data['checked_out'] = rq.checked_out
-#             data['course'] = rq.course.Number
-#
-#             QueueNamespace.emit(data, json=True)
-#             return HttpResponse(200)
-#         except:
-#             pass
-#     return HttpResponse(404)
 
+@login_required()
+@user_passes_test(is_ta)
+def update_photo(request):
+    if request.method == 'POST':
+        image_form = TAPhotoChangeForm(request.POST, request.FILES)
+        if image_form.is_valid():
+            ta = TA.objects.get(pk=request.user.ta.pk)
+            if ta.has_updated_headshot:
+                ta.headshot.delete()
+            else:
+                ta.has_updated_headshot = True
+            ta.headshot = image_form.cleaned_data['image']  # request.FILES['image']
+            ta.save()
+            return HttpResponseRedirect(reverse('ModularHomePage'))
+    else:
+        image_form = TAPhotoChangeForm()
+
+    template_params = {'form': image_form}
+    return render(request,
+                  'HalliganTAAvailability/update_photo.html',
+                  template_params)
 
 ############################################################################
 #             Socketio Stuff
@@ -488,11 +490,9 @@ class QueueNamespace(BaseNamespace):
             # oh_bundle = br.build_bundle(obj=oh, request=connection['request'])
             # logging.error(oh_bundle)
             o = OfficeHour.objects.get(id=office_hour_id)
-            logger.debug("{}: {}".format(o.pk, o.location))
             resource = br.build_bundle(obj=o, request=connection['request'])
             data = br.full_dehydrate(resource)
             srl = br.serialize(None, data, 'application/json')
-            logger.debug(srl)
             # resource = br.get_detail(connection['request'], id=office_hour_id)
             # logging.error(resource)
             # resource = json.loads(resource.content)
@@ -528,6 +528,9 @@ class AnnouncementNamespace(BaseNamespace):
         for _, connection in AnnouncementNamespace._connections.items():
             connection['socket'].send(msg, json)
 
+    @staticmethod
+    def cancel_office_hours(hour_id, json_parse=True):
+        logger.debug("CANCEL HOUR ID {}".format(hour_id))
 
 def socketio(request):
     try:
@@ -539,3 +542,5 @@ def socketio(request):
         logger.error("Exception while handling sockets")
 
     return HttpResponse()
+
+

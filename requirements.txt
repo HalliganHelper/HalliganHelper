@@ -1,7 +1,11 @@
 Django==1.5
 Pillow==2.5.3
 South==0.8.2
+amqp==1.4.6
+anyjson==0.3.3
 argparse==1.2.1
+billiard==3.3.0.18
+celery==3.1.15
 defusedxml==0.4.1
 dj-database-url==0.2.2
 dj-static==0.0.5
@@ -23,6 +27,7 @@ gevent-socketio==0.3.6
 gevent-websocket==0.9.3
 greenlet==0.4.2
 gunicorn==18.0
+kombu==3.0.23
 lxml==3.3.5
 manifesto==0.5
 meld3==1.0.0
@@ -39,6 +44,7 @@ python-dateutil==2.1
 python-mimeparse==0.1.4
 python-openid==2.2.5
 pytz==2013.7
+redis==2.10.3
 requests==2.2.1
 requests-oauthlib==0.4.0
 rope==0.9.4

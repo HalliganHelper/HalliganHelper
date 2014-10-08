@@ -292,8 +292,7 @@ ROOMS_CACHE_KEY = "ROOMS_CACHE_KEY"
 LABS_CACHE_KEY = "LABS_CACHE_KEY"
 
 
-@login_required
-def ModularHomePage(request):
+def get_logged_in_data():
     template_params = {}
 
     rooms = cache.get(ROOMS_CACHE_KEY)
@@ -314,7 +313,13 @@ def ModularHomePage(request):
     course_data = sorted(course_data, key=lambda k: k['num'])
     template_params['rooms'] = rooms
     template_params['courses'] = course_data
+    return template_params
 
+
+
+@login_required
+def ModularHomePage(request):
+    template_params = get_logged_in_data()
     return render(request, 'logged_in.html', template_params)
 
 

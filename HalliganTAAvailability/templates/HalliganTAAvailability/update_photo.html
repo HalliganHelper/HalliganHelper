@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="row">
+        <div class="card text-center">
+            <a href="/"><img src="{% static 'HalliganTAAvailability/imgs/HH_Logo.jpg' %}" width=100 height=100 alt=logo/></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card text-center">
+            <h3>Photo Change Form</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card text-center"><img src="{{ user.ta.headshot.url }}" height="100" width="100" alt="Current Headshot"/></div>
+    </div>
+    <div class="row">
+        <div class="card text-center">
+            <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.image }}
+            {% if form.image.errors %}
+                {{ form.image.errors }}
+            {% endif %}
+            <input type="submit" value="Submit" class="button"/>
+            </form>
+        </div>
+    </div>
+{%  endblock %}

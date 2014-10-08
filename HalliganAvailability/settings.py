@@ -98,7 +98,7 @@ INSTALLED_APPS = (
     'provider.oauth2',
     'djangobower',
     'compressor',
-    'imagekit'
+    'imagekit',
 )
 
 
@@ -154,7 +154,12 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'verbose'
+        },
+        'exception': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
         }
     },
     'loggers': {
@@ -173,7 +178,11 @@ LOGGING = {
         'api': {
             'handlers': ['console'],
             'level': 'DEBUG'
-        }
+        },
+        'task': {
+            'handlers': ['console', 'exception'],
+            'level': 'DEBUG'
+        },
     }
 }
 
@@ -197,3 +206,5 @@ TASTYPIE_DEFAULT_FORMATS = ['json']
 
 LOGIN_URL = 'login_or_register'
 LOGIN_REDIRECT_URL = '/'
+BROKER_URL = 'redis://localhost:6379/0'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 10850}

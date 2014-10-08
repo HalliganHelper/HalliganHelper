@@ -32,7 +32,7 @@ class Computer(models.Model):
     status = models.CharField(max_length=9,
                               choices=STATUS_CHOICES,
                               default=AVAILABLE)
-    used_for = models.CharField(max_length=40, null=True)
+    used_for = models.CharField(max_length=40, blank=True)
     last_update = models.DateTimeField(auto_now=True)
 
     # TODO: Foreign Key to computers in TA System?

@@ -17,14 +17,16 @@ from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 from .models import Course, TA, OfficeHour
 from .models import Request, Student
 from HalliganAvailability.authentication import OAuth20Authentication
+from .tasks import cancel_hours
 logger = logging.getLogger('api')
+
 
 def _now():
     now = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
     return now
 
 
-class CommonMeta:
+class CommonMeta(object):
     authorization = DjangoAuthorization()
     authentication = MultiAuthentication(OAuth20Authentication(),
                                          SessionAuthentication())
@@ -95,7 +97,6 @@ class OfficeHourResource(ModelResource):
             data['meta']['ta'] = request.user.ta.active
         except Exception:
             data['meta']['ta'] = False
-        logger.debug(data)
         return data
 
     def dehydrate(self, bundle):
@@ -152,18 +153,18 @@ class OfficeHourResource(ModelResource):
                         course=course, ta=request.user.ta,
                         location=location)
         oh.save()
-        logger.debug("Just saved with id {0}".format(oh.pk))
         response = self.create_response(request, {
             'success': True,
             })
 
+        try:
+            cancel_hours.apply_async((oh.pk,), countdown=2)
+            logger.debug("SCHEDULED TASK")
+        except Exception, e:
+            logger.exception("SHIT BAD")
         from .views import QueueNamespace
-        logger.debug("SENDING WS FOR OBJECT {0}".format(oh.pk))
         QueueNamespace.send_ta_update(oh.course.Number, oh.pk)
-        # try:
-        # except Exception, e:
-        #     logger.debug(e)
-        #     raise e
+        # cancel_hours.apply_async(oh.pk, eta=end_time)
         return response
 
 
@@ -202,7 +203,7 @@ class RequestResource(ModelResource):
     class Meta(CommonMeta):
         queryset = Request.objects.still_open()
         resource_name = 'request'
-        fields = ['question', 'whenAsked', 'whereLocated', 'id']
+        fields = ['question', 'whenAsked', 'whereLocated', 'id', 'checked_out']
         allowed_methods = ['get', 'post', 'put']
         filtering = {
             'course': ALL_WITH_RELATIONS
@@ -212,8 +213,6 @@ class RequestResource(ModelResource):
         is_superuser = bundle.request.user.is_superuser
         is_this_user = bundle.data['student'].data['usr'].data['id']
         is_this_user = is_this_user == bundle.request.user.pk
-        logger.debug(bundle.data['student'])
-        logger.debug("CALLING DEHYDRATE")
 
         try:
             is_ta = bundle.request.user.ta is not None
@@ -283,8 +282,6 @@ class RequestResource(ModelResource):
                     'success': True
                 })
             except Exception, e:
-                logger.error(" LOOK HERE ".center(80, '='))
-                logger.error(e)
                 return self.create_response(request, {
                     'success': False,
                     'reason': 'Creation failed'

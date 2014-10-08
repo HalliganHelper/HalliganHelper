@@ -133,13 +133,6 @@ $(function() {
         });
     });
 
-    app_router.on('route:defaultRoute', function(actions) {
-        app.ohView = null;
-        app.currentRoomNumber = null;
-        $('.custom-sidenav > li > a').removeClass('active');
-        $('#home').addClass('active');
-    });
-
     app_router.on('route:labRoute', function(actions) {
         app.ohView = null;
         app.currentRoomNumber = null;
@@ -150,6 +143,15 @@ $(function() {
             app.currentView = new app.LabsView();
             $('#content').fadeIn(100);
         });
+    });
+
+    app_router.on('route:defaultRoute', function(actions) {
+        app.ohView = null;
+        app.currentRoomNumber = null;
+        $('.custom-sidenav > li > a').removeClass('active');
+        $('#home').addClass('active');
+        //Backbone.history.navigate('#room/116')
+        app_router.navigate('room/116', {trigger: true});
     });
 
     Backbone.history.start();

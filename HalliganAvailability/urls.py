@@ -14,7 +14,6 @@ from HalliganComputerAvailability.api import ComputerUpdateResource
 from HalliganTAAvailability.api import CourseResource, OfficeHourResource
 from HalliganTAAvailability.api import TAResource, UserResource, RequestResource
 
-
 v1_api = Api(api_name='v2')
 
 # Computer Availability api
