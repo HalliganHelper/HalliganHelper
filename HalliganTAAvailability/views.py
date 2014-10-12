@@ -379,7 +379,7 @@ def update_photo(request):
                 ta.headshot.delete()
             else:
                 ta.has_updated_headshot = True
-            ta.headshot = image_form.cleaned_data['image']  # request.FILES['image']
+            ta.headshot = image_form.cleaned_data['image']
             ta.save()
             return HttpResponseRedirect(reverse('ModularHomePage'))
     else:
@@ -393,6 +393,7 @@ def update_photo(request):
 ############################################################################
 #             Socketio Stuff
 ############################################################################
+
 
 class QueueNamespace(BaseNamespace):
     _connections = {}
@@ -421,7 +422,8 @@ class QueueNamespace(BaseNamespace):
             'type': 'add'
         }
         for connection_id, connection in QueueNamespace._connections.items():
-            resource = base_resource.get_detail(connection['request'], id=rq_id)
+            resource = base_resource.get_detail(connection['request'],
+                                                id=rq_id)
             resource = json.loads(resource.content)
             json_resource['resource'] = resource
             connection['socket'].send(json_resource, json_parse)
@@ -485,20 +487,10 @@ class QueueNamespace(BaseNamespace):
 
         logger.debug("Looking for resource id: {0}".format(office_hour_id))
         for _, connection in QueueNamespace._connections.items():
-            # basic_bundle = br.build_bundle(request=connection['request'])
-            # oh = br.obj_get(basic_bundle, pk=office_hour_id)
-            # oh_bundle = br.build_bundle(obj=oh, request=connection['request'])
-            # logging.error(oh_bundle)
             o = OfficeHour.objects.get(id=office_hour_id)
             resource = br.build_bundle(obj=o, request=connection['request'])
             data = br.full_dehydrate(resource)
             srl = br.serialize(None, data, 'application/json')
-            # resource = br.get_detail(connection['request'], id=office_hour_id)
-            # logging.error(resource)
-            # resource = json.loads(resource.content)
-
-
-
             msg['resource'] = json.loads(srl)
             connection['socket'].send(msg, json_parse)
 
@@ -529,8 +521,18 @@ class AnnouncementNamespace(BaseNamespace):
             connection['socket'].send(msg, json)
 
     @staticmethod
-    def cancel_office_hours(hour_id, json_parse=True):
-        logger.debug("CANCEL HOUR ID {}".format(hour_id))
+    def cancel_office_hours(hour_id, class_number, json_parse=True):
+        msg = {
+            'type': 'cancel_hours',
+            'course_number': class_number,
+            'office_hour_id': hour_id
+        }
+        logger.debug("SEND CANCEL OUTER")
+        logger.debug("Count: {}".format(len(AnnouncementNamespace._connections.items())))
+        for _, connection in AnnouncementNamespace._connections.items():
+            logger.debug("SEND CANCEL")
+            connection['socket'].send(msg, json_parse)
+
 
 def socketio(request):
     try:
@@ -542,5 +544,3 @@ def socketio(request):
         logger.error("Exception while handling sockets")
 
     return HttpResponse()
-
-

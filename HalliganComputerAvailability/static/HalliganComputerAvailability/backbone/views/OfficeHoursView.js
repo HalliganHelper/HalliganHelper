@@ -11,6 +11,7 @@ app.OfficeHoursView = Backbone.View.extend({
         
         this.listenTo(this.collection, 'add', this.renderOfficeHour);
         this.listenTo(this.collection, 'reset', this.render);
+        this.listenTo(this.collection, 'remove', this.render);
     },
     hideEmptyDivIfNecessary: function() {
         if (this.collection.length != 0) {

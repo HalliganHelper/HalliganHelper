@@ -10,7 +10,6 @@ app.queueItemsView = Backbone.View.extend({
 
         this.listenTo(this.collection, 'add', this.renderQueueItem);
         this.listenTo(this.collection, 'reset', this.render);
-        //this.listenTo(this.collection, 'remove', this.removeItem);
         this.events["click #makeRequestButton"] = this.makeRequest;
         this.events["click .cancel-button"] = this.cancelRequest;
         this.events["click .edit-button"] = this.editRequest;

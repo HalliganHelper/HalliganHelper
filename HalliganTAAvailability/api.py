@@ -1,7 +1,5 @@
 from django.contrib.auth.models import User
-from django.utils.timezone import now, localtime
 from django.utils.html import escape, strip_tags
-from django.db import transaction
 from tastypie import fields
 from tastypie.http import HttpBadRequest, HttpUnauthorized
 import dateutil
@@ -149,7 +147,7 @@ class OfficeHourResource(ModelResource):
             return self.create_response(request, {
                 'success': False,
             }, HttpBadRequest)
-        oh = OfficeHour(start_time=localtime(now()), end_time=end_time,
+        oh = OfficeHour(start_time=_now(), end_time=end_time,
                         course=course, ta=request.user.ta,
                         location=location)
         oh.save()
@@ -158,9 +156,9 @@ class OfficeHourResource(ModelResource):
             })
 
         try:
-            cancel_hours.apply_async((oh.pk,), countdown=2)
+            cancel_hours.apply_async(args=[oh.pk, course.Number], countdown=2)
             logger.debug("SCHEDULED TASK")
-        except Exception, e:
+        except Exception:
             logger.exception("SHIT BAD")
         from .views import QueueNamespace
         QueueNamespace.send_ta_update(oh.course.Number, oh.pk)
@@ -271,7 +269,7 @@ class RequestResource(ModelResource):
             try:
                 course = Course.objects.get(Number=courseNum)
                 rq = Request(course=course, question=question,
-                             whenAsked=localtime(now()),
+                             whenAsked=_now(),
                              whereLocated=whereLocated,
                              student=request.user.student)
                 rq.save()
@@ -281,7 +279,7 @@ class RequestResource(ModelResource):
                 return self.create_response(request, {
                     'success': True
                 })
-            except Exception, e:
+            except Exception:
                 return self.create_response(request, {
                     'success': False,
                     'reason': 'Creation failed'
@@ -309,7 +307,7 @@ class RequestResource(ModelResource):
 
         try:
             this_rq = Request.objects.get(pk=request_id)
-            this_rq.whenSolved = localtime(now())
+            this_rq.whenSolved = _now()
             this_rq.solved = True
             try:
                 ta_solver = request.user.ta
@@ -319,7 +317,7 @@ class RequestResource(ModelResource):
                 }, HttpUnauthorized)
                 ta_solver = None
             this_rq.who_solved = ta_solver
-            this_rq.whenSolved = localtime(now())
+            this_rq.whenSolved = _now()
             this_rq.solved = True
             this_rq.save()
             from .views import QueueNamespace, AnnouncementNamespace

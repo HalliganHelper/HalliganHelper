@@ -54,6 +54,11 @@ $(function() {
                     lbl.addClass('alert');
                 }
                 break;
+            case 'cancel_hours':
+                if (Boolean(app.ohView) && app.currentCourseNumber == data.course_number) {
+                    app.ohView.collection.remove(data.office_hour_id);
+                }
+                break;
         }
     });
 
