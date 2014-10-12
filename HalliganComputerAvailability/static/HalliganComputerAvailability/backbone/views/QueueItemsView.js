@@ -10,6 +10,7 @@ app.queueItemsView = Backbone.View.extend({
 
         this.listenTo(this.collection, 'add', this.renderQueueItem);
         this.listenTo(this.collection, 'reset', this.render);
+        //this.listenTo(this.collection, 'remove', this.removeItem);
         this.events["click #makeRequestButton"] = this.makeRequest;
         this.events["click .cancel-button"] = this.cancelRequest;
         this.events["click .edit-button"] = this.editRequest;
@@ -27,7 +28,7 @@ app.queueItemsView = Backbone.View.extend({
         this.$el.append( _.template( $('#makeRequestTemplate').html() )() );    
         var taDiv = $('<div class="small-12 columns"></div>');
         this.$el.find('#get-help').after(taDiv);
-        new app.OfficeHoursView([], {'courseNum': this.courseNum, 'el': taDiv});
+        app.ohView = new app.OfficeHoursView([], {'courseNum': this.courseNum, 'el': taDiv});
         this.collection.each(function(item) {
             this.renderQueueItem( item );
         }, this);
@@ -66,7 +67,7 @@ app.queueItemsView = Backbone.View.extend({
             'whereLocated': whereLocated,
             'course': this.courseNum,
         });
-        newRequest.url = '/api/v2/request/make_request/'
+        newRequest.url = location.origin + '/api/v2/request/make_request/'
         newRequest.save({}, {
             success: function requestSuccess(){
                 locationField.val(''); 
@@ -97,7 +98,7 @@ app.queueItemsView = Backbone.View.extend({
         var newRequest = new app.QueueItem({
             id: objectId,
         });
-        newRequest.url = '/api/v2/request/cancel_request';
+        newRequest.url = location.origin + '/api/v2/request/cancel_request';
         newRequest.save({}, {
             success: function cancelSuccess() {
                 _this.removeContainerDiv(objectId);
@@ -114,7 +115,7 @@ app.queueItemsView = Backbone.View.extend({
             id: objectId,
         });
 
-        newRequest.url = '/api/v2/request/resolve_request';
+        newRequest.url = location.origin + '/api/v2/request/resolve_request';
         newRequest.save({}, {
             success: function resolveSuccess() {
                 _this.removeContainerDiv(objectId);
@@ -134,9 +135,9 @@ app.queueItemsView = Backbone.View.extend({
             target = $(ev.currentTarget),
             objectId = $(target).data('object-id'),
             loc = $('div').find(".queue-location[data-object-id='" + objectId + "']"),
-            oldLoc = loc[0].innerText,
+            oldLoc = _this.collection.get(objectId).get('whereLocated'),
             ques = $('div').find(".queue-problem[data-object-id='" + objectId + "']"),
-            oldQues = ques[0].innerText,
+            oldQues = this.collection.get(objectId).get('question'),
             resolveBlock = $('div').find(".queue-resolve[data-object-id='" + objectId + "']"),
             oldResolveHtml = resolveBlock.html();
 
@@ -158,7 +159,7 @@ app.queueItemsView = Backbone.View.extend({
 
             modelInstance.set({'whereLocated': newLocation, 'question': newQuestion});
             modelInstance.trigger('change');
-            modelInstance.url = '/api/v2/request/update_request';
+            modelInstance.url = location.origin + '/api/v2/request/update_request';
             modelInstance.save();
             resolveBlock.html(oldResolveHtml);
         });

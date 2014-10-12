@@ -14,4 +14,5 @@ urlpatterns = patterns('HalliganTAAvailability.views',
     url(r'^cancel_hours', 'cancel_hours', name='cancel_hours'),
     url(r'^socket\.io', 'socketio', name='socketio'),
     url(r'^login_or_register', 'login_or_register', name='login_or_register'),
+    url(r'^ta/updatephoto', 'update_photo', name='update_photo'),
 )

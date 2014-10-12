@@ -6,7 +6,7 @@ app.OfficeHour = Backbone.TastypieModel.extend({
         start_time: '',
         location: '',
         ta: null,
-        image_url: 'http://placekitten.com/g/100/101'
+        image_url: '//placekitten.com/g/99/99'
 
     }
 });

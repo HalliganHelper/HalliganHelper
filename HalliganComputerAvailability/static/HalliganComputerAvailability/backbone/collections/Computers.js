@@ -6,7 +6,7 @@ app.Computers = Backbone.TastypieCollection.extend({
         this.roomNum = roomNum;
     },
     url: function() {
-        return '/api/v2/computer/?room_number=' + this.roomNum;
+        return location.origin + '/api/v2/computer/?room_number=' + this.roomNum;
     },
     comparator: function (collection) {
         return collection.get('number');

@@ -1,13 +1,14 @@
 from django.contrib.auth.models import User
-from django.utils.timezone import now
+from django.utils.timezone import now, localtime
 from django.utils.html import escape, strip_tags
+from django.db import transaction
 from tastypie import fields
 from tastypie.http import HttpBadRequest, HttpUnauthorized
 import dateutil
 import pytz
+import logging
+import datetime
 from HalliganAvailability import settings
-# from tastypie.authentication import BasicAuthentication, ApiKeyAuthentication
-# from tastypie.authentication import MultiAuthentication
 from tastypie.utils import trailing_slash
 from django.conf.urls import url
 from tastypie.authorization import DjangoAuthorization
@@ -16,14 +17,20 @@ from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 from .models import Course, TA, OfficeHour
 from .models import Request, Student
 from HalliganAvailability.authentication import OAuth20Authentication
-import logging
+from .tasks import cancel_hours
 logger = logging.getLogger('api')
 
 
-class CommonMeta:
+def _now():
+    now = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
+    return now
+
+
+class CommonMeta(object):
     authorization = DjangoAuthorization()
     authentication = MultiAuthentication(OAuth20Authentication(),
                                          SessionAuthentication())
+    limit = 0
 
 
 class CourseResource(ModelResource):
@@ -56,7 +63,7 @@ class TAResource(ModelResource):
         filtering = {
             'active': ['exact', ],
         }
-        fields = ['active']
+        fields = ['active', 'headshot']
         resource_name = 'ta'
         allowed_methods = ['get']
         authorization = DjangoAuthorization()
@@ -67,15 +74,23 @@ class OfficeHourResource(ModelResource):
     course = fields.ForeignKey(CourseResource, 'course', full=True)
 
     class Meta(CommonMeta):
-        queryset = OfficeHour.objects.on_duty()
+        queryset = OfficeHour.objects.all()
+        resource_name = 'officehour'
+        fields = ['start_time', 'end_time', 'course', 'ta', 'location', 'id']
+        allowed_methods = ['get', 'post', 'put']
         filtering = {
             'start_time': ['exact', 'lt', 'lte', 'gt', 'gte', ],
             'end_time': ['exact', 'lt', 'lte', 'gt', 'gte', ],
             'course': ALL_WITH_RELATIONS,
         }
-        resource_name = 'officehour'
-        fields = ['start_time', 'end_time', 'course', 'ta', 'location']
-        allowed_methods = ['get']
+
+    def get_object_list(self, request):
+        now = _now()
+
+        return super(OfficeHourResource, self)\
+            .get_object_list(request)\
+            .filter(start_time__lte=now)\
+            .filter(end_time__gte=now)
 
     def alter_list_data_to_serialize(self, request, data):
         try:
@@ -83,6 +98,9 @@ class OfficeHourResource(ModelResource):
         except Exception:
             data['meta']['ta'] = False
         return data
+
+    def dehydrate(self, bundle):
+        return bundle
 
     def prepend_urls(self):
         return [
@@ -105,7 +123,8 @@ class OfficeHourResource(ModelResource):
 
         data = self.deserialize(request,
                                 request.raw_post_data,
-                                format=request.META.get('CONTENT_TYPE', 'application/json'))
+                                format=request.META.get('CONTENT_TYPE',
+                                                        'application/json'))
         location = data.get('location', None)
         end_time = data.get('end_time', None)
         course_num = data.get('course_num', None)
@@ -126,23 +145,27 @@ class OfficeHourResource(ModelResource):
 
         try:
             course = Course.objects.get(Number=course_num)
-            oh = OfficeHour(start_time=now(), end_time=end_time, course=course,
-                            ta=request.user.ta, location=location)
-            oh.save()
-
-            from .views import QueueNamespace, AnnouncementNamespace
-            AnnouncementNamespace.send_ta_update(course.Number, oh)
-            # QueueNamespace.emit_cancel_request(this_rq.id)
-            return self.create_response(request, {
-                'success': True,
-            })
         except Course.DoesNotExist:
             return self.create_response(request, {
                 'success': False,
             }, HttpBadRequest)
-        return self.create_response(request, {
-            'success': False
-        }, HttpBadRequest)
+        oh = OfficeHour(start_time=localtime(now()), end_time=end_time,
+                        course=course, ta=request.user.ta,
+                        location=location)
+        oh.save()
+        response = self.create_response(request, {
+            'success': True,
+            })
+
+        try:
+            cancel_hours.apply_async((oh.pk,), countdown=2)
+            logger.debug("SCHEDULED TASK")
+        except Exception, e:
+            logger.exception("SHIT BAD")
+        from .views import QueueNamespace
+        QueueNamespace.send_ta_update(oh.course.Number, oh.pk)
+        # cancel_hours.apply_async(oh.pk, eta=end_time)
+        return response
 
 
 class UserResource(ModelResource):
@@ -178,9 +201,9 @@ class RequestResource(ModelResource):
     course = fields.ForeignKey(CourseResource, 'course', full=True)
 
     class Meta(CommonMeta):
-        queryset = Request.display_objects.all()
+        queryset = Request.objects.still_open()
         resource_name = 'request'
-        fields = ['question', 'whenAsked', 'whereLocated', 'id']
+        fields = ['question', 'whenAsked', 'whereLocated', 'id', 'checked_out']
         allowed_methods = ['get', 'post', 'put']
         filtering = {
             'course': ALL_WITH_RELATIONS
@@ -188,9 +211,8 @@ class RequestResource(ModelResource):
 
     def dehydrate(self, bundle):
         is_superuser = bundle.request.user.is_superuser
-        is_this_user = bundle.data['student'].data['usr'].data['id'] == bundle.request.user.pk
-        logger.debug(bundle.data['student'])
-        logger.debug("CALLING DEHYDRATE")
+        is_this_user = bundle.data['student'].data['usr'].data['id']
+        is_this_user = is_this_user == bundle.request.user.pk
 
         try:
             is_ta = bundle.request.user.ta is not None
@@ -228,7 +250,8 @@ class RequestResource(ModelResource):
     def make_request(self, request, **kwargs):
         data = self.deserialize(request,
                                 request.raw_post_data,
-                                format=request.META.get('CONTENT_TYPE', 'application/json'))
+                                format=request.META.get('CONTENT_TYPE',
+                                                        'application/json'))
         question = data.get('question', None)
         whereLocated = data.get('whereLocated', None)
         courseNum = data.get('course', None)
@@ -248,7 +271,8 @@ class RequestResource(ModelResource):
             try:
                 course = Course.objects.get(Number=courseNum)
                 rq = Request(course=course, question=question,
-                             whenAsked=now(), whereLocated=whereLocated,
+                             whenAsked=localtime(now()),
+                             whereLocated=whereLocated,
                              student=request.user.student)
                 rq.save()
                 from .views import QueueNamespace, AnnouncementNamespace
@@ -258,8 +282,6 @@ class RequestResource(ModelResource):
                     'success': True
                 })
             except Exception, e:
-                logger.error(" LOOK HERE ".center(80, '='))
-                logger.error(e)
                 return self.create_response(request, {
                     'success': False,
                     'reason': 'Creation failed'
@@ -267,7 +289,7 @@ class RequestResource(ModelResource):
 
         return self.create_response(request, {
             'success': False,
-            'reason': 'MISSING', #Keep the same
+            'reason': 'MISSING',  # Keep the same
             'missing_question': question is None,
             'missing_location': whereLocated is None
         }, HttpBadRequest)
@@ -275,7 +297,8 @@ class RequestResource(ModelResource):
     def resolve_request(self, request, **kwargs):
         data = self.deserialize(request,
                                 request.raw_post_data,
-                                format=request.META.get('CONTENT_TYPE', 'application/json'))
+                                format=request.META.get('CONTENT_TYPE',
+                                                        'application/json'))
         request_id = data.get('id', None)
 
         if request_id is None:
@@ -286,7 +309,7 @@ class RequestResource(ModelResource):
 
         try:
             this_rq = Request.objects.get(pk=request_id)
-            this_rq.whenSolved = now()
+            this_rq.whenSolved = localtime(now())
             this_rq.solved = True
             try:
                 ta_solver = request.user.ta
@@ -296,7 +319,7 @@ class RequestResource(ModelResource):
                 }, HttpUnauthorized)
                 ta_solver = None
             this_rq.who_solved = ta_solver
-            this_rq.whenSolved = now()
+            this_rq.whenSolved = localtime(now())
             this_rq.solved = True
             this_rq.save()
             from .views import QueueNamespace, AnnouncementNamespace
@@ -317,7 +340,8 @@ class RequestResource(ModelResource):
     def update_request(self, request, **kwargs):
         data = self.deserialize(request,
                                 request.raw_post_data,
-                                format=request.META.get('CONTENT_TYPE', 'application/json'))
+                                format=request.META.get('CONTENT_TYPE',
+                                                        'application/json'))
         request_id = data.get('id', None)
         new_location = data.get('whereLocated', None)
         new_question = data.get('question', None)
@@ -356,7 +380,8 @@ class RequestResource(ModelResource):
     def cancel_request(self, request, **kwargs):
         data = self.deserialize(request,
                                 request.raw_post_data,
-                                format=request.META.get('CONTENT_TYPE', 'application/json'))
+                                format=request.META.get('CONTENT_TYPE',
+                                                        'application/json'))
         request_id = data.get('id', None)
         if request_id is None:
             return self.create_response(request, {

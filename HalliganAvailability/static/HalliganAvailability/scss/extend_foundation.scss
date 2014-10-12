@@ -249,6 +249,10 @@ span.float-right {
     background-color: $success-color;
 }
 
-.queue-course-header > .small-12 > h3 {
+.queue-course-header > .small-12 > h3, .lab-header > .small-12 > h3 {
     color: white;
+}
+
+.checked_out {
+  background: gray !important;
 }

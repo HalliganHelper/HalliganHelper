@@ -3,6 +3,9 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 import datetime
 import pytz
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFit
+from imagekit.admin import AdminThumbnail
 from HalliganAvailability import settings
 
 
@@ -33,21 +36,35 @@ class Course(models.Model):
 admin.site.register(Course)
 
 
+class TAAdmin(admin.ModelAdmin):
+    list_display = ['usr', 'active', 'headshot']
+    headshot = AdminThumbnail(image_field='headshot')
+
+
 class TA(models.Model):
     usr = models.OneToOneField(User)
     course = models.ManyToManyField(Course)
     active = models.BooleanField(default=True)
+    headshot = models.ImageField(upload_to='headshots',
+                                 default='headshots/None/ming.jpg')
+    has_updated_headshot = models.BooleanField(default=False)
 
     def __str__(self):
         return "{0}: {1}".format(self.usr, self.usr.get_full_name())
 
-admin.site.register(TA)
+admin.site.register(TA, TAAdmin)
 
 
 class RequestDisplayManager(models.Manager):
-    def get_query_set(self):
+    def not_resolved(self):
         qs = super(RequestDisplayManager, self).get_query_set()
         return qs.filter(cancelled=False, solved=False)
+
+    def still_open(self):
+        three_hours = datetime.timedelta(hours=5)
+        now = _now()
+        now -= three_hours
+        return self.get_query_set().filter(whenAsked__gte=now, cancelled=False, solved=False)
 
 
 class Request(models.Model):
@@ -64,8 +81,7 @@ class Request(models.Model):
     checked_out = models.BooleanField(default=False)
     cancelled = models.BooleanField(default=False, blank=True)
 
-    objects = models.Manager()
-    display_objects = RequestDisplayManager()
+    objects = RequestDisplayManager()
 
     def save(self, *args, **kwargs):
         est = pytz.timezone('US/Eastern')

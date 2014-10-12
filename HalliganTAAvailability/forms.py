@@ -1,16 +1,12 @@
 from registration.forms import RegistrationFormUniqueEmail
 from django import forms
 from models import Request, Student, Course, OfficeHour
-import datetime
-import pytz
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm
+from imagekit import ImageSpec, register
+from imagekit.processors import ResizeToFit
+from imagekit.forms import ProcessedImageField
+import StringIO
+from PIL import Image
 from django.utils.translation import ugettext_lazy as _
-
-
-#class RegisteredUserAuthentication(AuthenticationForm):
-        #super(RegisteredUserAuthentication, self).__init__(*args, **kwargs)
-
 
 
 class TuftsEmail(RegistrationFormUniqueEmail):
@@ -56,6 +52,7 @@ class ResolveForm(forms.ModelForm):
         model = Request
         fields = ['course', 'question', 'whenSolved']
 
+
 class SuggestionForm(forms.Form):
     suggestion = forms.CharField(widget=forms.Textarea)
     name = forms.CharField()
@@ -74,5 +71,21 @@ class OfficeHourForm(forms.ModelForm):
         model = OfficeHour
         fields = ['end_time', 'course', 'location']
 
+
 class CancelHoursForm(forms.Form):
     confirm = forms.BooleanField(required=False)
+
+
+class HeadShot(ImageSpec):
+    processors = [ResizeToFit(100, 100)]
+    format = 'JPEG'
+    options = {'quality': 60}
+
+register.generator('HalliganTAAvailability:Headshot', HeadShot)
+
+
+class TAPhotoChangeForm(forms.Form):
+    image = ProcessedImageField(spec_id='HalliganTAAvailability:Headshot')
+                                # processors=[ResizeToFit([100, 100])],
+                                # format='JPEG',
+                                # options={'quality': 60})

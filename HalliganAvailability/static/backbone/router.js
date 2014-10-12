@@ -34,19 +34,14 @@ function checkXhrAndAbort() {
 }
 
 $(function() {
-    setInterval(function() {
-        $('.moment').each(function updateIntervals(indx, item) {
-            $(item).html(moment($(item).data('time'), 'YYYY-MM-DD HH:mm:ss').fromNow());
-        });
-    }, 300000);
-    
     var app_router = new AppRouter();
     app.currentRoomNumber = null;
     app.currentCourseNumber = null;
     app.currentView = null;
+    app.ohView = null;
     app.announcementSocket = io.connect('/announcements');
     app.announcementSocket.on("message", function(data) {
-        console.log(data)
+        console.log(data);
         switch (data.type) {
             case 'request_update':
                 var lbl = $('#' + data.course_number + '-count');
@@ -65,10 +60,26 @@ $(function() {
 
     app.currentTASocket = io.connect('/taqueue');
     app.currentTASocket.on("message", function(rq_data) {
+        console.log(rq_data);
         switch (rq_data.type) {
+            case 'add_oh':
+                var rq_course = rq_data.course_number;
+                if(Boolean(app.ohView) && rq_course == app.currentCourseNumber) {
+                    var newOH = new app.OfficeHour(rq_data.resource);
+                    app.ohView.collection.add(newOH);
+                    //app.ohView.collection.fetch();
+                }
+                break;
+            case 'remove_oh':
+                var rq_course = rq_data.resource.course.Number;
+                if(Boolean(app.ohView) && rq_course == app.currentCourseNumber) {
+                    app.ohView.collection.remove(app.ohView.collection.get(rq_data.id));
+                }
+                break;
             case 'add':
                 var rq_course = rq_data.resource.course.Number;
                 if (Boolean(app.currentCourseNumber) && rq_course == app.currentCourseNumber) {
+                    console.log('adding');
                     var current_obj = app.currentView.collection.get(rq_data.resource.id);
                     if (Boolean(current_obj)) {
                         current_obj.set(rq_data.resource);
@@ -80,16 +91,8 @@ $(function() {
                 }
                 break;
             case 'remove':
+                console.log('removing');
                 app.currentView.removeContainerDiv(rq_data.id);
-                break;
-            case 'update':
-                var id = rq_data.id,
-                    question = rq_data.question,
-                    loc = rq_data.location;
-                var model_instance = app.currentView.collection.get(id);
-                if (Boolean(model_instance)) {
-                    model_instance.set({'question': question, 'whereLocated': loc});
-                }
                 break;
         }
     });
@@ -103,6 +106,7 @@ $(function() {
     });
 
     app_router.on('route:roomRoute', function(roomNum) {
+        app.ohView = null;
         if(app.currentRoomNumber == roomNum) {
             return;
         }
@@ -129,13 +133,8 @@ $(function() {
         });
     });
 
-    app_router.on('route:defaultRoute', function(actions) {
-        app.currentRoomNumber = null;
-        $('.custom-sidenav > li > a').removeClass('active');
-        $('#home').addClass('active');
-    });
-
     app_router.on('route:labRoute', function(actions) {
+        app.ohView = null;
         app.currentRoomNumber = null;
         $('.custom-sidenav > li > a').removeClass('active');
         $('#labs').addClass('active');
@@ -144,6 +143,15 @@ $(function() {
             app.currentView = new app.LabsView();
             $('#content').fadeIn(100);
         });
+    });
+
+    app_router.on('route:defaultRoute', function(actions) {
+        app.ohView = null;
+        app.currentRoomNumber = null;
+        $('.custom-sidenav > li > a').removeClass('active');
+        $('#home').addClass('active');
+        //Backbone.history.navigate('#room/116')
+        app_router.navigate('room/116', {trigger: true});
     });
 
     Backbone.history.start();

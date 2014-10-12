@@ -34,15 +34,6 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-# Example: "/var/www/example.com/media/"
-MEDIA_ROOT = ''
-
-# URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash.
-# Examples: "http://example.com/media/", "http://media.example.com/"
-MEDIA_URL = ''
-
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
@@ -107,6 +98,7 @@ INSTALLED_APPS = (
     'provider.oauth2',
     'djangobower',
     'compressor',
+    'imagekit',
 )
 
 
@@ -162,7 +154,12 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'verbose'
+        },
+        'exception': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
         }
     },
     'loggers': {
@@ -181,7 +178,11 @@ LOGGING = {
         'api': {
             'handlers': ['console'],
             'level': 'DEBUG'
-        }
+        },
+        'task': {
+            'handlers': ['console', 'exception'],
+            'level': 'DEBUG'
+        },
     }
 }
 
@@ -205,3 +206,5 @@ TASTYPIE_DEFAULT_FORMATS = ['json']
 
 LOGIN_URL = 'login_or_register'
 LOGIN_REDIRECT_URL = '/'
+BROKER_URL = 'redis://localhost:6379/0'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 10850}

@@ -36,7 +36,7 @@ app.OfficeHoursView = Backbone.View.extend({
                     end_time: moment(endTime).toISOString(),
                     course_num: _this.courseNum
                 });
-                newHour.url = '/api/v2/officehour/go_on_duty/'
+                newHour.url = location.origin + '/api/v2/officehour/go_on_duty/'
                 newHour.save();
 
             });

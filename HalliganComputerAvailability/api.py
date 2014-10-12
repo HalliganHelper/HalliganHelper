@@ -1,20 +1,75 @@
 from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
+from tastypie.authentication import Authentication
 from tastypie.authorization import DjangoAuthorization
+from tastypie.authorization import Authorization
+from tastypie.exceptions import Unauthorized
 from HalliganComputerAvailability.models import RoomInfo, CourseUsageInfo
 from HalliganComputerAvailability.models import Lab, Computer, Server
 from HalliganAvailability.authentication import OAuth20Authentication
+
+
+class UpdateAuthorization(Authorization):
+    def read_list(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return object_list
+
+    def read_detail(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return True
+
+    def create_list(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return object_list
+
+    def create_detail(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return True
+
+    def update_list(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return object_list
+
+    def update_detail(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return True
+
+    def delete_list(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return object_list
+
+    def delete_detail(self, object_list, bundle):
+        if not bundle.request.user.is_superuser:
+            raise Unauthorized("You are not authorized!")
+        return True
 
 
 class CommonMeta:
     authorization = DjangoAuthorization()
     authentication = MultiAuthentication(OAuth20Authentication(),
                                          SessionAuthentication())
+    limit = 0
+
+
+class ComputerUpdateResource(ModelResource):
+    class Meta():
+        authentication = Authentication()
+        authorization = Authorization() #UpdateAuthorization()
+        queryset = Computer.objects.all()
+        resource_name = 'computer_update'
+        allowed_methods = ['post']
+        fields = ['number', 'room_number', 'status', 'used_for']
 
 
 class ComputerResource(ModelResource):
-
     class Meta(CommonMeta):
         queryset = Computer.objects.all()
         limit = 0
@@ -36,7 +91,7 @@ class RoomInfoResource(ModelResource):
         'cuis', full=True
         )
 
-    class Meta:
+    class Meta(CommonMeta):
         queryset = RoomInfo.objects.all().order_by('-last_updated')
         filtering = {
             'lab': ['exact', ],
@@ -46,21 +101,19 @@ class RoomInfoResource(ModelResource):
                   'num_error', 'last_updated']
         allowed_methods = ['get']
         limit = 100
-        authorization = DjangoAuthorization()
 
 
 class CourseUsageInfoResource(ModelResource):
     room = fields.ToOneField(RoomInfoResource, 'room')
 
-    class Meta:
+    class Meta(CommonMeta):
         queryset = CourseUsageInfo.objects.all()
         allowed_methods = ['get']
-        authorization = DjangoAuthorization()
 
 
 class ServerResource(ModelResource):
 
-    class Meta:
+    class Meta(CommonMeta):
         queryset = Server.objects.all()
         filtering = {
             'name': ['exact', 'iexact'],
@@ -70,7 +123,6 @@ class ServerResource(ModelResource):
         resource_name = 'server'
         fields = ['name', 'num_users', 'status', 'last_updated']
         allowed_methods = ['get']
-        authorization = DjangoAuthorization()
 
 
 class LabResource(ModelResource):
