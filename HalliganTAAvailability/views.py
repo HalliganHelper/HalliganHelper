@@ -496,6 +496,7 @@ class QueueNamespace(BaseNamespace):
 
 
 class AnnouncementNamespace(BaseNamespace):
+
     _connections = {}
 
     def recv_connect(self, *args, **kwargs):
@@ -527,8 +528,6 @@ class AnnouncementNamespace(BaseNamespace):
             'course_number': class_number,
             'office_hour_id': hour_id
         }
-        logger.debug("SEND CANCEL OUTER")
-        logger.debug("Count: {}".format(len(AnnouncementNamespace._connections.items())))
         for _, connection in AnnouncementNamespace._connections.items():
             logger.debug("SEND CANCEL")
             connection['socket'].send(msg, json_parse)

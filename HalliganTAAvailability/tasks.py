@@ -5,9 +5,11 @@ __author__ = 'tyler'
 from celery import shared_task
 from .views import AnnouncementNamespace
 import logging
+import redis
 
 logger = logging.getLogger("task")
 
+POOL = redis.ConnectionPool(host='localhost', db=0)
 
 @shared_task
 def cancel_hours(office_hour_id, course_number):

@@ -15,7 +15,7 @@ from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 from .models import Course, TA, OfficeHour
 from .models import Request, Student
 from HalliganAvailability.authentication import OAuth20Authentication
-from .tasks import cancel_hours
+# from .tasks import cancel_hours
 logger = logging.getLogger('api')
 
 
@@ -155,11 +155,7 @@ class OfficeHourResource(ModelResource):
             'success': True,
             })
 
-        try:
-            cancel_hours.apply_async(args=[oh.pk, course.Number], countdown=2)
-            logger.debug("SCHEDULED TASK")
-        except Exception:
-            logger.exception("SHIT BAD")
+        # cancel_hours.apply_async(args=[oh.pk, course.Number], countdown=2)
         from .views import QueueNamespace
         QueueNamespace.send_ta_update(oh.course.Number, oh.pk)
         # cancel_hours.apply_async(oh.pk, eta=end_time)

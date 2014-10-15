@@ -97,7 +97,7 @@ app.queueItemsView = Backbone.View.extend({
         var newRequest = new app.QueueItem({
             id: objectId,
         });
-        newRequest.url = location.origin + '/api/v2/request/cancel_request';
+        newRequest.url = 'https://' + document.location.host + '/api/v2/request/cancel_request';
         newRequest.save({}, {
             success: function cancelSuccess() {
                 _this.removeContainerDiv(objectId);
