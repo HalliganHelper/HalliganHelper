@@ -239,6 +239,9 @@ class RequestResource(ModelResource):
             url(r"^(?P<resource_name>%s)/cancel_request%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('cancel_request'), name="cancel_request"),
+            url(r"^(?P<resource_name>%s)/checkout_request%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('checkout_request'), name="checkout_request"),
         ]
 
     def make_request(self, request, **kwargs):
@@ -394,6 +397,47 @@ class RequestResource(ModelResource):
             from .views import QueueNamespace, AnnouncementNamespace
             AnnouncementNamespace.send_request_update(this_rq.course.Number)
             QueueNamespace.emit_cancel_request(this_rq.id)
+            return self.create_response(request, {
+                'success': True
+            })
+
+        except Request.DoesNotExist:
+            return self.create_response(request, {
+                'success': False,
+                'reason': 'BAD'
+            }, HttpBadRequest)
+
+        return self.create_response(request, {
+            'success': False
+        }, HttpBadRequest)
+
+    def checkout_request(self, request, **kwargs):
+        data = self.deserialize(request,
+                                request.raw_post_data,
+                                format=request.META.get('CONTENT_TYPE',
+                                                        'application/json'))
+        request_id = data.get('id', None)
+        if request_id is None:
+            return self.create_response(request, {
+                'success': False,
+                'reason': 'MISSING'
+            }, HttpBadRequest)
+
+        try:
+            this_rq = Request.objects.get(pk=request_id)
+
+            try:
+                is_ta = this_rq.student.usr.ta.active
+            except Exception:
+                is_ta = False
+            if not is_ta:
+                return self.create_response(request, {
+                    'success': False
+                }, HttpUnauthorized)
+            this_rq.checked_out = True
+            this_rq.save()
+            from .views import QueueNamespace
+            QueueNamespace.emit_checkout_request(this_rq.course.Number, this_rq.id)
             return self.create_response(request, {
                 'success': True
             })

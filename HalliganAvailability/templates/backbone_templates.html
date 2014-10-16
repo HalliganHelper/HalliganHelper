@@ -97,7 +97,10 @@
         <% } else if (allow_resolve) { %>
             <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
             <div class="large-2 medium-2 small-12 columns end text-center queue-resolve">
-                <div class="tiny button resolve-button" data-object-id="<%= id %>">
+                <div class="tiny secondary button checkout-button" data-object-id="<%= id %>">
+                    Checkout
+                </div> 
+                <div class="tiny primary button resolve-button" data-object-id="<%= id %>">
                     Resolve
                 </div>
             </div>

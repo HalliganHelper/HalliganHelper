@@ -476,6 +476,16 @@ class QueueNamespace(BaseNamespace):
                 connection['socket'].send(msg, json)
 
     @staticmethod
+    def emit_checkout_request(course_num, rq_id, json_parse=True):
+        msg = {
+            'type': 'checkout',
+            'id': rq_id,
+            'course_num': course_num,
+        }
+        for connection_id, connection in QueueNamespace._connections.items():
+            connection['socket'].send(msg, json_parse)
+
+    @staticmethod
     def send_ta_update(course_number, office_hour_id, json_parse=True):
         from api import OfficeHourResource
         br = OfficeHourResource()

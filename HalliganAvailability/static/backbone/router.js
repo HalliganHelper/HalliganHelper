@@ -92,6 +92,12 @@ $(function() {
                 console.log('removing');
                 app.currentView.removeContainerDiv(rq_data.id);
                 break;
+            case 'checkout':
+                if (Boolean(app.ohView) && rq_data.course_num == app.currentCourseNumber) {
+                    console.log('checkout!');
+                     
+                }
+                break;
         }
     });
     

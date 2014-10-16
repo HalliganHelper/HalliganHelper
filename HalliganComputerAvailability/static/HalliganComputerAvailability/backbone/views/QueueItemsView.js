@@ -14,6 +14,7 @@ app.queueItemsView = Backbone.View.extend({
         this.events["click .cancel-button"] = this.cancelRequest;
         this.events["click .edit-button"] = this.editRequest;
         this.events["click .resolve-button"] = this.resolveRequest;
+        this.events["click .checkout-button"] = this.checkout;
         this.events["keyup #location"] = this.enterPressed;
         this.events["keyup #problem"] = this.enterPressed;
         this.delegateEvents(this.events);
@@ -42,6 +43,7 @@ app.queueItemsView = Backbone.View.extend({
         this.events["click .cancel-button"] = undefined;
         this.events["click .edit-button"] = undefined;
         this.events["click .resolve-button"] = undefined;
+        this.events["click .checkout-button"] = undefined;
         this.events["keyup #location"] = undefined;
         this.events["keyup #problem"] = undefined;
 
@@ -90,6 +92,17 @@ app.queueItemsView = Backbone.View.extend({
             }
         });
      },
+    checkout: function(ev) {
+        var _this = this,
+            target = $(ev.currentTarget),
+            objectId = $(target).data('object-if'),
+            newRequest = new app.QueueItem({
+                id: objectId,
+            });
+
+            newRequest.url = 'https://' + document.location.host + '/api/v2/request/checkout_request';
+            newRequest.save();
+    },
     cancelRequest: function(ev) {
         var _this = this;
         var target = $(ev.currentTarget);
@@ -114,7 +127,7 @@ app.queueItemsView = Backbone.View.extend({
             id: objectId,
         });
 
-        newRequest.url = location.origin + '/api/v2/request/resolve_request';
+        newRequest.url = 'https://' + document.location.host + '/api/v2/request/resolve_request';
         newRequest.save({}, {
             success: function resolveSuccess() {
                 _this.removeContainerDiv(objectId);
