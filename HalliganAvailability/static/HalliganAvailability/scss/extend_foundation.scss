@@ -5,6 +5,38 @@ $warning-color: rgba(215, 44, 44, 0.6);
 $alert-color: rgba(215, 165, 44, 0.6);
 $available-color: rgba(0, 116, 0, 0.6);
 
+@mixin animation($animate...) {
+    $max: length($animate);
+    $animations: '';
+
+    @for $i from 1 through $max {
+        $animations: #{$animations + nth($animate, $i)};
+
+        @if $i < $max {
+            $animations: #{$animations + ", "};
+        }
+    }
+    -webkit-animation: $animations;
+    -moz-animation:    $animations;
+    -o-animation:      $animations;
+}
+
+@mixin keyframes($animationName) {
+    @-webkit-keyframes #{$animationName} {
+        @content;
+    }
+    @-moz-keyframes #{$animationName} {
+        @content;
+    }
+    @-o-keyframes #{$animationName} {
+        @content;
+    }
+    @keyframes #{$animationName} {
+        @content;
+    }
+}
+
+
 body {
     background: #FAFAFA;
 }
@@ -126,45 +158,6 @@ h1 {
 
 $size: 10em;
 
-.circle {
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 0; height: 0;
-    border-radius: 50%;
-    z-index: 1;
-    @include transform(translate(-50%, -50%));
-    @include transition(all 200ms ease);
-
-    $duration: 1s;
-
-    &:nth-child(1){
-        z-index: 2;
-        background: #e74c3c;
-        animation-name: explode;
-        animation-duration: $duration;
-        animation-timing-function: ease;
-        animation-delay: 0;
-        animation-iteration-count: infinite;
-        //animation-direction: alternate;
-}
-
-&:nth-child(2){
-    background: #34495e;
-    animation-name: explode;
-    animation-duration: $duration;
-    animation-timing-function: ease;
-    animation-delay: 0.5s;
-    animation-iteration-count: infinite;
-    //animation-direction: alternate;
-}
-}
-
-@keyframes explode {
-    0% { width: 0; height: 0; z-index: 1 }
-    50% { width: $size; height: $size; z-index: 1 }
-    100% { display: none; }
-}
-
 .login-card {
     @extend .card;
     opacity: .93;
@@ -254,5 +247,58 @@ span.float-right {
 }
 
 .checked_out {
-  background: gray !important;
+    background: gray !important;
+}
+
+.spinner {
+    margin: 100px auto;
+    width: 100px;
+    height: 50px;
+    text-align: center;
+    font-size: 10px;
+}
+
+.spinner > div {
+    background-color: #333;
+    height: 100%;
+    width: 6px;
+    display: inline-block;
+
+    -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+    animation: stretchdelay 1.2s infinite ease-in-out;
+}
+
+.spinner .rect2 {
+    -webkit-animation-delay: -1.1s;
+    animation-delay: -1.1s;
+}
+
+.spinner .rect3 {
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
+}
+
+.spinner .rect4 {
+    -webkit-animation-delay: -0.9s;
+    animation-delay: -0.9s;
+}
+
+.spinner .rect5 {
+    -webkit-animation-delay: -0.8s;
+    animation-delay: -0.8s;
+}
+
+@-webkit-keyframes stretchdelay {
+    0%, 40%, 100% { -webkit-transform: scaleY(0.4) }  
+    20% { -webkit-transform: scaleY(1.0) }
+}
+
+@keyframes stretchdelay {
+    0%, 40%, 100% { 
+        transform: scaleY(0.4);
+        -webkit-transform: scaleY(0.4);
+    }  20% { 
+        transform: scaleY(1.0);
+        -webkit-transform: scaleY(1.0);
+    }
 }

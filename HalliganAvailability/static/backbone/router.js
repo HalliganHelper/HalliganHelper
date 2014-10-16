@@ -8,13 +8,6 @@ var AppRouter = Backbone.Router.extend({
 });
 
 
-Backbone.View.prototype.showWaiting = function() {
-    var circleOne = $('<div class="circle"/>'),
-        circleTwo = circleOne.clone();
-    this.$el.append(circleOne).append(circleTwo);
-    this.$el.append("Loading...");
-};
-
 _.each(["Model", "Collection"], function(name) {
     var ctor = Backbone[name];
     var fetch = ctor.prototype.fetch;

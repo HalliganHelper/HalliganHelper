@@ -7,7 +7,13 @@ app.OfficeHoursView = Backbone.View.extend({
         this.courseNum = options.courseNum;
         this.collection = new app.OfficeHours([], this.courseNum);
         this.listenTo(this.collection, 'fetch', this.showWaiting);
-        app.fetchXhr = this.collection.fetch({reset: true});
+        app.fetchXhr = this.collection.fetch({
+            reset: true,
+            complete: (function(e){
+                console.log("Finished!"); 
+            })
+        });
+
         
         this.listenTo(this.collection, 'add', this.renderOfficeHour);
         this.listenTo(this.collection, 'reset', this.render);

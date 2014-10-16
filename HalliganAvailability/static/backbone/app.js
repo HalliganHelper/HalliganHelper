@@ -1,15 +1,14 @@
 var app = typeof app !== "undefined" ? app : {};
 
-$(function() {
-    /*
-    $('.custom-sidenav > li > a').click(function() {
-        console.log(this);
-        $('.custom-sidenav > li > a').removeClass('active');
-        $(this).addClass('active');
-    });
-    */
-    //new app.LabsView();
-    //new app.ComputersView([], {'roomNum': 116, 'el': '#a'});
-    //new app.ComputersView([], {'roomNum': 118, 'el': '#b'});
-    //new app.ComputersView([], {'roomNum': 120, 'el': '#c'});
-});
+
+Backbone.View.prototype.showWaiting = function() {
+    var loading = $('<div class="loading"/>');
+    var loading = $('<div class="spinner"/>');
+    for(var i = 1; i < 6; i++) {
+        var innerDiv = $('<div class="rect' + i + '"/>');
+        $(loading).append(innerDiv);
+    }
+
+    this.$el.append(loading);
+    console.log("waiting");
+};
