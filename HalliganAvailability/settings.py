@@ -202,6 +202,14 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-scss', 'sass --scss --compass -E "UTF-8" -I "%s/bower_components/foundation/scss" "{infile}" "{outfile}"' % BOWER_COMPONENTS_ROOT),
 )
 
+COMPRESS_CSS_FILTERS = [
+    'compressor.filters.cssmin.CSSMinFilter'
+]
+
+COMPRESS_JS_FILTERS = [
+    'compressor.filters.jsmin.JSMinFilter'
+]
+
 COMPRESS_OFFLINE = True
 
 # PIPELINE_JS = {

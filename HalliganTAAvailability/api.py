@@ -412,10 +412,12 @@ class RequestResource(ModelResource):
         }, HttpBadRequest)
 
     def checkout_request(self, request, **kwargs):
+        logger.debug("GOT CHECKOUT");
         data = self.deserialize(request,
                                 request.raw_post_data,
                                 format=request.META.get('CONTENT_TYPE',
                                                         'application/json'))
+        logger.debug(data);
         request_id = data.get('id', None)
         if request_id is None:
             return self.create_response(request, {

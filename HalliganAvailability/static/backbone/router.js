@@ -93,9 +93,10 @@ $(function() {
                 app.currentView.removeContainerDiv(rq_data.id);
                 break;
             case 'checkout':
-                if (Boolean(app.ohView) && rq_data.course_num == app.currentCourseNumber) {
+                if (Boolean(app.currentView) && rq_data.course_num == app.currentCourseNumber) {
                     console.log('checkout!');
-                     
+                    //var item = app.currentView.collection.get(rq_data.id);
+                    $('div').find("[data-main-object-id=" + rq_data.id + "]").addClass('checked_out');
                 }
                 break;
         }

@@ -95,7 +95,7 @@ app.queueItemsView = Backbone.View.extend({
     checkout: function(ev) {
         var _this = this,
             target = $(ev.currentTarget),
-            objectId = $(target).data('object-if'),
+            objectId = $(target).data('object-id'),
             newRequest = new app.QueueItem({
                 id: objectId,
             });
