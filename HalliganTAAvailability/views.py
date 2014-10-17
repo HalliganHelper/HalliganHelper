@@ -495,7 +495,6 @@ class QueueNamespace(BaseNamespace):
             'course_number': course_number,
         }
 
-        logger.debug("Looking for resource id: {0}".format(office_hour_id))
         for _, connection in QueueNamespace._connections.items():
             o = OfficeHour.objects.get(id=office_hour_id)
             resource = br.build_bundle(obj=o, request=connection['request'])
@@ -512,6 +511,7 @@ class AnnouncementNamespace(BaseNamespace):
     def recv_connect(self, *args, **kwargs):
         self._connections[id(self)] = {
             'socket': self,
+            'user': self.request.user,
         }
         return super(AnnouncementNamespace, self).recv_connect(*args, **kwargs)
 
@@ -539,8 +539,38 @@ class AnnouncementNamespace(BaseNamespace):
             'office_hour_id': hour_id
         }
         for _, connection in AnnouncementNamespace._connections.items():
-            logger.debug("SEND CANCEL")
             connection['socket'].send(msg, json_parse)
+
+    @staticmethod
+    def notify_ta(user_name, course_number, json_parse=True):
+        msg = {
+            'type': 'notifyta',
+            'name': user_name
+        }
+
+        for _, connection in AnnouncementNamespace._connections.items():
+            try:
+                ta = connection['user'].ta
+                if ta.active:
+                    courses = [c.Number for c in ta.course.all()]
+                    if course_number in courses:
+                        connection['socket'].send(msg, json_parse)
+            except Exception:
+                continue
+
+    @staticmethod
+    def notify_user(which_user, ta_name, json_parse=True):
+        msg = {
+            'type': 'notifystudent',
+            'name': ta_name
+        }
+
+        logger.debug("NOTIFY USER")
+        for _, connection in AnnouncementNamespace._connections.items():
+            logger.debug("Looking for user {} with user {}".format(connection['user'].pk, which_user))
+            if connection['user'].pk == which_user:
+                logger.debug("SENDING NOTIFICATION")
+                connection['socket'].send(msg, json_parse)
 
 
 def socketio(request):

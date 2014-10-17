@@ -266,14 +266,17 @@ class RequestResource(ModelResource):
 
         if question and whereLocated and courseNum:
             try:
+                user = request.user
                 course = Course.objects.get(Number=courseNum)
                 rq = Request(course=course, question=question,
                              whenAsked=_now(),
                              whereLocated=whereLocated,
-                             student=request.user.student)
+                             student=user.student)
                 rq.save()
                 from .views import QueueNamespace, AnnouncementNamespace
                 AnnouncementNamespace.send_request_update(rq.course.Number)
+                AnnouncementNamespace.notify_ta(user.get_full_name(),
+                                                rq.course.Number)
                 QueueNamespace.emit_single_request(request, rq.id)
                 return self.create_response(request, {
                     'success': True
@@ -412,12 +415,10 @@ class RequestResource(ModelResource):
         }, HttpBadRequest)
 
     def checkout_request(self, request, **kwargs):
-        logger.debug("GOT CHECKOUT");
         data = self.deserialize(request,
                                 request.raw_post_data,
                                 format=request.META.get('CONTENT_TYPE',
                                                         'application/json'))
-        logger.debug(data);
         request_id = data.get('id', None)
         if request_id is None:
             return self.create_response(request, {
@@ -438,8 +439,11 @@ class RequestResource(ModelResource):
                 }, HttpUnauthorized)
             this_rq.checked_out = True
             this_rq.save()
-            from .views import QueueNamespace
-            QueueNamespace.emit_checkout_request(this_rq.course.Number, this_rq.id)
+            from .views import QueueNamespace, AnnouncementNamespace
+            QueueNamespace.emit_checkout_request(this_rq.course.Number,
+                                                 this_rq.id)
+            AnnouncementNamespace.notify_user(this_rq.student.usr.pk,
+                                              request.user.get_full_name())
             return self.create_response(request, {
                 'success': True
             })

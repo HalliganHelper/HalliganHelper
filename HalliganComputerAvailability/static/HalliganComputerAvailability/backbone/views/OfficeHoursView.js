@@ -9,9 +9,6 @@ app.OfficeHoursView = Backbone.View.extend({
         this.listenTo(this.collection, 'fetch', this.showWaiting);
         app.fetchXhr = this.collection.fetch({
             reset: true,
-            complete: (function(e){
-                console.log("Finished!"); 
-            })
         });
 
         
@@ -36,6 +33,9 @@ app.OfficeHoursView = Backbone.View.extend({
             this.listBlock.append(addHoursDiv);
             var clockInBtn = $(addHoursDiv).find('#clockInBtn');
             $('#clockInBtn').click(function clockIn() {
+                if (Notification.permission != 'enabled') {
+                    Notification.requestPermission();
+                }
                 var hq = $('#TAHQ').val(),
                     endTime = $('#dtPick').val();
                 var newHour = new app.OfficeHour({

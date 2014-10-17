@@ -1,3 +1,11 @@
+function show_notification(msg) {
+    var options = {
+        'body': msg,
+        'icon': '/static/HalliganTAAvailability/imgs/HH_Logo.jpg'
+    };
+    var notification = new Notification("Halligan Helper", options);
+};
+
 var AppRouter = Backbone.Router.extend({
     routes: {
         "room/:roomNum": "roomRoute",
@@ -34,7 +42,6 @@ $(function() {
     app.ohView = null;
     app.announcementSocket = io.connect('/announcements');
     app.announcementSocket.on("message", function(data) {
-        console.log(data);
         switch (data.type) {
             case 'request_update':
                 var lbl = $('#' + data.course_number + '-count');
@@ -52,13 +59,19 @@ $(function() {
                     app.ohView.collection.remove(data.office_hour_id);
                 }
                 break;
+            case 'notifyta':
+                var msg = data.name + " added themself to the queue";
+                show_notification(msg);
+                break;
+            case 'notifystudent':
+                show_notification(data.name + " is on their way!");
+                break;
         }
     });
 
 
     app.currentTASocket = io.connect('/taqueue');
     app.currentTASocket.on("message", function(rq_data) {
-        console.log(rq_data);
         switch (rq_data.type) {
             case 'add_oh':
                 var rq_course = rq_data.course_number;
@@ -77,7 +90,6 @@ $(function() {
             case 'add':
                 var rq_course = rq_data.resource.course.Number;
                 if (Boolean(app.currentCourseNumber) && rq_course == app.currentCourseNumber) {
-                    console.log('adding');
                     var current_obj = app.currentView.collection.get(rq_data.resource.id);
                     if (Boolean(current_obj)) {
                         current_obj.set(rq_data.resource);
@@ -89,13 +101,10 @@ $(function() {
                 }
                 break;
             case 'remove':
-                console.log('removing');
                 app.currentView.removeContainerDiv(rq_data.id);
                 break;
             case 'checkout':
                 if (Boolean(app.currentView) && rq_data.course_num == app.currentCourseNumber) {
-                    console.log('checkout!');
-                    //var item = app.currentView.collection.get(rq_data.id);
                     $('div').find("[data-main-object-id=" + rq_data.id + "]").addClass('checked_out');
                 }
                 break;

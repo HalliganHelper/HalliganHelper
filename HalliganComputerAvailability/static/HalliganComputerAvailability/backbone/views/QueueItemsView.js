@@ -56,6 +56,9 @@ app.queueItemsView = Backbone.View.extend({
         this.$el.find('#get-help').before( queueItemView.render().el );
     },
     makeRequest: function() {
+        if (Notification.permission != 'granted') {
+            Notification.requestPermission();
+        }
         var $that = $($('#makeRequestButton')[0])
         $that.prop('disabled', true);
 
