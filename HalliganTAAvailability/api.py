@@ -312,7 +312,7 @@ class RequestResource(ModelResource):
             this_rq.whenSolved = _now()
             this_rq.solved = True
             try:
-                ta_solver = request.user.ta
+                ta_solver = request.user.ta.active
             except TA.DoesNotExist:
                 return self.create_response(request, {
                     'success': False,
@@ -430,8 +430,8 @@ class RequestResource(ModelResource):
             this_rq = Request.objects.get(pk=request_id)
 
             try:
-                is_ta = this_rq.student.usr.ta.active
-            except Exception:
+                is_ta = request.user.ta.active
+            except TA.DoesNotExist:
                 is_ta = False
             if not is_ta:
                 return self.create_response(request, {
