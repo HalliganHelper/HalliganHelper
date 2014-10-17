@@ -1,4 +1,7 @@
 {% load staticfiles %}
+{% load compress %}
+
+{% compress js %}
 <script src="{% static 'backbone/app.js' %}"></script>
 <script src="{% static 'backbone/TastyPie_Backbone_Shim.js' %}"></script>
 <script src="{% static 'HalliganComputerAvailability/backbone/views/ComputerView.js' %}"></script>
@@ -26,3 +29,4 @@
 <script src="{% static 'HalliganComputerAvailability/backbone/collections/OfficeHours.js' %}"></script>
 
 <script src="{% static 'backbone/router.js' %}"></script>
+{% endcompress %}

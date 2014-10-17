@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 {% load static %}
 {% block endscripts %}
+    {% include "backbone_templates.html" %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/livestamp/1.1.2/livestamp.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script>
     <link rel="stylesheet" href='//code.jquery.com/ui/1.11.0-beta.1/themes/base/jquery-ui.css'/>
     <script src='//cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.4.5/jquery-ui-timepicker-addon.min.js'></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
-    {% include "backbone_templates.html" %}
+    {# <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script> #}
     {% include "backbone_scripts.html" %}
 {% endblock %}
 
@@ -17,7 +21,7 @@
             <li class="name">
                 <h1><a href="/">Halligan Helper</a></h1>
             </li>
-            <li class="toggle-topbar menu-icon"><a href><span>Menu</span></a></li>
+            <li class="toggle-topbar menu-icon"><a href><span></span></a></li>
         </ul>
         <section class="top-bar-section">
         <!-- Right Nav Section -->

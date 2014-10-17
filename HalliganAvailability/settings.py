@@ -59,6 +59,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'htmlmin.middleware.HtmlMinifyMiddleware',
+    'htmlmin.middleware.MarkRequestMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -199,6 +201,19 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-sass', 'sass --compass -E "UTF-8" "{infile}" "{outfile}"'),
     ('text/x-scss', 'sass --scss --compass -E "UTF-8" -I "%s/bower_components/foundation/scss" "{infile}" "{outfile}"' % BOWER_COMPONENTS_ROOT),
 )
+
+COMPRESS_OFFLINE = True
+
+# PIPELINE_JS = {
+#     'backbone': {
+#         'source_filenames': (
+#             'HalliganComputerAvailability/backbone/models/*',
+#             'HalliganComputerAvailability/backbone/collections/*',
+#             'HalliganComputerAvailability/backbone/views/*',
+#         ),
+#         'output_filename': 'js/backbone.js'
+#     }
+# }
 
 # COMPRESS_URL = '/static/'
 

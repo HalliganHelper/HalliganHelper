@@ -4,6 +4,7 @@ South==0.8.2
 amqp==1.4.6
 anyjson==0.3.3
 argparse==1.2.1
+beautifulsoup4==4.3.2
 billiard==3.3.0.18
 celery==3.1.15
 defusedxml==0.4.1
@@ -14,6 +15,7 @@ django-appconf==0.6
 django-bower==5.0.1
 django-compressor==1.4
 django-extensions==1.2.5
+django-htmlmin==0.7.0
 django-imagekit==3.2.4
 django-oauth2-provider==0.2.6
 django-pylibmc-sasl==0.2.4
@@ -27,6 +29,7 @@ gevent-socketio==0.3.6
 gevent-websocket==0.9.3
 greenlet==0.4.2
 gunicorn==18.0
+html5lib==0.999
 kombu==3.0.23
 lxml==3.3.5
 manifesto==0.5
@@ -50,11 +53,10 @@ requests-oauthlib==0.4.0
 rope==0.9.4
 ropemode==0.2
 ropevim==0.4
-shortuuid==0.4.0
+shortuuid==0.4
 six==1.4.1
 sphinx-me==0.2.1
 static==0.4
 supervisor==3.0
 ujson==1.33
 wsgiref==0.1.2
-
