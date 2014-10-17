@@ -435,7 +435,8 @@ class RequestResource(ModelResource):
                 is_ta = False
             if not is_ta:
                 return self.create_response(request, {
-                    'success': False
+                    'success': False,
+                    'reason': 'Not a TA'
                 }, HttpUnauthorized)
             this_rq.checked_out = True
             this_rq.save()
