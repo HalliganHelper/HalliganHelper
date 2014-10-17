@@ -100,7 +100,7 @@ app.queueItemsView = Backbone.View.extend({
                 id: objectId,
             });
 
-            newRequest.url = document.location.origin + '/api/v2/request/checkout_request';
+            newRequest.url = document.location.origin + '/api/v2/request/checkout_request/';
             newRequest.save();
     },
     cancelRequest: function(ev) {
@@ -110,7 +110,7 @@ app.queueItemsView = Backbone.View.extend({
         var newRequest = new app.QueueItem({
             id: objectId,
         });
-        newRequest.url = document.location.origin + '/api/v2/request/cancel_request';
+        newRequest.url = document.location.origin + '/api/v2/request/cancel_request/';
         newRequest.save({}, {
             success: function cancelSuccess() {
                 _this.removeContainerDiv(objectId);
@@ -125,7 +125,7 @@ app.queueItemsView = Backbone.View.extend({
             id: objectId,
         });
 
-        newRequest.url = document.location.origin + '/api/v2/request/resolve_request';
+        newRequest.url = document.location.origin + '/api/v2/request/resolve_request/';
         newRequest.save({}, {
             success: function resolveSuccess() {
                 _this.removeContainerDiv(objectId);
