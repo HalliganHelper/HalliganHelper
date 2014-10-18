@@ -78,7 +78,6 @@ $(function() {
                 if(Boolean(app.ohView) && rq_course == app.currentCourseNumber) {
                     var newOH = new app.OfficeHour(rq_data.resource);
                     app.ohView.collection.add(newOH);
-                    //app.ohView.collection.fetch();
                 }
                 break;
             case 'remove_oh':

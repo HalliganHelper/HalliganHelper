@@ -4,34 +4,42 @@
 
 {% block content %}
 
-<form method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
-    <div class="row text-center">
-        <p class="field">
-            {% render_field form.username class="narrow text input" type="text" placeholder="Username" %}
-        </p>
-
-        <p class="field">
-            {% render_field form.password class="narrow input password" type="password" placeholder="Password"%}
-        </p>
-
-        {% for error in form.non_field_errors %}
-            <p class="danger alert">
-                {{ error }}
-            </p>
-        {% endfor %} 
-
-        
+<div class="row login-card">
+    <div class="small-12 columns text-center">
+        <h2 class="text-center">Halligan Again?</h2>
     </div>
-    <div class="row text-center">
-        <div class="medium primary btn">
-            <input type="submit" value="Login"/>
+</div>
+<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+    <div class="row collapse login-card">
+        {% for field in form %}
+        <div class="small-4 columns">
+            <span class="prefix">{{ field.label }}</span>
+        </div>
+        <div class="small-8 columns">
+            {{ field }} 
+        </div>
+        {% endfor %}
+    </div>
+    {% if form.non_field_errors %}
+    <div class="row login-card">
+        <div class="small-12 text-center columns">
+            {% for error in form.non_field_errors %}
+            <p class="alert-box alert">
+            {{ error }}
+            </p>
+            {% endfor %} 
         </div>
     </div>
-    <div class="row text-center">
-            <a href="{% url 'auth_password_reset' %}">
+    {% endif %}
+    <div class="row login-card">
+        <div class="small-12 text-center columns">
+            <p><input type="submit" value="Login" class="button success extend"/></p>
+            <p><a href="{% url 'auth_password_reset' %}">
                 Forgot Password?
-            </a>
+            </a></p>
+        </div>
     </div>
+    <input type="hidden" name="next" value="{{ next }}" />
+    {% csrf_token %}
 </form>
-
 {% endblock %}
