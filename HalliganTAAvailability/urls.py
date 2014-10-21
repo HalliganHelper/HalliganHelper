@@ -1,11 +1,13 @@
 __author__ = 'tyler'
 from django.conf.urls import patterns, include, url
+from django.core.urlresolvers import reverse_lazy
+from django.views.generic import RedirectView
 from views import TuftsRegistrationView
 
 urlpatterns = patterns('HalliganTAAvailability.views',
     url(r'^accounts/register/$', TuftsRegistrationView.as_view(), name='register'),
     url(r'^accounts/', include('registration.backends.default.urls')),
-    url(r'^taSystem$', 'onlineQueue', name='taSystem'),
+    url(r'^taSystem$', RedirectView.as_view(url=reverse_lazy('ModularHomePage')), name='taSystem'),
     url(r'^users$', 'profile', name='userProfile'),
     url(r'^users/gethelp$', 'getHelp', name='getHelp'),
     url(r'^users/listRequests', 'listRequests', name='listRequests'),
