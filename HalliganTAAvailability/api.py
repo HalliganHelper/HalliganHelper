@@ -195,13 +195,27 @@ class RequestResource(ModelResource):
     course = fields.ForeignKey(CourseResource, 'course', full=True)
 
     class Meta(CommonMeta):
-        queryset = Request.objects.still_open()
+        three_hours = datetime.timedelta(hours=5)
+        now = _now()
+        now -= three_hours
+        queryset = Request.objects.all().filter(whenAsked__gte=now,
+                                                cancelled=False,
+                                                solved=False)
+
         resource_name = 'request'
         fields = ['question', 'whenAsked', 'whereLocated', 'id', 'checked_out']
         allowed_methods = ['get', 'post', 'put']
         filtering = {
             'course': ALL_WITH_RELATIONS
         }
+
+    def get_object_list(self, request):
+        three_hours = datetime.timedelta(hours=5)
+        now = _now()
+        now -= three_hours
+        return super(RequestResource, self).get_object_list(request).filter(whenAsked__gte=now,
+                                                                            cancelled=False,
+                                                                            solved=False)
 
     def dehydrate(self, bundle):
         is_superuser = bundle.request.user.is_superuser
