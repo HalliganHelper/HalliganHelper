@@ -326,7 +326,11 @@ class RequestResource(ModelResource):
             this_rq.whenSolved = _now()
             this_rq.solved = True
             try:
-                ta_solver = request.user.ta.active
+                ta_solver = request.user.ta
+                if not ta_solver.active:
+                    return self.create_response(request, {
+                        'success': False,
+                    }, HttpUnauthorized)
             except TA.DoesNotExist:
                 return self.create_response(request, {
                     'success': False,
