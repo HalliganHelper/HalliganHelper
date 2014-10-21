@@ -210,7 +210,7 @@ COMPRESS_JS_FILTERS = [
     'compressor.filters.jsmin.JSMinFilter'
 ]
 
-COMPRESS_OFFLINE = True
+# COMPRESS_OFFLINE = True
 
 # PIPELINE_JS = {
 #     'backbone': {
