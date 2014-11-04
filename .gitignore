@@ -1,3 +1,4 @@
+
 .idea/
 .DS_Store
 components/
@@ -10,6 +11,7 @@ HalliganAvailability/secret.py
 *.csr
 HalliganAvailability/environment.py
 *.sw[o|p]
+*.*.sw[o|p]
 .db/
 *.pid
 *.log
