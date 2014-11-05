@@ -11,52 +11,11 @@ import json
 from django.core.cache import cache
 import operator
 from dateutil import tz
-import datetime as dt
 from collections import defaultdict
 
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-@require_GET
-def labInformation(request):
-    room = request.GET.get('room', None)
-    current = request.GET.get('current', False)
-    upcoming = request.GET.get('upcoming', False)
-    response = []
-
-    if room and current == 'true' and upcoming == 'true':
-        labs = Lab.objects.filter(room_number=room)
-        response = []
-        for lab in labs:
-            if lab.is_lab_coming_up() or lab.is_lab_in_session():
-                response.append(lab.for_response())
-
-        return HttpResponse(
-            json.dumps(response),
-            content_type="application/json")
-
-    now = dt.datetime.now().date()
-    if not room:
-        labs = Lab.objects.all()
-        for lab in labs:
-            if lab.end_date > now:
-                response.append(lab.for_response())
-
-    else:
-        labs = Lab.objects.filter(room_number=room)
-        for lab in labs:
-            data = lab.for_response()
-            response.append(data)
-
-    response.sort(
-        key=operator.itemgetter(
-            'DayOfWeek_AsNum',
-            'start_time',
-            'room_number'))
-
-    return HttpResponse(json.dumps(response), content_type="application/json")
 
 
 @require_GET
@@ -304,9 +263,11 @@ def get_logged_in_data():
     courses = Course.objects.values_list('Number', flat=True)
     course_data = []
     for course in courses:
+        count = Request.objects.still_open()
+        count = count.filter(course__Number=course).count()
         data = {
             'num': course,
-            'count': Request.objects.still_open().filter(course__Number=course).count()
+            'count': count
         }
         course_data.append(data)
 
@@ -314,7 +275,6 @@ def get_logged_in_data():
     template_params['rooms'] = rooms
     template_params['courses'] = course_data
     return template_params
-
 
 
 @login_required

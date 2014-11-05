@@ -3,7 +3,7 @@ from django.db import IntegrityError
 import pytz
 import datetime as dt
 from django.conf import settings
-from .models import RoomInfo, Server, Computer
+from .models import RoomInfo, Server, Computer, CourseUsageInfo
 from .models import _now
 
 
@@ -110,3 +110,31 @@ class TestComputer(TestCase):
         c = Computer.objects.get(number='116a')
         self.assertEqual(str(c.number), str(c))
         self.assertEqual(str(c.number), repr(c))
+
+
+class TestCUI(TestCase):
+    def setUp(self):
+        r = RoomInfo.objects.create(lab='116a', num_reporting=5,
+                                    num_available=10, num_unavailable=20,
+                                    num_error=3)
+        CourseUsageInfo.objects.create(room=r, course='comp11', num_machines=10)
+        CourseUsageInfo.objects.create(room=r, num_machines=10)
+
+    def test_course_names(self):
+        """
+        CUIs saved without a course should default to 'other'
+        """
+        c11 = CourseUsageInfo.objects.get(pk=1)
+        other = CourseUsageInfo.objects.get(pk=2)
+        self.assertEqual(c11.course, 'comp11')
+        self.assertEqual(other.course, 'other')
+
+    def test_str_repr(self):
+        """
+        Test that the string and representation methods do what we think
+        """
+        c11 = CourseUsageInfo.objects.get(pk=3)
+        format_str = '{0} has {1} machine(s) in room {2}'
+        msg = format_str.format(c11.course, c11.num_machines, c11.room.lab)
+        self.assertEqual(msg, str(c11))
+        self.assertEqual(msg, repr(c11))

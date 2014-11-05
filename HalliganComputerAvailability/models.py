@@ -35,8 +35,6 @@ class Computer(models.Model):
     used_for = models.CharField(max_length=40, blank=True)
     last_update = models.DateTimeField(auto_now=True)
 
-    # TODO: Foreign Key to computers in TA System?
-
     def __str__(self):
         return str(self.number)
 
@@ -75,8 +73,8 @@ class CourseUsageInfo(models.Model):
     num_machines = models.IntegerField()
 
     def save(self, *args, **kwargs):
-        if self.course is None:
-            self.course = 'Other'
+        if self.pk is None and self.course == '':
+            self.course = 'other'
         return super(CourseUsageInfo, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -84,7 +82,11 @@ class CourseUsageInfo(models.Model):
         return format_str.format(self.course, self.num_machines,
                                  self.room.lab)
 
+    def __repr__(self):
+        return self.__str__()
+
 admin.site.register(CourseUsageInfo)
+
 
 class Server(models.Model):
     OFF = 'OFF'
@@ -126,19 +128,6 @@ class Lab(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     day_of_week = models.IntegerField(max_length=1)
-
-    def for_response(self):
-        response = {
-            'course_name': self.course_name,
-            'room_number': self.room_number,
-            'start_time': self.start_time.strftime('%I:%M %p'),
-            'end_time': self.end_time.strftime('%I:%M %p'),
-            'day_of_week': self.day_of_week_name(),
-            'InSession': self.is_lab_in_session(),
-            'ComingUp': self.is_lab_coming_up(),
-            'DayOfWeek_AsNum': self.day_of_week
-        }
-        return response
 
     def day_of_week_name(self, short_name=False):
         def long(x):
