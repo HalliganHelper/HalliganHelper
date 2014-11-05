@@ -3,66 +3,8 @@ from django.db import IntegrityError
 import pytz
 import datetime as dt
 from django.conf import settings
-from .models import RoomInfo, Server, Computer, CourseUsageInfo
+from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo
 from .models import _now
-
-
-class TestRoomInfo(TestCase):
-    def setUp(self):
-        RoomInfo.objects.create(lab='116a', num_reporting=5,
-                                num_available=10, num_unavailable=20,
-                                num_error=3)
-
-    def test_save_proper(self):
-        room_one = RoomInfo.objects.get(lab='116a')
-        self.assertEqual(room_one.num_reporting, 5)
-        self.assertEqual(room_one.num_available, 10)
-        self.assertEqual(room_one.num_unavailable, 20)
-        self.assertEqual(room_one.num_error, 3)
-
-    def test_updated_time(self):
-        room_one = RoomInfo.objects.get(lab='116a')
-        old_saved_time = room_one.last_updated
-        room_one.save()
-        new_saved_time = room_one.last_updated
-        self.assertLess(old_saved_time, new_saved_time)
-
-    def test_str_repr(self):
-        room_one = RoomInfo.objects.get(lab='116a')
-        format_str = '{5}: {0} has {1} machine(s) reporting: '
-        format_str += '{2} available {3} unavailable and {4} broken'
-
-        msg = format_str.format('116a', 5, 10, 20, 3, room_one.last_updated)
-
-        self.assertEqual(msg, str(room_one))
-
-
-class TestServer(TestCase):
-    def setUp(self):
-        Server.objects.create(name='test_server', num_users=20, status='OFF')
-        Server.objects.create(name='on_server', num_users=20, status='ON')
-        Server.objects.create(name='error_server', num_users=20, status='ERROR')
-
-    def test_save_proper(self):
-        """
-        Make sure that servers are saved as expected.
-        Check the status short name and display name
-        """
-        server = Server.objects.get(name='test_server')
-        self.assertEqual(server.name, 'test_server')
-        self.assertEqual(server.num_users, 20)
-        self.assertEqual(server.status, 'OFF')
-        self.assertEqual(server.get_status_display(), 'Off')
-        server = Server.objects.get(name='on_server')
-        self.assertEqual(server.name, 'on_server')
-        self.assertEqual(server.num_users, 20)
-        self.assertEqual(server.status, 'ON')
-        self.assertEqual(server.get_status_display(), 'On')
-        server = Server.objects.get(name='error_server')
-        self.assertEqual(server.name, 'error_server')
-        self.assertEqual(server.num_users, 20)
-        self.assertEqual(server.status, 'ERROR')
-        self.assertEqual(server.get_status_display(), 'Error')
 
 
 class TestNow(TestCase):
@@ -112,6 +54,36 @@ class TestComputer(TestCase):
         self.assertEqual(str(c.number), repr(c))
 
 
+class TestRoomInfo(TestCase):
+    def setUp(self):
+        RoomInfo.objects.create(lab='116a', num_reporting=5,
+                                num_available=10, num_unavailable=20,
+                                num_error=3)
+
+    def test_save_proper(self):
+        room_one = RoomInfo.objects.get(lab='116a')
+        self.assertEqual(room_one.num_reporting, 5)
+        self.assertEqual(room_one.num_available, 10)
+        self.assertEqual(room_one.num_unavailable, 20)
+        self.assertEqual(room_one.num_error, 3)
+
+    def test_updated_time(self):
+        room_one = RoomInfo.objects.get(lab='116a')
+        old_saved_time = room_one.last_updated
+        room_one.save()
+        new_saved_time = room_one.last_updated
+        self.assertLess(old_saved_time, new_saved_time)
+
+    def test_str_repr(self):
+        room_one = RoomInfo.objects.get(lab='116a')
+        format_str = '{5}: {0} has {1} machine(s) reporting: '
+        format_str += '{2} available {3} unavailable and {4} broken'
+
+        msg = format_str.format('116a', 5, 10, 20, 3, room_one.last_updated)
+
+        self.assertEqual(msg, str(room_one))
+
+
 class TestCUI(TestCase):
     def setUp(self):
         r = RoomInfo.objects.create(lab='116a', num_reporting=5,
@@ -138,3 +110,62 @@ class TestCUI(TestCase):
         msg = format_str.format(c11.course, c11.num_machines, c11.room.lab)
         self.assertEqual(msg, str(c11))
         self.assertEqual(msg, repr(c11))
+
+
+class TestServer(TestCase):
+    def setUp(self):
+        Server.objects.create(name='test_server', num_users=20, status='OFF')
+        Server.objects.create(name='on_server', num_users=20, status='ON')
+        Server.objects.create(name='error_server', num_users=20, status='ERROR')
+
+    def test_save_proper(self):
+        """
+        Make sure that servers are saved as expected.
+        Check the status short name and display name
+        """
+        server = Server.objects.get(name='test_server')
+        self.assertEqual(server.name, 'test_server')
+        self.assertEqual(server.num_users, 20)
+        self.assertEqual(server.status, 'OFF')
+        self.assertEqual(server.get_status_display(), 'Off')
+        server = Server.objects.get(name='on_server')
+        self.assertEqual(server.name, 'on_server')
+        self.assertEqual(server.num_users, 20)
+        self.assertEqual(server.status, 'ON')
+        self.assertEqual(server.get_status_display(), 'On')
+        server = Server.objects.get(name='error_server')
+        self.assertEqual(server.name, 'error_server')
+        self.assertEqual(server.num_users, 20)
+        self.assertEqual(server.status, 'ERROR')
+        self.assertEqual(server.get_status_display(), 'Error')
+
+    def test_no_duplicate_name(self):
+        with self.assertRaises(IntegrityError):
+            Server.objects.create(name='test_server',
+                                  num_users=20, status='OFF')
+
+
+class TestServerInfo(TestCase):
+    def setUp(self):
+        ServerInfo.objects.create(name='dummy_server',
+                                  num_users=20)
+
+    def test_save(self):
+        """
+        Test that the save actually succeeds
+        """
+        s = ServerInfo.objects.get(name='dummy_server')
+        self.assertEqual(s.name, 'dummy_server')
+        self.assertEqual(s.num_users, 20)
+        self.assertNotEqual(s.last_updated, None)
+
+    def test_auto_time_update(self):
+        """
+        Test to make sure that a server's last_updated member is auto-updated
+        at a save
+        """
+        s = ServerInfo.objects.get(name='dummy_server')
+        last_updated = s.last_updated
+        s.save()
+        now_updated = s.last_updated
+        self.assertLess(last_updated, now_updated)
