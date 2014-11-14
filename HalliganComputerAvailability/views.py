@@ -18,11 +18,11 @@ LABS_CACHE_KEY = "LABS_CACHE_KEY"
 def ModularHomePage(request):
     template_params = {}
 
-    rooms = cache.get(ROOMS_CACHE_KEY)
-    if not rooms or rooms:
-        rooms = Computer.objects.values_list('room_number', flat=True)
-        rooms = sorted(list(set(rooms)))
-        cache.set(ROOMS_CACHE_KEY, rooms)
+    room_nums = cache.get(ROOMS_CACHE_KEY)
+    if not room_nums or room_nums:
+        rooms = Computer.objects.distinct('room_number').order_by('room_number')
+        room_nums = rooms.values_list('room_number', flat=True)
+        cache.set(ROOMS_CACHE_KEY, room_nums)
 
     courses = Course.objects.values_list('Number', flat=True)
     course_data = []
@@ -36,7 +36,7 @@ def ModularHomePage(request):
         course_data.append(data)
 
     course_data = sorted(course_data, key=lambda k: k['num'])
-    template_params['rooms'] = rooms
+    template_params['rooms'] = room_nums
     template_params['courses'] = course_data
 
     return render(request, 'logged_in.html', template_params)
