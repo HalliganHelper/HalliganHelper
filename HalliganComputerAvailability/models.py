@@ -1,5 +1,4 @@
 from django.db import models
-from datetime import datetime
 import datetime as dt
 from django.contrib import admin
 import pytz
@@ -152,35 +151,28 @@ class Lab(models.Model):
         """
         # now = dt.datetime.now()
         now = _now()
+        weekday_same = now.weekday() == self.day_of_week
+        time_within = self.start_time <= now.time() <= self.end_time
+        day_within = self.start_date <= now.date() <= self.end_date
 
-        if(self.start_date <= now.date() <= self.end_date
-           and self.start_time <= now.time() <= self.end_time
-           and self.day_of_week == now.weekday()):
+        if weekday_same and time_within and day_within:
             return True
-        print('false!')
-
         return False
 
     def is_lab_coming_up(self, within_hours=3):
         """
-         Returns whether the lab occurs within the next 3 hours
+         Returns whether the lab occurs within the next 'within_hours' hours
         """
 
-        CurrTime = datetime.now().time()
-        CurrDate = datetime.now().date()
-        CurrDay = datetime.now().weekday()
-        delta = dt.timedelta(hours=within_hours)
-        start_time = dt.date(10, 10, 10)
-        combined = datetime.combine(start_time, self.start_time)
+        now = dt.datetime.now()
+        within_hours_delta = dt.timedelta(hours=within_hours)
+        within_datetime = now + within_hours_delta
 
-        ModdedStartTime = (combined - delta).time()
-
-        if(self.start_date < CurrDate < self.end_date
-            and self.day_of_week == CurrDay
-            and self.end_time > CurrTime > ModdedStartTime
-                and not self.is_lab_in_session()):
-
+        weekday_within = within_datetime.weekday() == self.day_of_week
+        date_within = self.start_date <= within_datetime.date() <= self.end_date
+        time_within = self.start_time <= within_datetime.time() <= self.end_time
+        if date_within and time_within and weekday_within:
             return True
-        return False
 
+        return False
 admin.site.register(Lab)

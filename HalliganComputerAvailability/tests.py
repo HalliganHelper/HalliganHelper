@@ -183,12 +183,10 @@ class TestLab(TestCase):
     def setUp(self):
         tz = pytz.timezone(settings.TIME_ZONE)
         now = dt.datetime.now(tz)
-        # now = dt.datetime.now()
         hour_ago = now - dt.timedelta(hours=1)
         hour_from_now = now + dt.timedelta(hours=1)
-        print('Hour ago: {}'.format(hour_ago))
-        print('Hour fro now: {}'.format(hour_from_now))
-        Lab.objects.create(course_name='Test Lab',
+        two_hour_from_now = now + dt.timedelta(hours=2)
+        Lab.objects.create(course_name='In Session Lab',
                            room_number=116,
                            start_time=hour_ago.time(),
                            start_date=hour_ago.date(),
@@ -196,6 +194,18 @@ class TestLab(TestCase):
                            end_date=hour_from_now.date(),
                            day_of_week=now.weekday())
 
+        Lab.objects.create(course_name='Coming Up Lab',
+                           room_number=116,
+                           start_time=hour_from_now.time(),
+                           start_date=hour_from_now.date(),
+                           end_time=two_hour_from_now.time(),
+                           end_date=two_hour_from_now.date(),
+                           day_of_week=hour_from_now.weekday())
+
     def test_in_session(self):
-        lab = Lab.objects.get(course_name='Test Lab')
+        lab = Lab.objects.get(course_name='In Session Lab')
         self.assertTrue(lab.is_lab_in_session())
+
+    def test_coming_up(self):
+        lab = Lab.objects.get(course_name='Coming Up Lab')
+        self.assertTrue(lab.is_lab_coming_up(within_hours=1))
