@@ -150,18 +150,18 @@ class Lab(models.Model):
         """
         Returns whether a lab is currently in session
         """
-        CurrTime = datetime.now().time()
-        CurrDate = datetime.now().date()
-        CurrDay = datetime.now().weekday()
+        # now = dt.datetime.now()
+        now = _now()
 
-        if(self.start_date < CurrDate < self.end_date
-           and self.start_time < CurrTime < self.end_time
-           and self.day_of_week == CurrDay):
+        if(self.start_date <= now.date() <= self.end_date
+           and self.start_time <= now.time() <= self.end_time
+           and self.day_of_week == now.weekday()):
             return True
+        print('false!')
 
         return False
 
-    def is_lab_coming_up(self):
+    def is_lab_coming_up(self, within_hours=3):
         """
          Returns whether the lab occurs within the next 3 hours
         """
@@ -169,7 +169,7 @@ class Lab(models.Model):
         CurrTime = datetime.now().time()
         CurrDate = datetime.now().date()
         CurrDay = datetime.now().weekday()
-        delta = dt.timedelta(hours=3)
+        delta = dt.timedelta(hours=within_hours)
         start_time = dt.date(10, 10, 10)
         combined = datetime.combine(start_time, self.start_time)
 
@@ -181,7 +181,6 @@ class Lab(models.Model):
                 and not self.is_lab_in_session()):
 
             return True
-
         return False
 
 admin.site.register(Lab)

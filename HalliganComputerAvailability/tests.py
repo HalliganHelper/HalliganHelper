@@ -3,7 +3,7 @@ from django.db import IntegrityError
 import pytz
 import datetime as dt
 from django.conf import settings
-from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo
+from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo, Lab
 from .models import _now
 
 
@@ -169,3 +169,33 @@ class TestServerInfo(TestCase):
         s.save()
         now_updated = s.last_updated
         self.assertLess(last_updated, now_updated)
+
+
+class TestLab(TestCase):
+    # course_name = models.CharField(max_length=30)
+    # room_number = models.IntegerField()
+    # start_time = models.TimeField()
+    # end_time = models.TimeField()
+    # start_date = models.DateField()
+    # end_date = models.DateField()
+    # day_of_week = models.IntegerField(max_length=1)
+
+    def setUp(self):
+        tz = pytz.timezone(settings.TIME_ZONE)
+        now = dt.datetime.now(tz)
+        # now = dt.datetime.now()
+        hour_ago = now - dt.timedelta(hours=1)
+        hour_from_now = now + dt.timedelta(hours=1)
+        print('Hour ago: {}'.format(hour_ago))
+        print('Hour fro now: {}'.format(hour_from_now))
+        Lab.objects.create(course_name='Test Lab',
+                           room_number=116,
+                           start_time=hour_ago.time(),
+                           start_date=hour_ago.date(),
+                           end_time=hour_from_now.time(),
+                           end_date=hour_from_now.date(),
+                           day_of_week=now.weekday())
+
+    def test_in_session(self):
+        lab = Lab.objects.get(course_name='Test Lab')
+        self.assertTrue(lab.is_lab_in_session())
