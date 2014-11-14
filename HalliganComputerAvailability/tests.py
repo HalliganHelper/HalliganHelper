@@ -1,8 +1,10 @@
 from django.test import TestCase
 from django.db import IntegrityError
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 import pytz
 import datetime as dt
-from django.conf import settings
 from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo, Lab
 from .models import _now
 
@@ -172,14 +174,6 @@ class TestServerInfo(TestCase):
 
 
 class TestLab(TestCase):
-    # course_name = models.CharField(max_length=30)
-    # room_number = models.IntegerField()
-    # start_time = models.TimeField()
-    # end_time = models.TimeField()
-    # start_date = models.DateField()
-    # end_date = models.DateField()
-    # day_of_week = models.IntegerField(max_length=1)
-
     def setUp(self):
         tz = pytz.timezone(settings.TIME_ZONE)
         now = dt.datetime.now(tz)
@@ -209,3 +203,39 @@ class TestLab(TestCase):
     def BROKEN_test_coming_up(self):
         lab = Lab.objects.get(course_name='Coming Up Lab')
         self.assertTrue(lab.is_lab_coming_up(within_hours=1))
+
+
+class TestHomePage(TestCase):
+    def setUp(self):
+        u = User.objects.create(username='john')
+        u.set_password('pass')
+        u.save()
+        self.client.login(username='john', password='pass')
+        Computer.objects.create(number='116a', room_number=116,
+                                status='OFF')
+        Computer.objects.create(number='118a', room_number=118,
+                                status='In Use', used_for='comp11')
+        Computer.objects.create(number='120a', room_number=120,
+                                status='In Use', used_for='comp11')
+
+    def get_home_page(self):
+        return self.client.get(reverse('ModularHomePage'))
+
+    def test_home_page_redirects_when_not_logged_in(self):
+        self.client.logout()
+        response = self.get_home_page()
+        self.assertEqual(response.status_code, 302)
+
+    def test_home_page_exists_when_logged_in(self):
+        response = self.get_home_page()
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'logged_in.html')
+
+    def test_home_page_has_rooms(self):
+        response = self.get_home_page()
+        self.assertEqual(len(response.context['rooms']), 3)
+
+    def test_home_page_has_sorted_rooms(self):
+        response = self.get_home_page()
+        rooms = response.context['rooms']
+        self.assertEqual(rooms, sorted(rooms))
