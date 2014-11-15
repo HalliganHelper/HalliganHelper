@@ -7,6 +7,7 @@ import pytz
 import datetime as dt
 from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo, Lab
 from .models import _now
+from HalliganTAAvailability.models import Student, Course, Request
 
 
 class TestNow(TestCase):
@@ -206,36 +207,52 @@ class TestLab(TestCase):
 
 
 class TestHomePage(TestCase):
-    def setUp(self):
-        u = User.objects.create(username='john')
-        u.set_password('pass')
-        u.save()
-        self.client.login(username='john', password='pass')
-        Computer.objects.create(number='116a', room_number=116,
-                                status='OFF')
-        Computer.objects.create(number='118a', room_number=118,
-                                status='In Use', used_for='comp11')
-        Computer.objects.create(number='120a', room_number=120,
-                                status='In Use', used_for='comp11')
+    fixtures = ['courses.json', 'computers.json']
 
-    def get_home_page(self):
+    def setUp(self):
+        self.user = User.objects.create_user(username='john', password='pass',
+                                             first_name='john', last_name='doe')
+        self.student = Student.objects.create(usr=self.user)
+        self.client.login(username='john', password='pass')
+
+        Request.objects.create(course=Course.objects.all()[0],
+                               student=self.student,
+                               question='Some Question',
+                               whenAsked=_now(),
+                               whereLocated='Some Place')
+
+    def _get_home_page(self):
         return self.client.get(reverse('ModularHomePage'))
 
     def test_home_page_redirects_when_not_logged_in(self):
         self.client.logout()
-        response = self.get_home_page()
+        response = self._get_home_page()
         self.assertEqual(response.status_code, 302)
 
     def test_home_page_exists_when_logged_in(self):
-        response = self.get_home_page()
+        response = self._get_home_page()
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'logged_in.html')
 
     def test_home_page_has_rooms(self):
-        response = self.get_home_page()
-        self.assertEqual(len(response.context['rooms']), 3)
+        response = self._get_home_page()
+        self.assertNotEqual(response.context['rooms'], [])
 
     def test_home_page_has_sorted_rooms(self):
-        response = self.get_home_page()
+        response = self._get_home_page()
         rooms = response.context['rooms']
-        self.assertEqual(rooms, sorted(rooms))
+        self.assertSequenceEqual(rooms, sorted(rooms), str)
+
+    def test_home_page_has_courses(self):
+        response = self._get_home_page()
+        self.assertNotEqual(response.context['courses'], [])
+
+    def test_home_page_has_sorted_courses(self):
+        response = self._get_home_page()
+        courses = response.context['courses']
+        sorted_courses = sorted(courses, key=lambda k: k['num'])
+        self.assertSequenceEqual(courses, sorted_courses)
+
+
+
+
