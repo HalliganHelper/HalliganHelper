@@ -9,6 +9,8 @@ from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo, Lab
 from .models import _now
 from HalliganTAAvailability.models import Student, Course, Request
 
+from test_api import *
+
 
 class TestNow(TestCase):
     def test_now_func(self):

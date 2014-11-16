@@ -8,47 +8,50 @@ from tastypie.exceptions import Unauthorized
 from HalliganComputerAvailability.models import RoomInfo, CourseUsageInfo
 from HalliganComputerAvailability.models import Lab, Computer, Server
 from HalliganAvailability.authentication import OAuth20Authentication
+from .models import _now
 
 
 class UpdateAuthorization(Authorization):
-    def read_list(self, object_list, bundle):
-        if not bundle.request.user.is_superuser:
+    def _superuser_or_group(self, object_list, bundle):
+        user = bundle.request.user
+        if not user.is_superuser or not user.is_active:
             raise Unauthorized("You are not authorized!")
+
+    def _authenticated_active_user(self, object_list, bundle):
+        user = bundle.request.user
+        if not user.is_authenticated() or not user.is_active:
+            raise Unauthorized("You are not authorized!")
+
+    def read_list(self, object_list, bundle):
+        self._authenticated_active_user(object_list, bundle)
         return object_list
 
     def read_detail(self, object_list, bundle):
-        if not bundle.request.user.is_superuser:
-            raise Unauthorized("You are not authorized!")
+        self._authenticated_active_user(object_list, bundle)
         return True
 
     def create_list(self, object_list, bundle):
-        if not bundle.request.user.is_superuser:
-            raise Unauthorized("You are not authorized!")
+        self._superuser_or_group(object_list, bundle)
         return object_list
 
     def create_detail(self, object_list, bundle):
-        if not bundle.request.user.is_superuser:
-            raise Unauthorized("You are not authorized!")
+        self._superuser_or_group(object_list, bundle)
         return True
 
     def update_list(self, object_list, bundle):
-        if not bundle.request.user.is_superuser:
-            raise Unauthorized("You are not authorized!")
+        self._superuser_or_group(object_list, bundle)
         return object_list
 
     def update_detail(self, object_list, bundle):
-        if not bundle.request.user.is_superuser:
-            raise Unauthorized("You are not authorized!")
+        self._superuser_or_group(object_list, bundle)
         return True
 
     def delete_list(self, object_list, bundle):
-        if not bundle.request.user.is_superuser:
-            raise Unauthorized("You are not authorized!")
+        self._superuser_or_group(object_list, bundle)
         return object_list
 
     def delete_detail(self, object_list, bundle):
-        if not bundle.request.user.is_superuser:
-            raise Unauthorized("You are not authorized!")
+        self._superuser_or_group(object_list, bundle)
         return True
 
 
@@ -62,7 +65,7 @@ class CommonMeta:
 class ComputerUpdateResource(ModelResource):
     class Meta():
         authentication = Authentication()
-        authorization = Authorization() #UpdateAuthorization()
+        authorization = Authorization()  # UpdateAuthorization()
         queryset = Computer.objects.all()
         resource_name = 'computer_update'
         allowed_methods = ['post']
@@ -71,6 +74,7 @@ class ComputerUpdateResource(ModelResource):
 
 class ComputerResource(ModelResource):
     class Meta(CommonMeta):
+        authorization = UpdateAuthorization()
         queryset = Computer.objects.all()
         limit = 0
         filtering = {
@@ -82,7 +86,15 @@ class ComputerResource(ModelResource):
         resource_name = 'computer'
         fields = ['number', 'room_number', 'status', 'used_for',
                   'last_update']
-        allowed_methods = ['get']
+        allowed_methods = ['get', 'put']
+
+    def obj_create(self, bundle, **kwargs):
+        bundle.data['last_update'] = _now()
+        return super(ComputerResource, self).obj_create(bundle, **kwargs)
+
+    def obj_update(self, bundle, **kwargs):
+        bundle.data['last_update'] = _now()
+        return super(ComputerResource, self).obj_update(bundle, **kwargs)
 
 
 class RoomInfoResource(ModelResource):
