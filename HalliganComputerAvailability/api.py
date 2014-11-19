@@ -1,58 +1,12 @@
 from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
-from tastypie.authentication import Authentication
 from tastypie.authorization import DjangoAuthorization
-from tastypie.authorization import Authorization
-from tastypie.exceptions import Unauthorized
 from HalliganComputerAvailability.models import RoomInfo, CourseUsageInfo
 from HalliganComputerAvailability.models import Lab, Computer, Server
 from HalliganAvailability.authentication import OAuth20Authentication
 from .models import _now
-
-
-class UpdateAuthorization(Authorization):
-    def _superuser_or_group(self, object_list, bundle):
-        user = bundle.request.user
-        if not user.is_superuser or not user.is_active:
-            raise Unauthorized("You are not authorized!")
-
-    def _authenticated_active_user(self, object_list, bundle):
-        user = bundle.request.user
-        if not user.is_authenticated() or not user.is_active:
-            raise Unauthorized("You are not authorized!")
-
-    def read_list(self, object_list, bundle):
-        self._authenticated_active_user(object_list, bundle)
-        return object_list
-
-    def read_detail(self, object_list, bundle):
-        self._authenticated_active_user(object_list, bundle)
-        return True
-
-    def create_list(self, object_list, bundle):
-        self._superuser_or_group(object_list, bundle)
-        return object_list
-
-    def create_detail(self, object_list, bundle):
-        self._superuser_or_group(object_list, bundle)
-        return True
-
-    def update_list(self, object_list, bundle):
-        self._superuser_or_group(object_list, bundle)
-        return object_list
-
-    def update_detail(self, object_list, bundle):
-        self._superuser_or_group(object_list, bundle)
-        return True
-
-    def delete_list(self, object_list, bundle):
-        self._superuser_or_group(object_list, bundle)
-        return object_list
-
-    def delete_detail(self, object_list, bundle):
-        self._superuser_or_group(object_list, bundle)
-        return True
+from .authorizations import AdminWriteAuthorization
 
 
 class CommonMeta:
@@ -62,19 +16,9 @@ class CommonMeta:
     limit = 0
 
 
-class ComputerUpdateResource(ModelResource):
-    class Meta():
-        authentication = Authentication()
-        authorization = Authorization()  # UpdateAuthorization()
-        queryset = Computer.objects.all()
-        resource_name = 'computer_update'
-        allowed_methods = ['post']
-        fields = ['number', 'room_number', 'status', 'used_for']
-
-
 class ComputerResource(ModelResource):
     class Meta(CommonMeta):
-        authorization = UpdateAuthorization()
+        authorization = AdminWriteAuthorization()
         queryset = Computer.objects.all()
         limit = 0
         filtering = {
@@ -86,7 +30,7 @@ class ComputerResource(ModelResource):
         resource_name = 'computer'
         fields = ['number', 'room_number', 'status', 'used_for',
                   'last_update']
-        allowed_methods = ['get', 'put']
+        allowed_methods = ['get', 'post', 'put']
 
     def obj_create(self, bundle, **kwargs):
         bundle.data['last_update'] = _now()

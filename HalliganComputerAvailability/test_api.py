@@ -37,9 +37,17 @@ class ComputerResourceSessionTest(ResourceTestCase):
             'used_for': 'comp11'
         }
 
+        self.post_data = {
+            'number': '117A',
+            'room_number': 117,
+            'status': 'OFF',
+            'used_for': 'comp11'
+        }
+
         put_url = '/api/v2/computer/{0}/'
         self.put_new_url = put_url.format(self.put_new_data['number'])
         self.put_exists_url = put_url.format(self.put_exists_data['number'])
+        self.post_url = '/api/v2/computer/'
 
     def _setup_basic_session(self):
         self.api_client.client.login(username=self.basic_username,
@@ -65,8 +73,8 @@ class ComputerResourceSessionTest(ResourceTestCase):
         return response
 
     def _post_data(self):
-        response = self.api_client.post(self.put_exists_url,
-                                        data=self.put_exists_data,
+        response = self.api_client.post(self.post_url,
+                                        data=self.post_data,
                                         format='json')
         return response
 
@@ -150,14 +158,31 @@ class ComputerResourceSessionTest(ResourceTestCase):
     def test_post_fails_unauthorized(self):
         self._break_session()
         response = self._post_data()
-        self.assertHttpMethodNotAllowed(response)
+        self.assertHttpUnauthorized(response)
 
     def test_post_fails_basic_user(self):
         self._setup_basic_session()
         response = self._post_data()
-        self.assertHttpMethodNotAllowed(response)
+        self.assertHttpUnauthorized(response)
 
-    def test_post_fails_super_user(self):
+    def test_post_creates_super_user(self):
         self._setup_super_session()
         response = self._post_data()
-        self.assertHttpMethodNotAllowed(response)
+        self.assertHttpCreated(response)
+
+    def test_post_updates_super_user(self):
+        """Test that multiple posts just updates a machine:
+            Post once.
+            Immediately post again.
+            assert created, then assert count is 1
+
+        """
+        self._setup_super_session()
+        response = self._post_data()
+        # Did first post work?
+        self.assertHttpCreated(response)
+        response = self._post_data()
+        # Did second post work?
+        self.assertHttpCreated(response)
+        count = Computer.objects.filter(number=self.post_data['number']).count()
+        self.assertEquals(count, 1)
