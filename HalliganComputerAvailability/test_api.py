@@ -1,13 +1,13 @@
 from django.contrib.auth.models import User
 from tastypie.test import ResourceTestCase
+from provider.oauth2.models import Client, AccessToken
 from .models import Computer
 
 
-class ComputerResourceSessionTest(ResourceTestCase):
+class ComputerResourceTestData(object):
     fixtures = ['computers.json']
 
-    def setUp(self):
-        super(ComputerResourceSessionTest, self).setUp()
+    def create_vars(self):
         self.basic_username = 'john'
         self.password = 'pass'
         self.super_username = 'super'
@@ -48,6 +48,14 @@ class ComputerResourceSessionTest(ResourceTestCase):
         self.put_new_url = put_url.format(self.put_new_data['number'])
         self.put_exists_url = put_url.format(self.put_exists_data['number'])
         self.post_url = '/api/v2/computer/'
+
+
+class ComputerResourceSessionTest(ResourceTestCase, ComputerResourceTestData):
+    fixtures = ['computers.json']
+
+    def setUp(self):
+        super(ComputerResourceSessionTest, self).setUp()
+        self.create_vars()
 
     def _setup_basic_session(self):
         self.api_client.client.login(username=self.basic_username,
@@ -186,3 +194,29 @@ class ComputerResourceSessionTest(ResourceTestCase):
         self.assertHttpCreated(response)
         count = Computer.objects.filter(number=self.post_data['number']).count()
         self.assertEquals(count, 1)
+
+
+class ComputerResourceTokenTest(ResourceTestCase, ComputerResourceTestData):
+    fixtures = ['computers.json']
+
+    def setUp(self):
+        super(ComputerResourceTokenTest, self).setUp()
+        self.create_vars()
+
+        self.c = Client(user=self.super_user, name="test client",
+                        client_type=1, url='https://www.example.com')
+        self.c.save()
+        self.client_id = self.c.client_id
+        self.client_secret = self.c.client_secret
+
+        self.access_token = AccessToken(user=self.super_user,
+                                        client=self.c)
+        self.access_token.save()
+        header_str = "OAuth {}"
+        self.authorization_header = header_str.format(self.access_token.token)
+
+    def test_can_get_list_token_access(self):
+        response = self.client.get(path='/api/v2/computer/',
+                                   HTTP_AUTHORIZATION=self.authorization_header)
+        self.assertValidJSONResponse(response)
+        self.assertHttpOK(response)
