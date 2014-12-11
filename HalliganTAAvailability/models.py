@@ -64,7 +64,9 @@ class RequestDisplayManager(models.Manager):
         three_hours = datetime.timedelta(hours=5)
         now = _now()
         now -= three_hours
-        return self.get_query_set().filter(whenAsked__gte=now, cancelled=False, solved=False)
+        return self.get_query_set().filter(whenAsked__gte=now,
+                                           cancelled=False,
+                                           solved=False)
 
 
 class Request(models.Model):

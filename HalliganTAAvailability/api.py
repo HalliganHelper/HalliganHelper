@@ -12,6 +12,7 @@ from django.conf.urls import url
 from tastypie.authorization import DjangoAuthorization
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
+from .authorization import NoEditAuthorization
 from .models import Course, TA, OfficeHour
 from .models import Request, Student
 from HalliganAvailability.authentication import OAuth20Authentication
@@ -32,12 +33,9 @@ class CommonMeta(object):
 
 
 class CourseResource(ModelResource):
-    tas = fields.ToManyField('HalliganTAAvailability.api.TAResource',
-                             'ta_set',
-                             full=True)
-
-    class Meta:
+    class Meta(CommonMeta):
         queryset = Course.objects.all()
+        authorization = NoEditAuthorization()
         filtering = {
             'Name': ['exact', 'iexact', 'startswith', ],
             'Number': ['exact', 'lte', 'lt', 'gte', 'gt', ],
@@ -46,7 +44,6 @@ class CourseResource(ModelResource):
         resource_name = 'course'
         fields = ['Name', 'Number', 'Professor', 'students']
         allowed_methods = ['get']
-        authorization = DjangoAuthorization()
 
 
 class TAResource(ModelResource):
@@ -69,7 +66,7 @@ class TAResource(ModelResource):
 
 class OfficeHourResource(ModelResource):
     ta = fields.ForeignKey(TAResource, 'ta', full=True)
-    course = fields.ForeignKey(CourseResource, 'course', full=True)
+    # course = fields.ForeignKey(CourseResource, 'course', full=True)
 
     class Meta(CommonMeta):
         queryset = OfficeHour.objects.all()
@@ -85,20 +82,19 @@ class OfficeHourResource(ModelResource):
     def get_object_list(self, request):
         now = _now()
 
-        return super(OfficeHourResource, self)\
+        things = super(OfficeHourResource, self)\
             .get_object_list(request)\
-            .filter(start_time__lte=now)\
-            .filter(end_time__gte=now)
+            .filter(start_time__lte=now, end_time__gte=now)
+
+        print(things)
+        return things
 
     def alter_list_data_to_serialize(self, request, data):
         try:
             data['meta']['ta'] = request.user.ta.active
         except Exception:
             data['meta']['ta'] = False
-        return data
-
-    def dehydrate(self, bundle):
-        return bundle
+            return data
 
     def prepend_urls(self):
         return [
@@ -153,7 +149,7 @@ class OfficeHourResource(ModelResource):
         oh.save()
         response = self.create_response(request, {
             'success': True,
-            })
+        })
 
         # cancel_hours.apply_async(args=[oh.pk, course.Number], countdown=2)
         from .views import QueueNamespace
@@ -195,27 +191,35 @@ class RequestResource(ModelResource):
     course = fields.ForeignKey(CourseResource, 'course', full=True)
 
     class Meta(CommonMeta):
+        limit = 100
         three_hours = datetime.timedelta(hours=5)
         now = _now()
         now -= three_hours
-        queryset = Request.objects.all().filter(whenAsked__gte=now,
-                                                cancelled=False,
-                                                solved=False)
+        queryset = Request.objects.all()
+        # queryset = Request.objects.all().filter(whenAsked__gte=now,
+        #                                         cancelled=False,
+        #                                         solved=False)
 
         resource_name = 'request'
         fields = ['question', 'whenAsked', 'whereLocated', 'id', 'checked_out']
         allowed_methods = ['get', 'post', 'put']
+        ordering = ['whenAsked']
         filtering = {
             'course': ALL_WITH_RELATIONS
         }
 
     def get_object_list(self, request):
-        three_hours = datetime.timedelta(hours=5)
-        now = _now()
-        now -= three_hours
-        return super(RequestResource, self).get_object_list(request).filter(whenAsked__gte=now,
-                                                                            cancelled=False,
-                                                                            solved=False)
+        get_all = request.GET.get('get_all', False)
+        if get_all:
+            return super(RequestResource, self).get_object_list(request)
+        else:
+            three_hours = datetime.timedelta(hours=5)
+            now = _now()
+            now -= three_hours
+            return super(RequestResource, self) \
+                .get_object_list(request).filter(whenAsked__gte=now,
+                                                 cancelled=False,
+                                                 solved=False)
 
     def dehydrate(self, bundle):
         is_superuser = bundle.request.user.is_superuser
@@ -335,7 +339,7 @@ class RequestResource(ModelResource):
                 return self.create_response(request, {
                     'success': False,
                 }, HttpUnauthorized)
-                ta_solver = None
+            ta_solver = None
             this_rq.who_solved = ta_solver
             this_rq.whenSolved = _now()
             this_rq.solved = True
@@ -451,11 +455,11 @@ class RequestResource(ModelResource):
                 is_ta = request.user.ta.active
             except TA.DoesNotExist:
                 is_ta = False
-            if not is_ta:
-                return self.create_response(request, {
-                    'success': False,
-                    'reason': 'Not a TA'
-                }, HttpUnauthorized)
+                if not is_ta:
+                    return self.create_response(request, {
+                        'success': False,
+                        'reason': 'Not a TA'
+                    }, HttpUnauthorized)
             this_rq.checked_out = True
             this_rq.save()
             from .views import QueueNamespace, AnnouncementNamespace
