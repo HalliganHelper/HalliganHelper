@@ -41,6 +41,12 @@ class TAAdmin(admin.ModelAdmin):
     headshot = AdminThumbnail(image_field='headshot')
 
 
+class TAManager(models.Manager):
+    def active(self):
+        qs = super(TAManager, self).get_query_set()
+        return qs.filter(active=True)
+
+
 class TA(models.Model):
     usr = models.OneToOneField(User)
     course = models.ManyToManyField(Course)
@@ -48,6 +54,8 @@ class TA(models.Model):
     headshot = models.ImageField(upload_to='headshots',
                                  default='headshots/None/ming.jpg')
     has_updated_headshot = models.BooleanField(default=False)
+
+    objects = TAManager()
 
     def __str__(self):
         return "{0}: {1}".format(self.usr, self.usr.get_full_name())

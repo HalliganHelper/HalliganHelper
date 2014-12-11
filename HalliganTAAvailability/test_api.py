@@ -1,10 +1,10 @@
-from django.test import TestCase
 from django.contrib.auth.models import User
 from tastypie.test import ResourceTestCase
 from provider.oauth2.models import Client, AccessToken
-from .models import Course
+from .models import Course, TA
 
-class CourseResourceTestData(object):
+
+class BasicTestData(object):
     def set_vars(self):
         self.basic_username = 'john'
         self.super_username = 'super'
@@ -18,10 +18,6 @@ class CourseResourceTestData(object):
                                                         'john@example.com',
                                                         self.password)
 
-        self.get_url = '/api/v2/course/'
-        self.get_single_url = '/api/v2/course/{}/'
-        self.authorization_header = ''
-
     def _setup_basic_session(self):
         self.api_client.client.login(username=self.basic_username,
                                      password=self.password)
@@ -30,8 +26,17 @@ class CourseResourceTestData(object):
         self.api_client.client.logout()
 
 
+class CourseResourceTestData(BasicTestData):
+    def set_vars(self):
+        super(CourseResourceTestData, self).set_vars()
+        self.get_url = '/api/v2/course/'
+        self.get_single_url = '/api/v2/course/{}/'
+        self.authorization_header = ''
+
+
 class CourseResourceSessionTest(CourseResourceTestData, ResourceTestCase):
     fixtures = ['courses.json']
+
     def setUp(self):
         super(CourseResourceSessionTest, self).setUp()
         self.set_vars()
@@ -105,7 +110,9 @@ class CourseResourceSessionTest(CourseResourceTestData, ResourceTestCase):
 
 
 class CourseResourceTokenTest(CourseResourceTestData, ResourceTestCase):
+
     fixtures = ['courses.json']
+
     def setUp(self):
         super(CourseResourceTokenTest, self).setUp()
         self.set_vars()
@@ -198,3 +205,53 @@ class CourseResourceTokenTest(CourseResourceTestData, ResourceTestCase):
                                          data={},
                                          HTTP_AUTHORIZATION=self.auth_header)
         self.assertHttpMethodNotAllowed(response)
+
+
+class TAResourceTestData(BasicTestData):
+    def set_vars(self):
+        super(TAResourceTestData, self).set_vars()
+        self.get_url = '/api/v2/ta/'
+        self.get_single_url = '/api/v2/ta/{}/'
+        self.authorization_header = ''
+        self.ta = TA(usr=self.user)
+        self.ta.save()
+        self.deactive_ta = TA(usr=self.super_user, active=False)
+        self.deactive_ta.save()
+
+
+class TAResourceSessionTest(TAResourceTestData, ResourceTestCase):
+    def setUp(self):
+        super(TAResourceTestData, self).setUp()
+        self.set_vars()
+
+    def test_get_active_tas_unauthorized(self):
+        self._break_session()
+        self.assertHttpUnauthorized(self.api_client.get(self.get_url,
+                                                        format='json'))
+
+    def test_get_active_tas_basic_user(self):
+        self._setup_basic_session()
+        response = self.api_client.get(self.get_url,
+                                       format='json')
+        self.assertHttpOK(response)
+        self.assertValidJSONResponse(response)
+
+        clean_response = self.deserialize(response)
+        objects = clean_response['objects']
+        self.assertEquals(len(objects), 1)
+
+    def test_get_single_ta_unauthorized(self):
+        self._break_session()
+        response = self.api_client.get(self.get_single_url.format(self.ta.pk),
+                                       format='json')
+        self.assertHttpUnauthorized(response)
+
+    def test_get_single_ta_basic_user(self):
+        self._setup_basic_session()
+        response = self.api_client.get(self.get_single_url.format(self.ta.pk),
+                                       format='json')
+        self.assertHttpOK(response)
+        self.assertValidJSONResponse(response)
+
+        ta = self.deserialize(response)
+        self.assertKeys(ta, ['headshot', 'full_name', 'resource_uri'])
