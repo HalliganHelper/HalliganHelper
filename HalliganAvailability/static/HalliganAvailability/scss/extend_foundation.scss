@@ -302,3 +302,18 @@ span.float-right {
         -webkit-transform: scaleY(1.0);
     }
 }
+
+/* D3 Stuff */
+path { 
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}

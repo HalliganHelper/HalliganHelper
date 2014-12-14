@@ -1,7 +1,14 @@
 from django.contrib.auth.models import User
+from django.conf import settings
 from tastypie.test import ResourceTestCase
 from provider.oauth2.models import Client, AccessToken
-from .models import Course, TA
+import datetime
+import pytz
+from .models import Course, TA, Request, Student
+
+def _now():
+    now = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
+    return now
 
 
 class BasicTestData(object):
@@ -18,6 +25,9 @@ class BasicTestData(object):
                                                         'john@example.com',
                                                         self.password)
 
+    def _setup_super_session(self):
+        self.api_client.client.login(username=self.super_username,
+                                     password=self.password)
     def _setup_basic_session(self):
         self.api_client.client.login(username=self.basic_username,
                                      password=self.password)
@@ -255,3 +265,120 @@ class TAResourceSessionTest(TAResourceTestData, ResourceTestCase):
 
         ta = self.deserialize(response)
         self.assertKeys(ta, ['headshot', 'full_name', 'resource_uri'])
+        self.assertEqual(ta['headshot'].split('/')[-1],
+                         str(self.ta.headshot).split('/')[-1])
+
+        self.assertEqual(ta['full_name'], self.ta.usr.get_full_name())
+
+
+class RequestResourceTestData(BasicTestData):
+    def set_vars(self):
+        super(RequestResourceTestData, self).set_vars()
+        self.get_url = '/api/v2/request/'
+        self.single_url = '/api/v2/request/{}/'
+        self.authorization_header = ''
+        self.ta = TA.objects.create(usr=self.super_user)
+
+
+class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
+    fixtures = ['courses.json']
+    def setUp(self):
+        super(RequestResourceSessionTest, self).setUp()
+        self.set_vars()
+        self.s = Student.objects.create(usr=self.user)
+        self.second_user = User.objects.create_user('user_two',
+                                                    'jim@jim.com',
+                                                    'password')
+        self.s2 = Student.objects.create(usr=self.second_user)
+        self.request = Request.objects.create(course=Course.objects.all()[0],
+                                              student=self.s,
+                                              question='Dummy Question',
+                                              whereLocated='Dummy Location')
+
+    def test_get_all_requests_unauthenticated(self):
+        self._break_session()
+        self.assertHttpUnauthorized(self.api_client.get(self.get_url,
+                                                        format='json'))
+
+    def test_get_all_requests_basic_user(self):
+        self._setup_basic_session()
+        response = self.api_client.get(self.get_url,
+                                       format='json')
+        self.assertHttpOK(response)
+        self.assertValidJSONResponse(response)
+        data = self.deserialize(response)
+        self.assertEqual(len(data['objects']), Request.objects.all().count())
+
+    def test_unauthorized_cant_change(self):
+        self._break_session()
+        url = self.single_url.format(self.request.pk)
+        new_data = {'question': 'new question'}
+        response = self.api_client.patch(url, format='json',
+                                         data=new_data)
+        self.assertHttpUnauthorized(response)
+
+    def test_non_owner_can_not_update(self):
+        self._break_session()
+        self.api_client.client.login(username='user_two',
+                                     password='password')
+
+        url = self.single_url.format(self.request.pk)
+        new_data = {'question': 'should not happen'}
+        response = self.api_client.patch(url, format='json',
+                                         data=new_data)
+        self.assertHttpUnauthorized(response)
+        request = Request.objects.get(pk=self.request.pk)
+        self.assertNotEqual(request, new_data['question'])
+
+    def test_owner_can_update(self):
+        person = User.objects.create_user('kate',
+                                          'kate@kate.com',
+                                          'thisismypassword')
+        s = Student.objects.create(usr=person)
+        request = Request.objects.create(course=Course.objects.all()[0],
+                                         student=s,
+                                         question='q',
+                                         whereLocated='w')
+        self.api_client.client.login(username='kate',
+                                     password='thisismypassword')
+
+        url = self.single_url.format(request.pk)
+        new_data = {'question': 'new question'}
+        response = self.api_client.patch(url, format='json',
+                                         data=new_data)
+        print(response.status_code)
+        self.assertHttpAccepted(response)
+
+        modded_request = Request.objects.get(pk=request.pk)
+        self.assertEqual(modded_request, request)
+        self.assertEqual(modded_request.question, 'new question')
+
+    def test_ta_can_resolve(self):
+        self._setup_super_session()
+        url = self.single_url.format(self.request.pk)
+        new_data = {'solved': True}
+        response = self.api_client.patch(url, format='json',
+                                         data=new_data)
+        self.assertHttpAccepted(response)
+
+        modded_request = Request.objects.get(pk=self.request.pk)
+        self.assertEqual(modded_request, self.request)
+        self.assertEqual(modded_request.solved, True)
+        # self.assertAlmostEqual(modded_request.whenSolved,
+        #                        _now(),
+        #                        delta=datetime.timedelta(seconds=30))
+
+    def test_owner_can_not_resolve(self):
+        self._setup_basic_session()
+        request = Request.objects.create(course=Course.objects.all()[0],
+                                              student=self.s,
+                                              question='Dummy Question',
+                                              whereLocated='Dummy Location')
+
+        url = self.single_url.format(request.pk)
+        new_data = {'solved': True}
+        response = self.api_client.patch(url, format='json',
+                                         data=new_data)
+        self.assertHttpUnauthorized(response)
+        modded_request = Request.objects.get(pk=request.pk)
+        self.assertNotEqual(modded_request.solved, True)

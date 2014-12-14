@@ -12,10 +12,10 @@ from provider.oauth2.models import AccessToken
 """
 This is a simple OAuth 2.0 authentication model for tastypie
 
-Copied nearly verbatim from amrox's example 
+Copied nearly verbatim from amrox's example
  - https://github.com/amrox/django-tastypie-two-legged-oauth
 
-Dependencies: 
+Dependencies:
  - django-oauth2-provider: https://github.com/caffeinehit/django-oauth2-provider
 
 Example:
@@ -31,7 +31,7 @@ class OAuthError(RuntimeError):
 
 class OAuth20Authentication(Authentication):
     """
-    OAuth authenticator. 
+    OAuth authenticator.
 
     This Authentication method checks for a provided HTTP_AUTHORIZATION
     and looks up to see if this is a valid OAuth Access Token
@@ -56,7 +56,7 @@ class OAuth20Authentication(Authentication):
                 if auth_header_value:
                     key = auth_header_value.split(' ')[1]
             if not key:
-                logging.error('OAuth20Authentication. No consumer_key found.')
+                # logging.error('OAuth20Authentication. No consumer_key found.')
                 return None
             """
             If verify_access_token() does not pass, it will raise an error

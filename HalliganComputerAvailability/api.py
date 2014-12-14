@@ -20,7 +20,7 @@ class ComputerResource(ModelResource):
     class Meta(CommonMeta):
         authorization = AdminWriteAuthorization()
         queryset = Computer.objects.all()
-        limit = 0
+        limit = 100
         filtering = {
             'number': ['exact', ],
             'room_number': ['exact', ],
@@ -57,6 +57,7 @@ class RoomInfoResource(ModelResource):
                   'num_error', 'last_updated']
         allowed_methods = ['get']
         limit = 100
+        ordering = ['last_updated']
 
 
 class CourseUsageInfoResource(ModelResource):

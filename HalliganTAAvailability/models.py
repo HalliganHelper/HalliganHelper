@@ -37,7 +37,13 @@ admin.site.register(Course)
 
 
 class TAAdmin(admin.ModelAdmin):
-    list_display = ['usr', 'active', 'headshot']
+    def list_courses(obj):
+        courses = map(str, obj.course.all().values_list('Number', flat=True))
+        return ', '.join(courses)
+
+    list_courses.short_description = 'Courses'
+
+    list_display = ['__str__', 'active', list_courses, 'headshot']
     headshot = AdminThumbnail(image_field='headshot')
 
 
@@ -48,17 +54,24 @@ class TAManager(models.Manager):
 
 
 class TA(models.Model):
+    class Meta:
+        verbose_name = "Teacher's Assistant"
+        verbose_name_plural = "Teacher's Assistants"
+    default_image = 'headshots/None/ming.jpg'
     usr = models.OneToOneField(User)
     course = models.ManyToManyField(Course)
     active = models.BooleanField(default=True)
     headshot = models.ImageField(upload_to='headshots',
-                                 default='headshots/None/ming.jpg')
+                                 default=default_image)
     has_updated_headshot = models.BooleanField(default=False)
 
     objects = TAManager()
 
     def __str__(self):
-        return "{0}: {1}".format(self.usr, self.usr.get_full_name())
+        return self.usr.get_full_name()
+
+    def __repr__(self):
+        return self.__str__()
 
 admin.site.register(TA, TAAdmin)
 
@@ -80,17 +93,19 @@ class RequestDisplayManager(models.Manager):
 class Request(models.Model):
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
+
     question = models.CharField(max_length=51)
     whenAsked = models.DateTimeField()
     whereLocated = models.CharField(max_length=50)
+    cancelled = models.BooleanField(default=False, blank=True)
+    emailed = models.BooleanField(default=False)
+
     solved = models.BooleanField(default=False)
     whenSolved = models.DateTimeField(blank=True, null=True)
-    timedOut = models.BooleanField(default=False)
-    emailed = models.BooleanField(default=False)
     who_solved = models.ForeignKey(TA, null=True, blank=True)
     checked_out = models.BooleanField(default=False)
-    cancelled = models.BooleanField(default=False, blank=True)
 
+    timedOut = models.BooleanField(default=False)
     objects = RequestDisplayManager()
 
     def save(self, *args, **kwargs):
