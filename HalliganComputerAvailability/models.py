@@ -1,14 +1,7 @@
 from django.db import models
 import datetime as dt
 from django.contrib import admin
-import pytz
-from django.conf import settings
-
-
-def _now():
-    tz = pytz.timezone(settings.TIME_ZONE)
-    now = dt.datetime.now(tz=tz)
-    return now
+from django.utils.timezone import now
 
 
 class Computer(models.Model):
@@ -53,7 +46,7 @@ class RoomInfo(models.Model):
     last_updated = models.DateTimeField()
 
     def save(self, *args, **kwargs):
-        self.last_updated = _now()
+        self.last_updated = now()
         return super(RoomInfo, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -150,10 +143,10 @@ class Lab(models.Model):
         Returns whether a lab is currently in session
         """
         # now = dt.datetime.now()
-        now = _now()
-        weekday_same = now.weekday() == self.day_of_week
-        time_within = self.start_time <= now.time() <= self.end_time
-        day_within = self.start_date <= now.date() <= self.end_date
+        _now = now()
+        weekday_same = _now.weekday() == self.day_of_week
+        time_within = self.start_time <= _now.time() <= self.end_time
+        day_within = self.start_date <= _now.date() <= self.end_date
 
         if weekday_same and time_within and day_within:
             return True
@@ -164,9 +157,9 @@ class Lab(models.Model):
          Returns whether the lab occurs within the next 'within_hours' hours
         """
 
-        now = dt.datetime.now()
+        _now = now()
         within_hours_delta = dt.timedelta(hours=within_hours)
-        within_datetime = now + within_hours_delta
+        within_datetime = _now + within_hours_delta
 
         weekday_within = within_datetime.weekday() == self.day_of_week
         date_within = self.start_date <= within_datetime.date() <= self.end_date

@@ -1,26 +1,13 @@
 from django.test import TestCase
 from django.db import IntegrityError
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-import pytz
+from django.utils.timezone import now
 import datetime as dt
-from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo, Lab
-from .models import _now
+from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo
 from HalliganTAAvailability.models import Student, Course, Request
 
 from test_api import *
-
-
-class TestNow(TestCase):
-    def test_now_func(self):
-        """
-        Test that the _now function creates a time for the given timezone.
-        Allow for a 1 minute delta.
-        """
-        tz = pytz.timezone(settings.TIME_ZONE)
-        now = dt.datetime.now(tz=tz)
-        self.assertAlmostEqual(now, _now(), delta=dt.timedelta(minutes=1))
 
 
 class TestComputer(TestCase):
@@ -178,18 +165,17 @@ class TestServerInfo(TestCase):
 
 class TestLab(TestCase):
     def setUp(self):
-        tz = pytz.timezone(settings.TIME_ZONE)
-        now = dt.datetime.now(tz)
-        hour_ago = now - dt.timedelta(hours=1)
-        hour_from_now = now + dt.timedelta(hours=1)
-        two_hour_from_now = now + dt.timedelta(hours=2)
+        _now = now()
+        hour_ago = _now - dt.timedelta(hours=1)
+        hour_from_now = _now + dt.timedelta(hours=1)
+        two_hour_from_now = _now + dt.timedelta(hours=2)
         Lab.objects.create(course_name='In Session Lab',
                            room_number=116,
                            start_time=hour_ago.time(),
                            start_date=hour_ago.date(),
                            end_time=hour_from_now.time(),
                            end_date=hour_from_now.date(),
-                           day_of_week=now.weekday())
+                           day_of_week=_now.weekday())
 
         Lab.objects.create(course_name='Coming Up Lab',
                            room_number=116,
@@ -220,7 +206,7 @@ class TestHomePage(TestCase):
         Request.objects.create(course=Course.objects.all()[0],
                                student=self.student,
                                question='Some Question',
-                               whenAsked=_now(),
+                               whenAsked=now(),
                                whereLocated='Some Place')
 
     def _get_home_page(self):
@@ -254,7 +240,3 @@ class TestHomePage(TestCase):
         courses = response.context['courses']
         sorted_courses = sorted(courses, key=lambda k: k['num'])
         self.assertSequenceEqual(courses, sorted_courses)
-
-
-
-

@@ -5,7 +5,7 @@ from tastypie.authorization import DjangoAuthorization
 from HalliganComputerAvailability.models import RoomInfo, CourseUsageInfo
 from HalliganComputerAvailability.models import Lab, Computer, Server
 from HalliganAvailability.authentication import OAuth20Authentication
-from .models import _now
+from django.utils.timezone import now
 from .authorizations import AdminWriteAuthorization
 
 
@@ -33,11 +33,11 @@ class ComputerResource(ModelResource):
         allowed_methods = ['get', 'post', 'put']
 
     def obj_create(self, bundle, **kwargs):
-        bundle.data['last_update'] = _now()
+        bundle.data['last_update'] = now()
         return super(ComputerResource, self).obj_create(bundle, **kwargs)
 
     def obj_update(self, bundle, **kwargs):
-        bundle.data['last_update'] = _now()
+        bundle.data['last_update'] = now()
         return super(ComputerResource, self).obj_update(bundle, **kwargs)
 
 
