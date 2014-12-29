@@ -1,13 +1,10 @@
 from django.contrib.auth.models import User
-from django.utils.html import escape, strip_tags
+from django.utils.timezone import now
 # from tastypie import fields
 from tastypie.http import HttpBadRequest, HttpUnauthorized
-import pytz
 import logging
-import datetime
-from django.conf import settings
-from tastypie.authorization import DjangoAuthorization
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
+from tastypie.authorization import DjangoAuthorization
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
 from .authorization import NoEditAuthorization, RequestAuthorization
 from .models import Course, TA, OfficeHour, Request
@@ -15,11 +12,6 @@ from .models import Course, TA, OfficeHour, Request
 from HalliganAvailability.authentication import OAuth20Authentication
 # from .tasks import cancel_hours
 logger = logging.getLogger('api')
-
-
-def _now():
-    now = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
-    return now
 
 
 class CommonMeta(object):
@@ -105,14 +97,6 @@ class RequestResource(ModelResource):
         if (not is_ta) or (is_ta and not changes_allowed):
             return False
         return True
-
-    # def obj_update(self, bundle, **kwargs):
-    #     if bundle.data['solved'] and bundle.data['whenSolved'] is None:
-    #         #TODO: Actual do things
-    #         pass
-    #         # bundle.data['whenAsked'] = _now()
-    #         # bundle.data['who_solved'] = bundle.request.user.ta
-    #     return super(RequestResource, self).obj_update(bundle, **kwargs)
 
     def patch_detail(self, request, **kwargs):
         data = self.deserialize(request,

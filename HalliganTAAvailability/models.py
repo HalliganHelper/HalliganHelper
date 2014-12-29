@@ -1,17 +1,13 @@
 from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User
+from django.utils.timezone import now
 import datetime
 import pytz
 from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFit
 from imagekit.admin import AdminThumbnail
 from HalliganAvailability import settings
-
-
-def _now():
-    now = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
-    return now
 
 
 class Student(models.Model):
@@ -83,9 +79,7 @@ class RequestDisplayManager(models.Manager):
 
     def still_open(self):
         three_hours = datetime.timedelta(hours=5)
-        now = _now()
-        now -= three_hours
-        return self.get_query_set().filter(whenAsked__gte=now,
+        return self.get_query_set().filter(whenAsked__gte=now() - three_hours,
                                            cancelled=False,
                                            solved=False)
 
@@ -109,9 +103,8 @@ class Request(models.Model):
     objects = RequestDisplayManager()
 
     def save(self, *args, **kwargs):
-        est = pytz.timezone('US/Eastern')
         if self.pk is None:
-            self.whenAsked = datetime.datetime.now(est)
+            self.whenAsked = now()
         super(Request, self).save(*args, **kwargs)
 
     def timeOut(self):
@@ -132,9 +125,8 @@ admin.site.register(Request)
 
 class OfficeHourManager(models.Manager):
     def on_duty(self):
-        now = _now()
         qs = self.get_query_set()
-        return qs.filter(start_time__lte=now).filter(end_time__gte=now)
+        return qs.filter(start_time__lte=now()).filter(end_time__gte=now())
 
 
 class OfficeHour(models.Model):

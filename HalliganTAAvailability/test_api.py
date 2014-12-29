@@ -6,10 +6,6 @@ import datetime
 import pytz
 from .models import Course, TA, Request, Student
 
-def _now():
-    now = datetime.datetime.now(pytz.timezone(settings.TIME_ZONE))
-    return now
-
 
 class BasicTestData(object):
     def set_vars(self):
