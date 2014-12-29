@@ -1,77 +1,81 @@
 __author__ = 'tyler'
-from django.core.management.base import BaseCommand
-import urllib2
+from django.core.management.base import BaseCommand, CommandError
+import requests
 import csv
-import StringIO
 import datetime
+from dateutil.parser import parse as date_parser
 from HalliganComputerAvailability.models import Lab
-from django.core.cache import cache
 
 
 class Command(BaseCommand):
     args = 'none'
     help = 'Add semesters labs from Bruce Molay\'s online log'
 
+    update_url = 'http://www.cs.tufts.edu/~molay/labs/times.cgi'
+
+    time_ranges = {
+        '8:30-10:20': (datetime.time(8, 30), datetime.time(10, 20)),
+        '10:30-11:45': (datetime.time(10, 30), datetime.time(11, 45)),
+        '12:00-1:15': (datetime.time(12, 00), datetime.time(13, 15)),
+        '1:30-2:45': (datetime.time(13, 30), datetime.time(14, 45)),
+        '3:00-4:15': (datetime.time(15, 00), datetime.time(16, 15)),
+        '4:30-5:45': (datetime.time(16, 30), datetime.time(17, 45)),
+        '6:00-7:15': (datetime.time(18, 00), datetime.time(19, 15)),
+        '7:30-8:45': (datetime.time(19, 30), datetime.time(20, 45)),
+        '9:00-10:15': (datetime.time(21, 00), datetime.time(22, 15))
+    }
+
+    def day_to_int(self, x):
+        return {
+            'Mon': 0,
+            'Tue': 1,
+            'Wed': 2,
+            'Thu': 3,
+            'Fri': 4,
+            'Sat': 5,
+            'Sun': 6,
+        }.get(x, 0)
+
     def handle(self, *args, **options):
-        cache.delete('HOMEPAGE')
-        StartDate = raw_input("Enter Start Date of Labs in format dd/mm/yyyy: ")
-        StartDate = StartDate.split('/')
+        start_msg = "Enter Start Date of Labs in format mm/dd/yyyy: "
+        end_msg = "Enter End Date of Labs in format mm/dd/yyyy: "
+        start_date_str = raw_input(start_msg)
+        end_date_str = raw_input(end_msg)
+        try:
+            start_date = date_parser(start_date_str).date()
+            end_date = date_parser(end_date_str).date()
+        except ValueError:
+            raise CommandError("Unable to parse date")
 
-        StartDate = datetime.date(int(StartDate[2]),
-                                  int(StartDate[1]),
-                                  int(StartDate[0]))
-        EndDate = raw_input("Enter End Date of Labs in format dd/mm/yyyy: ")
-        EndDate = EndDate.split('/')
-        EndDate = datetime.date(int(EndDate[2]),
-                                int(EndDate[1]),
-                                int(EndDate[0]))
+        msg = "Update labs between {} and {}: y/N? ".format(start_date,
+                                                            end_date)
+        confirm = raw_input(msg)
 
-        OldLabs = Lab.objects.filter(start_date=StartDate, end_date=EndDate)
-        OldLabs.delete()
+        if confirm.lower() not in ['y', 'yes']:
+            raise CommandError("Didn't get 'yes', aborting")
 
-        url = 'http://www.cs.tufts.edu/~molay/labs/times.cgi'
-        infile = urllib2.urlopen(url).read()
-        infile = StringIO.StringIO(infile)
+        Lab.objects.filter(start_date=start_date, end_date=end_date).delete()
 
-        r = list(csv.reader(infile, delimiter='\t'))
+        data = requests.get(self.update_url)
+        reader = csv.reader(data.content.split('\n'), delimiter='\t')
 
-        for row in r:
-            date = row[0]
-            date = date.split(' ')
-            RmNum = date[0]
-            DayOfWeek = date[1]
-            times = date[2].split('-')
-            StartTime = times[0]
-            EndTime = times[1]
-            course = row[2]
-            course = course.split('|')[0]
+        for row in reader:
+            # print row
+            if len(row) != 3:
+                continue
+            course_name = row[2].split('|')[0]
+            lab_info = row[0].split()
+            room_num = int(lab_info[0])
+            day_of_week = self.day_to_int(lab_info[1])
+            time_range = self.time_ranges.get(lab_info[2], None)
+            if time_range is None:
+                msg = "Unable to parse time range {}".format(lab_info[2])
+                raise CommandError(msg)
 
-            StartHour = int(StartTime.split(':')[0])
-            EndHour = int(EndTime.split(':')[0])
-            if StartHour < 8:
-                StartHour += 12
-                EndHour += 12
-            if StartHour == 12:
-                EndHour += 12
-
-            StartTimeElement = datetime.time(StartHour,
-                                             int(StartTime.split(':')[1]))
-            EndTimeElement = datetime.time(EndHour,
-                                           int(EndTime.split(':')[1]))
-
-            def DayToInt(x):
-                return {
-                    'Mon': 0,
-                    'Tue': 1,
-                    'Wed': 2,
-                    'Thu': 3,
-                    'Fri': 4,
-                    'Sat': 5,
-                    'Sun': 6,
-                }.get(x, 0)
-
-            l = Lab(room_number=RmNum, course_name=course,
-                    start_time=StartTimeElement, end_time=EndTimeElement,
-                    start_date=StartDate, end_date=EndDate,
-                    day_of_week=DayToInt(DayOfWeek))
-            l.save()
+            Lab.objects.create(room_number=room_num,
+                               course_name=course_name,
+                               start_time=time_range[0],
+                               end_time=time_range[1],
+                               start_date=start_date,
+                               end_date=end_date,
+                               day_of_week=day_of_week)
