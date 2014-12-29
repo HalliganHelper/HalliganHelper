@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from HalliganTAAvailability.models import Course, TA
 from django.db import IntegrityError
-import requests 
+import requests
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
@@ -29,7 +29,7 @@ class Command(BaseCommand):
         text_content = plaintext.render(d)
         html_content = htmly.render(d)
 
-        msg = EmailMultiAlternatives(subject, text_content, 
+        msg = EmailMultiAlternatives(subject, text_content,
                                      from_email, [to_email])
         msg.attach_alternative(html_content, 'text/html')
         msg.send()
