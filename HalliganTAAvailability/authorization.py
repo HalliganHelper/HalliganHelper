@@ -62,16 +62,15 @@ class RequestAuthorization(Authorization, AuthorizationMethods):
         raise Unauthorized("You are not authorized!")
 
     def update_detail(self, object_list, bundle):
-        if bundle.obj.student.pk == bundle.request.user.pk:
+        if bundle.obj.student.usr.pk == bundle.request.user.pk:
             return True
         try:
-            if bundle.obj.student.usr.ta.active:
+            if bundle.request.user.ta.active:
                 return True
             else:
                 raise Unauthorized("You are not authorized!")
         except TA.DoesNotExist:
             raise Unauthorized("You are not authorized!")
-
         raise Unauthorized("You are not authorized!")
 
     def delete_list(self, object_list, bundle):

@@ -264,11 +264,12 @@ class TAResourceSessionTest(TAResourceTestData, ResourceTestCase):
         self.assertValidJSONResponse(response)
 
         ta = self.deserialize(response)
-        self.assertKeys(ta, ['headshot', 'full_name', 'resource_uri'])
+        self.assertKeys(ta, ['active', 'headshot', 'full_name', 'resource_uri'])
         self.assertEqual(ta['headshot'].split('/')[-1],
                          str(self.ta.headshot).split('/')[-1])
 
         self.assertEqual(ta['full_name'], self.ta.usr.get_full_name())
+        self.assertEqual(ta['active'], self.ta.active)
 
 
 class RequestResourceTestData(BasicTestData):
@@ -331,6 +332,7 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         self.assertNotEqual(request, new_data['question'])
 
     def test_owner_can_update(self):
+        self._break_session()
         person = User.objects.create_user('kate',
                                           'kate@kate.com',
                                           'thisismypassword')
@@ -346,7 +348,6 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         new_data = {'question': 'new question'}
         response = self.api_client.patch(url, format='json',
                                          data=new_data)
-        print(response.status_code)
         self.assertHttpAccepted(response)
 
         modded_request = Request.objects.get(pk=request.pk)

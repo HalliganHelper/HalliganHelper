@@ -87,13 +87,8 @@ class RequestResource(ModelResource):
         is_owner = item_to_update.student.usr.pk == user.pk
 
         changes_allowed = new_keys.issubset(student_allowed_updates)
-        # print ("OWNER? {}".format(is_owner))
-        # print ("CHANGES ALLOWED? {}".format(changes_allowed))
 
         if (not is_owner) or (is_owner and not changes_allowed):
-            print ("RETURN FALSE: OWNER IS {} AND CHANGES ALLOWED IS {}" \
-                   .format(is_owner, changes_allowed))
-
             return False
 
         return True
@@ -109,7 +104,6 @@ class RequestResource(ModelResource):
         changes_allowed = new_keys.issubset(ta_allowed_updates)
         if (not is_ta) or (is_ta and not changes_allowed):
             return False
-
         return True
 
     # def obj_update(self, bundle, **kwargs):
@@ -132,12 +126,5 @@ class RequestResource(ModelResource):
         ta_update = self._can_ta_update(request.user, new_keys)
 
         if (not student_update) and (not ta_update):
-            print( "STUDENT: {}".format(student_update))
-            print( "TA: {}".format(ta_update))
             return HttpUnauthorized("You are not authorized")
-        print(request.body)
-        try:
-            ret_val = super(RequestResource, self).patch_detail(request, **kwargs)
-        except Exception:
-            print "RAISING A THING"
-        return ret_val
+        return super(RequestResource, self).patch_detail(request, **kwargs)
