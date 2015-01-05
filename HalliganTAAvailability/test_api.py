@@ -1,9 +1,8 @@
 from django.contrib.auth.models import User
-from django.conf import settings
+from django.utils.timezone import now
 from tastypie.test import ResourceTestCase
 from provider.oauth2.models import Client, AccessToken
 import datetime
-import pytz
 from .models import Course, TA, Request, Student
 
 
@@ -24,6 +23,7 @@ class BasicTestData(object):
     def _setup_super_session(self):
         self.api_client.client.login(username=self.super_username,
                                      password=self.password)
+
     def _setup_basic_session(self):
         self.api_client.client.login(username=self.basic_username,
                                      password=self.password)
@@ -279,6 +279,7 @@ class RequestResourceTestData(BasicTestData):
 
 class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
     fixtures = ['courses.json']
+
     def setUp(self):
         super(RequestResourceSessionTest, self).setUp()
         self.set_vars()
@@ -291,6 +292,26 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
                                               student=self.s,
                                               question='Dummy Question',
                                               whereLocated='Dummy Location')
+
+    def test_single_request_basic_user(self):
+        self._setup_basic_session()
+        response = self.api_client.get(self.single_url.format(self.request.pk),
+                                       format='json')
+        self.assertHttpOK(response)
+        self.assertValidJSONResponse(response)
+        data = self.deserialize(response)
+        self.assertKeys(data, ['first_name', 'last_name', 'cancelled', 'id',
+                               'checked_out', 'emailed', 'question', 'solved',
+                               'whenAsked', 'whenSolved', 'whereLocated',
+                               'resource_uri', 'timedOut'])
+
+    def test_single_request_unauthenticated(self):
+        self._break_session()
+
+        response = self.api_client.get(self.single_url.format(self.request.pk),
+                                       format='json')
+
+        self.assertHttpUnauthorized(response)
 
     def test_get_all_requests_unauthenticated(self):
         self._break_session()
@@ -361,16 +382,16 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         modded_request = Request.objects.get(pk=self.request.pk)
         self.assertEqual(modded_request, self.request)
         self.assertEqual(modded_request.solved, True)
-        # self.assertAlmostEqual(modded_request.whenSolved,
-        #                        _now(),
-        #                        delta=datetime.timedelta(seconds=30))
+        self.assertAlmostEqual(modded_request.whenSolved,
+                               now(),
+                               delta=datetime.timedelta(seconds=30))
 
     def test_owner_can_not_resolve(self):
         self._setup_basic_session()
         request = Request.objects.create(course=Course.objects.all()[0],
-                                              student=self.s,
-                                              question='Dummy Question',
-                                              whereLocated='Dummy Location')
+                                         student=self.s,
+                                         question='Dummy Question',
+                                         whereLocated='Dummy Location')
 
         url = self.single_url.format(request.pk)
         new_data = {'solved': True}
@@ -379,3 +400,24 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         self.assertHttpUnauthorized(response)
         modded_request = Request.objects.get(pk=request.pk)
         self.assertNotEqual(modded_request.solved, True)
+
+    def test_can_not_resolve_again(self):
+        rq = Request.objects.create(course=Course.objects.all()[0],
+                                    student=self.s,
+                                    question='Dummy Question 2',
+                                    whereLocated='Dummy Location 2')
+
+        self._setup_super_session()
+        response = self.api_client.patch(self.single_url.format(rq.pk),
+                                         format='json',
+                                         data={'solved': True})
+
+        self.assertHttpAccepted(response)
+        first_solved = Request.objects.get(pk=rq.pk).whenSolved
+
+        response = self.api_client.patch(self.single_url.format(rq.pk),
+                                         format='json',
+                                         data={'solved': True})
+        second_solved = Request.objects.get(pk=rq.pk).whenSolved
+
+        self.assertEqual(first_solved, second_solved)

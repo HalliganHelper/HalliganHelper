@@ -42,6 +42,7 @@ class NoEditAuthorization(Authorization, AuthorizationMethods):
     def delete_detail(self, object_list, bundle):
         raise Unauthorized("You are not authorized!")
 
+
 class RequestAuthorization(Authorization, AuthorizationMethods):
     def read_list(self, object_list, bundle):
         self._authenticated_active_user(object_list, bundle)
@@ -80,4 +81,41 @@ class RequestAuthorization(Authorization, AuthorizationMethods):
         raise Unauthorized("You are not authorized!")
 
 
+class OfficeHourAuthorization(Authorization, AuthorizationMethods):
+    def _is_active_ta(self, object_list, bundle):
+        self._authenticated_active_user(object_list, bundle)
+        try:
+            is_active = bundle.request.user.ta.active
+        except TA.DoesNotExist:
+            raise Unauthorized("You are not authorized!")
+        if not is_active:
+            raise Unauthorized("You are not authorized!")
 
+    def read_list(self, object_list, bundle):
+        self._authenticated_active_user(object_list, bundle)
+        return object_list
+
+    def read_detail(self, object_list, bundle):
+        self._authenticated_active_user(object_list, bundle)
+        return True
+
+    def create_list(self, object_list, bundle):
+        raise Unauthorized("You are not authorized!")
+
+    def create_detail(self, object_list, bundle):
+        self._is_active_ta()
+        return True
+
+    def update_list(self, object_list, bundle):
+        raise Unauthorized("You are not authorized!")
+
+    def update_detail(self, object_list, bundle):
+        if bundle.obj.ta.usr.pk == bundle.request.user.pk:
+            return True
+        raise Unauthorized("You are not authorized!")
+
+    def delete_list(self, object_list, bundle):
+        raise Unauthorized("You are not authorized!")
+
+    def delete_detail(self, object_list, bundle):
+        raise Unauthorized("You are not authorized!")

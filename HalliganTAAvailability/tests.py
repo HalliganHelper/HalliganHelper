@@ -7,12 +7,12 @@ Replace this with more appropriate tests for your application.
 
 from django.test import TestCase
 from django.contrib.auth.models import User
-from .models import TA
+from .models import TA, Course
 
-from test_api import *
 
 class TestTA(TestCase):
     fixtures = ['courses.json']
+
     def setUp(self):
         self.username = 'john'
         self.password = 'pass'

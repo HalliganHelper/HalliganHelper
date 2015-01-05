@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 # from tastypie import fields
-from tastypie.http import HttpBadRequest, HttpUnauthorized
+from tastypie.http import HttpUnauthorized
 import logging
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
 from tastypie.authorization import DjangoAuthorization
-from tastypie.resources import ModelResource, ALL_WITH_RELATIONS
+from tastypie.resources import ModelResource
 from .authorization import NoEditAuthorization, RequestAuthorization
+from .authorization import OfficeHourAuthorization
 from .models import Course, TA, OfficeHour, Request
 # from .models import Student
 from HalliganAvailability.authentication import OAuth20Authentication
@@ -38,7 +39,6 @@ class TAResource(ModelResource):
     class Meta(CommonMeta):
         authorization = NoEditAuthorization()
         queryset = TA.objects.active()
-        # queryset = TA.objects.all()
         fields = ['headshot', 'active']
         allowed_methods = ['get']
 
@@ -56,11 +56,15 @@ class TAResource(ModelResource):
 class OfficeHourResource(ModelResource):
     class Meta:
         queryset = OfficeHour.objects.all()
+        authorization = OfficeHourAuthorization()
+        allowed_list_methods = ['get']
+        allowed_detail_methods = ['get', 'post', 'patch']
 
-
-class UserResource(ModelResource):
-    class Meta:
-        queryset = User.objects.all()
+    def dehydrate(self, bundle):
+        bundle.data['first_name'] = bundle.obj.ta.usr.first_name
+        bundle.data['last_name'] = bundle.obj.ta.usr.last_name
+        bundle.data['is_me'] = bundle.request.user.pk == bundle.obj.ta.usr.pk
+        return bundle
 
 
 class RequestResource(ModelResource):
@@ -98,6 +102,20 @@ class RequestResource(ModelResource):
             return False
         return True
 
+    def obj_update(self, bundle, **kwargs):
+        request = bundle.request
+        data = self.deserialize(request,
+                                request.body,
+                                format=request.META.get('CONTENT_TYPE',
+                                                        'application/json'))
+        new_keys = set(data.keys())
+        ta_update = self._can_ta_update(request.user, new_keys)
+
+        if ta_update and 'solved' in new_keys and bundle.obj.whenSolved is None:
+            bundle.data['whenSolved'] = now()
+
+        return super(RequestResource, self).obj_update(bundle, **kwargs)
+
     def patch_detail(self, request, **kwargs):
         data = self.deserialize(request,
                                 request.body,
@@ -112,3 +130,8 @@ class RequestResource(ModelResource):
         if (not student_update) and (not ta_update):
             return HttpUnauthorized("You are not authorized")
         return super(RequestResource, self).patch_detail(request, **kwargs)
+
+    def dehydrate(self, bundle):
+        bundle.data['first_name'] = bundle.obj.student.usr.first_name
+        bundle.data['last_name'] = bundle.obj.student.usr.last_name
+        return bundle

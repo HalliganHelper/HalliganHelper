@@ -11,7 +11,7 @@ from HalliganComputerAvailability.api import ServerResource, RoomInfoResource
 
 # TA Availability api
 from HalliganTAAvailability.api import CourseResource, OfficeHourResource
-from HalliganTAAvailability.api import TAResource, UserResource, RequestResource
+from HalliganTAAvailability.api import TAResource, RequestResource
 
 v1_api = Api(api_name='v2')
 
@@ -26,7 +26,7 @@ v1_api.register(ServerResource())
 v1_api.register(CourseResource())
 v1_api.register(OfficeHourResource())
 v1_api.register(TAResource())
-v1_api.register(UserResource())
+# v1_api.register(UserResource())
 v1_api.register(RequestResource())
 
 
