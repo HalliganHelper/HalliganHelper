@@ -1,8 +1,10 @@
 app = typeof app !== "undefined" ? app : {};
 
 app.QueueItem = Backbone.TastypieModel.extend({
+    urlRoot: function() {
+        return '/api/v2/request/';
+    },
     defaults: {
-        id: -1,
         course: -1,
         question: '',
         whenAsked: new Date(),

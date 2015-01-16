@@ -7,28 +7,28 @@ app.OfficeHoursView = Backbone.View.extend({
         this.courseNum = options.courseNum;
         this.collection = new app.OfficeHours([], this.courseNum);
         this.listenTo(this.collection, 'fetch', this.showWaiting);
-        app.fetchXhr = this.collection.fetch({
-            reset: true,
-        });
-
-        
         this.listenTo(this.collection, 'add', this.renderOfficeHour);
         this.listenTo(this.collection, 'reset', this.render);
         this.listenTo(this.collection, 'remove', this.render);
+        app.fetchXhr = this.collection.fetch({
+            reset: true,
+        });
     },
     hideEmptyDivIfNecessary: function() {
-        if (this.collection.length != 0) {
+        if (this.collection.length !== 0) {
             this.$el.find('#emptyList').addClass('hide');
         }
     },
     render: function() {
         var _this = this;
         this.$el.empty();
+        this.listContainer = $('<div class="small-12 columns"/>');
         this.listBlock = $('<ul class="medium-block-grid-3 small-block-grid-1"/>');
-        this.$el.append(this.listBlock);
-        this.listBlock.before($('<div class="row queue-header text-center"><h4>TAs On Duty</h4></div>'));
+        this.$el.append($('<div class="row queue-header text-center"><h4>TAs On Duty</h4></div>'));
+        this.listContainer.append(this.listBlock);
+        this.$el.append(this.listContainer);
 
-        if (this.collection.recent_meta.ta) {
+        if (this.collection.recent_meta.is_ta) {
             var addHoursDiv = _.template( $('#addOfficeHourTemplate').html() )();
             this.listBlock.append(addHoursDiv);
             var clockInBtn = $(addHoursDiv).find('#clockInBtn');
@@ -43,7 +43,6 @@ app.OfficeHoursView = Backbone.View.extend({
                     end_time: moment(endTime).toISOString(),
                     course_num: _this.courseNum
                 });
-                newHour.url = location.origin + '/api/v2/officehour/go_on_duty/'
                 newHour.save();
 
             });
@@ -65,7 +64,6 @@ app.OfficeHoursView = Backbone.View.extend({
             this.renderOfficeHour( item );
         }, this);
     },
-
     renderOfficeHour: function( item ) {
         var officeHourView = new app.officeHourView({
             model: item

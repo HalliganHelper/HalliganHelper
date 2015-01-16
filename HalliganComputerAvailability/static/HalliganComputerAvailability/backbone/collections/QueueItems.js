@@ -6,7 +6,7 @@ app.queueItems = Backbone.TastypieCollection.extend({
         this.courseNum = courseNum;
     },
     url: function() {
-        return location.origin + '/api/v2/request/?course__Number=' + this.courseNum;
+        return '/api/v2/request/?course__Number=' + this.courseNum;
     },
     comparator: function (collection) {
         return collection.get('whenAsked');
