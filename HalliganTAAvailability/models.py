@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.utils.timezone import now
+from django.core.exceptions import ValidationError
 import datetime
 import pytz
 from imagekit.models import ProcessedImageField
@@ -9,6 +10,11 @@ from imagekit.processors import ResizeToFit
 from imagekit.admin import AdminThumbnail
 from HalliganAvailability import settings
 
+
+def not_empty_string(value):
+    print len(value)
+    if len(value) == 0:
+        raise ValidationError("No value for field")
 
 class Student(models.Model):
     usr = models.OneToOneField(User)
@@ -88,9 +94,11 @@ class Request(models.Model):
     course = models.ForeignKey(Course)
     student = models.ForeignKey(Student)
 
-    question = models.CharField(max_length=51)
+    question = models.CharField(max_length=51,
+                                validators=[not_empty_string])
     whenAsked = models.DateTimeField()
-    whereLocated = models.CharField(max_length=50)
+    whereLocated = models.CharField(max_length=50,
+                                    validators=[not_empty_string])
     cancelled = models.BooleanField(default=False, blank=True)
     emailed = models.BooleanField(default=False)
 
@@ -105,7 +113,7 @@ class Request(models.Model):
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.whenAsked = now()
-        super(Request, self).save(*args, **kwargs)
+        return super(Request, self).save(*args, **kwargs)
 
     def timeOut(self):
         self.timedOut = True

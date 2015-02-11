@@ -3,10 +3,8 @@
 <head>
     <title>{% block title %}Halligan Helper{% endblock %}</title>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Language" content="en-US">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Halligan Helper allows Tufts Computer Science students to easily get information about the Halligan Hall labs">
-
+    <meta http-equiv="content-language" content="en-US">
 
     {% load static %}
     {% load compress %}
@@ -16,7 +14,6 @@
     {% compress css %}
         <link href="{% static 'HalliganAvailability/scss/extend_foundation.scss' %}" rel="stylesheet" type="text/x-scss"/>
     {% endcompress %}
-    <link rel="shortcut icon" href="{% static 'HalliganTAAvailability/imgs/favicon.ico' %}"/>
 
 
 
@@ -37,12 +34,15 @@
 
 
     <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/livestamp/1.1.2/livestamp.min.js"></script>
     {% compress js %}
         <script src="{% static 'modernizr/modernizr.js' %}"></script>
         <script src="{% static 'fastclick/lib/fastclick.js' %}"></script>
         <script src="{% static 'foundation/js/foundation.min.js' %}"></script>
         <script src="{% static 'foundation/js/foundation/foundation.dropdown.js' %}"></script>
-        <script src="{% static 'foundation/js/foundation/foundation.equalizer.js' %}"></script>
         <script src="{% static 'js/jquery.titlealert.js' %}"></script>
         <script>
             $(document).foundation();

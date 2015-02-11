@@ -5,11 +5,16 @@ app.OfficeHoursView = Backbone.View.extend({
     initialize: function(prevModels, options) {
         this.$el = options.el;
         this.courseNum = options.courseNum;
+        this.courseUrl = options.courseUrl;
         this.collection = new app.OfficeHours([], this.courseNum);
         this.listenTo(this.collection, 'fetch', this.showWaiting);
         this.listenTo(this.collection, 'add', this.renderOfficeHour);
         this.listenTo(this.collection, 'reset', this.render);
         this.listenTo(this.collection, 'remove', this.render);
+        this.events['click #clockInBtn'] = this.clockIn;
+        this.events['keyup #TAHQ'] = this.enterToSubmit;
+        this.events['keyup #dtPick'] = this.enterToSubmit;
+        this.delegateEvents(this.events);
         app.fetchXhr = this.collection.fetch({
             reset: true,
         });
@@ -18,6 +23,70 @@ app.OfficeHoursView = Backbone.View.extend({
         if (this.collection.length !== 0) {
             this.$el.find('#emptyList').addClass('hide');
         }
+    },
+    computeNow: function() {
+        var now = moment().startOf('minute'),
+            minute = now.minute();
+
+        if (minute < 15) {
+            now.minute(15);
+        } else if (minute < 30) {
+            now.minute(30);
+        } else if (minute < 45) {
+            now.minute(45);
+        } else {
+            now.minute(0).add(1, 'hour');
+        }
+        return now;
+    },
+    enterToSubmit: function(ev) {
+        if( ev.keyCode === 13 ) {
+            this.clockIn();
+        }
+    },
+    clockIn: function(ev) {
+        var _this = this;
+        if (! this.collection.recent_meta.is_ta) {
+            return;
+        }
+        if (Notification.permission != 'enabled') {
+            Notification.requestPermission();
+        }
+        var hq = $('#TAHQ'),
+            endTime = $('#dtPick'),
+            timeLabel = $("label[for='dtPick']"),
+            hqLabel = $("label[for='TAHQ']"),
+            date_obj = $('#dtPick').pickatime('picker').get('select');
+        var newHour = new app.OfficeHour({
+            location: hq.val(),
+            end_time: moment().startOf('day').minute(date_obj.mins).hour(date_obj.hour).toISOString(),
+            course_num: _this.courseNum
+        });
+
+        newHour.save({}, 
+            {
+                success: function(model, response, options) {
+                    _this.collection.add(model);
+                   hq.val('');
+                   timeLabel.removeClass('error');
+                   hqLabel.removeClass('error');
+
+                },
+                error: function(model, response, options) {
+                    responseJSON = response.responseJSON;
+                    if (Boolean(responseJSON.error) || Boolean(responseJSON.officehour.end_time)) {
+                        timeLabel.addClass('error');
+                    } else {
+                        timeLabel.removeClass('label');
+                    }
+                    if (Boolean(responseJSON.officehour.location)) {
+                        hqLabel.addClass('error');
+                    } else {
+                        hqLabel.removeClass('error');
+                    }
+                }
+            }
+        );
     },
     render: function() {
         var _this = this;
@@ -32,29 +101,18 @@ app.OfficeHoursView = Backbone.View.extend({
             var addHoursDiv = _.template( $('#addOfficeHourTemplate').html() )();
             this.listBlock.append(addHoursDiv);
             var clockInBtn = $(addHoursDiv).find('#clockInBtn');
-            $('#clockInBtn').click(function clockIn() {
-                if (Notification.permission != 'enabled') {
-                    Notification.requestPermission();
+            
+            $('#dtPick').pickatime({
+                editable: false,
+                min: _this.computeNow(),
+                clear: false,
+                interval: 15,
+                onOpen: function() {
+                    this.set('min', _this.computeNow());
                 }
-                var hq = $('#TAHQ').val(),
-                    endTime = $('#dtPick').val();
-                var newHour = new app.OfficeHour({
-                    location: hq,
-                    end_time: moment(endTime).toISOString(),
-                    course_num: _this.courseNum
-                });
-                newHour.save();
+            });
 
-            });
-            var today = moment();
-            var tomorrow = moment(today).add('days', 1);
-            var startTime = moment(today).add('hours', 1);
-            $('#dtPick').datetimepicker({
-                minDateTime: startTime.toDate(),
-                maxDateTime: tomorrow.toDate(),
-                alwaysSetTime: true,
-                timeFormat: 'hh:mm TT'
-            });
+            $('#dtPick').pickatime('picker').set('select', _this.computeNow());
 
         } else {
             this.$el.append( _.template( $('#emptyListTemplate').html() )() );    

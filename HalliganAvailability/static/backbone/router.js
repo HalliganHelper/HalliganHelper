@@ -4,7 +4,7 @@ function show_notification(msg) {
         'icon': '/static/HalliganTAAvailability/imgs/HH_Logo.jpg'
     };
     var notification = new Notification("Halligan Helper", options);
-};
+}
 
 var AppRouter = Backbone.Router.extend({
     routes: {
@@ -28,13 +28,30 @@ _.each(["Model", "Collection"], function(name) {
 });
 
 function checkXhrAndAbort() {
-    if (Boolean(app.fetchXhr) && app.fetchXhr.readyState > 0
-        && app.fetchXhr.readyState < 4) {
+    if (Boolean(app.fetchXhr) && app.fetchXhr.readyState > 0 && app.fetchXhr.readyState < 4) {
         app.fetchXhr.abort();
     }
 }
 
+
 $(function() {
+    function ajaxSetup() {
+       var csrftoken = $.cookie('csrftoken'); 
+
+        function csrfSafeMethod(method) {
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+    }
+
+    ajaxSetup();
     var app_router = new AppRouter();
     app.currentRoomNumber = null;
     app.currentCourseNumber = null;
@@ -42,6 +59,7 @@ $(function() {
     app.ohView = null;
     app.announcementSocket = io.connect('/announcements');
     app.announcementSocket.on("message", function(data) {
+        console.log(data);
         switch (data.type) {
             case 'request_update':
                 var lbl = $('#' + data.course_number + '-count');
@@ -72,44 +90,42 @@ $(function() {
 
     app.currentTASocket = io.connect('/taqueue');
     app.currentTASocket.on("message", function(rq_data) {
+        console.log(rq_data);
+        var rq_course;
         switch (rq_data.type) {
-            case 'add_oh':
-                var rq_course = rq_data.course_number;
-                if(Boolean(app.ohView) && rq_course == app.currentCourseNumber) {
-                    var newOH = new app.OfficeHour(rq_data.resource);
-                    app.ohView.collection.add(newOH);
-                }
-                break;
-            case 'remove_oh':
-                var rq_course = rq_data.resource.course.Number;
-                if(Boolean(app.ohView) && rq_course == app.currentCourseNumber) {
-                    app.ohView.collection.remove(app.ohView.collection.get(rq_data.id));
-                }
-                break;
-            case 'add':
-                var rq_course = rq_data.resource.course.Number;
-                if (Boolean(app.currentCourseNumber) && rq_course == app.currentCourseNumber) {
-                    var current_obj = app.currentView.collection.get(rq_data.resource.id);
-                    if (Boolean(current_obj)) {
-                        current_obj.set(rq_data.resource);
-                    } else {
-                        current_obj = new app.QueueItem(rq_data.resource);
-                        app.currentView.collection.add(current_obj);
-                        app.currentView.hideEmptyDivIfNecessary();
+            case 'office_hour_update':
+                if ( Boolean ( app.ohView ) && rq_data.course == app.currentCourseNumber ) {
+                    var item = app.ohView.collection.get(rq_data.data.id);
+                    if ( Boolean( item ) ) {
+                        item.set(rq_data.data);
                     }
                 }
                 break;
-            case 'remove':
-                app.currentView.removeContainerDiv(rq_data.id);
+
+            case 'office_hour_create':
+                console.log ("CREATING");
+                if ( Boolean ( app.ohView ) && rq_data.course == app.currentCourseNumber ) {
+                    app.ohView.collection.add ( new app.OfficeHour ( rq_data.data ) );
+                }
                 break;
-            case 'checkout':
-                if (Boolean(app.currentView) && rq_data.course_num == app.currentCourseNumber) {
-                    $('div').find("[data-main-object-id=" + rq_data.id + "]").addClass('checked_out');
+
+            case 'request_update':
+                if ( Boolean( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
+                    var item = app.currentView.collection.get(rq_data.data.id);
+                    if ( Boolean( item ) ) {
+                        item.set(rq_data.data);
+                    }
+                }
+                break;
+
+            case 'request_create':
+                if ( Boolean ( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
+                    app.currentView.collection.add ( new app.QueueItem( rq_data.data ) );
                 }
                 break;
         }
     });
-    
+
     app_router.on('route', function() {
         if (Boolean(app.currentView) && Boolean(app.currentView.kill)) {
             app.currentView.kill();

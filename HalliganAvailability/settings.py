@@ -144,6 +144,10 @@ LOGGING = {
             'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
             'datefmt': '%d/%b/%Y %H:%M:%S'
         },
+        'deprecation': {
+            'format': 'DEPRECATION - [%(asctime)s] %(message)s',
+            'datefmt': '%d/%b/%Y %H:%M:%S'
+        },
         'simple': {
             'format': '[%(levelname)s] %(message)s'
         },
@@ -157,6 +161,12 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
+        },
+        'deprecation': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'view_deprecation.log',
+            'formatter': 'deprecation'
         },
         'exception': {
             'level': 'ERROR',
@@ -185,6 +195,10 @@ LOGGING = {
             'handlers': ['console', 'exception'],
             'level': 'DEBUG'
         },
+        'deprecated_views': {
+            'handlers': ['console', 'deprecation'],
+            'level': 'DEBUG'
+        }
     }
 }
 

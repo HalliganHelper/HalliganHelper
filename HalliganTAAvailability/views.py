@@ -32,6 +32,7 @@ from models import Student, Request, TA, Course, OfficeHour
 
 logger = logging.getLogger(__name__)
 socket_logger = logging.getLogger('sockets')
+deprecated_views_logger = logging.getLogger('deprecated_views')
 
 
 def _now():
@@ -123,6 +124,8 @@ def courseList(request):
 
 @login_required
 def getHelp(request, course=None):
+    """ DEPRECATED """
+    deprecated_views_logger.debug('getHelp')
     if request.method == 'POST':
         form = RequestForm(request.POST)
         if form.is_valid():
@@ -176,6 +179,9 @@ def getHelp(request, course=None):
 
 @login_required()
 def listRequests(request):
+    """ DEPRECATED """
+    deprecated_views_logger.debug('listRequests')
+
     try:
         stu = Student.objects.get(usr__id=request.user.id)
         rqs = stu.request_set.order_by('-whenAsked')
@@ -187,6 +193,9 @@ def listRequests(request):
 
 @login_required()
 def profile(request):
+    """ DEPRECATED """
+    deprecated_views_logger.debug('PROFILE')
+
     user = request.user
     data = {}
     try:
@@ -247,6 +256,9 @@ def onlineQueue(request):
 @require_POST
 @login_required()
 def resolveRequest(request):
+    """ DEPRECATED """
+    deprecated_views_logger.debug('RESOLVE REQUEST')
+
     rq_id = request.POST.get('requestID', None)
     student = Student.objects.get(usr__id=request.user.id)
     try:
@@ -411,43 +423,6 @@ class QueueNamespace(BaseNamespace):
         socket_logger.debug("Deleting socket with ID {}".format(id(self)))
         super(QueueNamespace, self).disconnect(*args, **kwargs)
 
-    def on_remove(self, packet):
-        self.send({'message': 'Goodbye!'}, json=True)
-
-    @staticmethod
-    def emit_single_request(request, rq_id, json_parse=True):
-        from api import RequestResource
-        base_resource = RequestResource()
-        json_resource = {
-            'type': 'add'
-        }
-        for connection_id, connection in QueueNamespace._connections.items():
-            resource = base_resource.get_detail(connection['request'],
-                                                id=rq_id)
-            resource = json.loads(resource.content)
-            json_resource['resource'] = resource
-            connection['socket'].send(json_resource, json_parse)
-
-    @staticmethod
-    def emit_cancel_request(rq_id, json_parse=True):
-        json_resource = {
-            'type': 'remove',
-            'id': rq_id
-        }
-        for connection_id, connection in QueueNamespace._connections.items():
-            connection['socket'].send(json_resource, json_parse)
-
-    @staticmethod
-    def emit_update_request(rq_id, question, location, json_parse=True):
-        json_resource = {
-            'type': 'update',
-            'id': rq_id,
-            'question': question,
-            'location': location
-        }
-        for connection_id, connection in QueueNamespace._connections.items():
-            connection['socket'].send(json_resource, json_parse)
-
     @staticmethod
     def emit(msg, json=True):
         for connection_id, connection in QueueNamespace._connections.items():
@@ -502,6 +477,50 @@ class QueueNamespace(BaseNamespace):
             srl = br.serialize(None, data, 'application/json')
             msg['resource'] = json.loads(srl)
             connection['socket'].send(msg, json_parse)
+
+    @staticmethod
+    def notify_request(request_id, course_number, change_type):
+        from api import RequestResource
+
+        resource = RequestResource()
+
+        message = {
+            'type': change_type,
+            'course': course_number
+        }
+
+        request = Request.objects.get(pk=request_id)
+
+        QueueNamespace.send_message(resource, request, message)
+
+
+    @staticmethod
+    def notify_office_hour(office_hour_id, course_number, change_type):
+        from api import OfficeHourResource
+
+        resource = OfficeHourResource()
+
+        message = {
+            'type': change_type,
+            'course': course_number
+        }
+
+        office_hour = OfficeHour.objects.get(pk=office_hour_id)
+
+        QueueNamespace.send_message(resource, office_hour, message)
+
+
+    @staticmethod
+    def send_message(br, item, message):
+        for _, connection in QueueNamespace._connections.items():
+            resource = br.build_bundle(obj=item, request=connection['request'])
+            dehydrated_data = br.full_dehydrate(resource)
+            serialized_data = br.serialize(None,
+                                           dehydrated_data,
+                                           'application/json')
+            message['data'] = json.loads(serialized_data)
+            connection['socket'].send(message, True)
+
 
 
 class AnnouncementNamespace(BaseNamespace):

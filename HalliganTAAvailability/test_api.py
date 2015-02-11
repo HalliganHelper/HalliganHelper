@@ -300,10 +300,10 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         self.assertHttpOK(response)
         self.assertValidJSONResponse(response)
         data = self.deserialize(response)
-        self.assertKeys(data, ['first_name', 'last_name', 'cancelled', 'id',
-                               'checked_out', 'emailed', 'question', 'solved',
-                               'whenAsked', 'whenSolved', 'whereLocated',
-                               'resource_uri', 'timedOut'])
+        self.assertKeys(data, ['whenAsked', 'first_name', 'last_name', 'course',
+                               'whereLocated', 'question', 'checked_out', 'id',
+                               'solved', 'resource_uri', 'allow_edit',
+                               'allow_resolve'])
 
     def test_single_request_unauthenticated(self):
         self._break_session()
@@ -374,17 +374,22 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
     def test_ta_can_resolve(self):
         self._setup_super_session()
         url = self.single_url.format(self.request.pk)
-        new_data = {'solved': True}
-        response = self.api_client.patch(url, format='json',
-                                         data=new_data)
+        data = {
+            'solved': True,
+            'checked_out': True
+        }
+        response = self.api_client.patch(url,
+                                         format='json',
+                                         data=data)
         self.assertHttpAccepted(response)
 
         modded_request = Request.objects.get(pk=self.request.pk)
         self.assertEqual(modded_request, self.request)
         self.assertEqual(modded_request.solved, True)
+        self.assertEqual(modded_request.checked_out, True)
         self.assertAlmostEqual(modded_request.whenSolved,
                                now(),
-                               delta=datetime.timedelta(seconds=30))
+                               delta=datetime.timedelta(seconds=10))
 
     def test_owner_can_not_resolve(self):
         self._setup_basic_session()
@@ -421,3 +426,38 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         second_solved = Request.objects.get(pk=rq.pk).whenSolved
 
         self.assertEqual(first_solved, second_solved)
+
+    def test_create_request(self):
+        self._setup_basic_session()
+
+        post_data = {
+            'question': 'Hello There',
+            'whereLocated': 'Up There',
+            'course': 11,
+            'allow_edit': False
+        }
+
+        response = self.api_client.post(self.get_url,
+                                        format='json',
+                                        data=post_data)
+
+        self.assertHttpCreated(response)
+
+    def test_other_student_cant_edit(self):
+        rq = Request.objects.create(course=Course.objects.first(),
+                                    student=self.s,
+                                    question='Dummy Question 2',
+                                    whereLocated='Dummy Location 2')
+
+
+        self.api_client.client.login(username=self.second_user.username,
+                                     password=self.password)
+        response = self.api_client.patch(self.single_url.format(rq.pk),
+                                         format='json',
+                                         data={'whereLocated': 'there'})
+
+        self.assertHttpUnauthorized(response)
+
+
+
+

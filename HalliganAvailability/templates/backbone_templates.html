@@ -65,6 +65,11 @@
 </script>
 
 <script id="queueItemHeaderTemplate" type="text/template">
+    <div class="row queue-course-header text-center">
+        <div class="small-12">
+            <h3>Comp <%= courseNum %> Queue</h3>
+        </div>
+    </div>
     <div class="row queue-header hide-for-small">
         <div class="medium-2 small-3 columns queue-name-header"><h4>Name</h4></div>
         <div class="medium-2 small-3 columns queue-location-header"><h4>Location</h4></div>
@@ -75,38 +80,104 @@
 
 <script id="queueTemplate" type="text/template">
     <% if ( checked_out ) { %>
-        <div class="row request checked_out" data-main-object-id="<%= id %>">
+        <div class="row request checked_out">
     <% } else { %>
-        <div class="row request" data-main-object-id="<%= id %>">
+        <div class="row request">
     <% } %>
-        <div class="large-2 medium-2 small-12 columns queue-name"><span class="show-for-small-only">Name: </span><%= student.usr.first_name %> <%= student.usr.last_name[0] %>.</div>
+        <div class="large-2 medium-2 small-12 columns queue-name">
+            <span class="show-for-small-only">
+                Name: 
+            </span>
+            <%= first_name %> <%= last_name[0] %>.
+        </div>
 
-        <div class="large-2 medium-2 small-12 columns queue-location" data-object-id="<%= id %>"><span class="show-for-small-only">Location: </span><%= whereLocated %></div>
+        <div class="large-2 medium-2 small-12 columns queue-location">
+            <span class="show-for-small-only">
+                Location: 
+            </span>
+            <%= whereLocated %>
+        </div>
 
-        <div class="large-4 medium-4 small-12 columns queue-problem" data-object-id="<%= id %>"><span class="show-for-small-only">Question: </span><%= question %></div>
-        <% if (allow_resolve && allow_edit) { %>
-            <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
-            <div class="large-2 medium-2 small-12 columns end queue-resolve text-center" data-object-id="<%= id %>">
-                <div class="tiny secondary button edit-button" data-object-id="<%= id %>">
+        <div class="large-4 medium-4 small-12 columns queue-problem">
+            <span class="show-for-small-only">
+                Question: 
+            </span>
+            <%= question %>
+        </div>
+
+        <% if (allow_edit) { %>
+            <div class="large-2 medium-2 small-12 columns queue-when-asked">
+                <span class="show-for-small-only">
+                    Asked at: 
+                </span>
+                <%= moment(whenAsked).format("MM/DD h:mm a") %>
+            </div>
+
+            <div class="large-2 medium-2 small-12 columns end queue-resolve text-center">
+                <div class="tiny secondary button edit-button">
                     Edit
                 </div>
-                <div class="tiny primary button cancel-button" data-object-id="<%= id %>">
+                <div class="tiny primary button cancel-button">
                     Cancel
                 </div>
             </div>
+
         <% } else if (allow_resolve) { %>
-            <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
+            <div class="large-2 medium-2 small-12 columns queue-when-asked">
+                <span class="show-for-small-only">
+                    Asked at: 
+                </span>
+                <%= moment(whenAsked).format("MM/DD h:mm a") %>
+            </div>
+
             <div class="large-2 medium-2 small-12 columns end text-center queue-resolve">
-                <div class="tiny secondary button checkout-button" data-object-id="<%= id %>">
+                <div class="tiny secondary button checkout-button">
                     Checkout
                 </div> 
-                <div class="tiny primary button resolve-button" data-object-id="<%= id %>">
+                <div class="tiny primary button resolve-button">
                     Resolve
                 </div>
             </div>
         <% } else { %> 
-            <div class="large-2 medium-2 small-12 columns end queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
+            <div class="large-2 medium-2 small-12 columns end queue-when-asked">
+                <span class="show-for-small-only">
+                    Asked at: 
+                </span>
+                <%= moment(whenAsked).format("MM/DD h:mm a") %>
+            </div>
         <% } %>
+    </div>
+</script>
+
+<script id="queueEditTemplate" type="text/template">
+    <% if ( checked_out ) { %>
+        <div class="row request checked_out">
+    <% } else { %>
+        <div class="row request">
+    <% } %>
+        <div class="large-2 medium-2 small-12 columns queue-name"><span class="show-for-small-only">Name: </span><%= first_name %> <%= last_name[0] %>.</div>
+
+        <div class="large-2 medium-2 small-12 columns queue-location">
+            <label> Where are you? 
+                <input type="text" id="whereLocated" value="<%= whereLocated %>"/> 
+            </label>
+        </div>
+
+        <div class="large-4 medium-4 small-12 columns queue-problem">
+            <label> What's your problem?
+                <input type="text" id="question" value="<%= question %>">
+            </label>
+        </div>
+
+        <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
+        <div class="large-2 medium-2 small-12 columns end text-center queue-resolve">
+            <div class="tiny secondary button undo-button">
+               Undo 
+            </div> 
+            <div class="tiny primary button save-button">
+               Save 
+            </div>
+        </div>
     </div>
 </script>
 
@@ -148,10 +219,17 @@
 </script>
 
 <script id="officeHourTemplate" type="text/template">
-    <div class="row text-center"><img width=100 height=100 alt="<%= ta.name %> headshot" src="<%= ta.headshot %>"/></div>
-    <div class="row text-center"><%= ta.name %></div>
+    <div class="row text-center"><img width="100" height="100" alt="<%= ta.full_name %>'s headshot" src="<%= ta.headshot %>"/></div>
+    <div class="row text-center"><%= ta.full_name %></div>
     <div class="row text-center"><%= location %></div>
     <div class="row text-center">Off Duty <span class="moment" data-time='<%= end_time %>'><%= moment(end_time).fromNow() %></span></div>
+    <% if (is_me) { %>
+        <div class="row text-center">
+            <div class="small-12 small-centered columns text-center">
+                <input id="cancelOfficeHours" type="button" class="tiny button extend" value="Cancel"/> 
+            </div>
+        </div>
+    <% } %>
 </script>
 
 <script id="goOnDutyTemplate" type="text/template">
@@ -165,8 +243,14 @@
 <script id="addOfficeHourTemplate" type="text/template">
     <li id="addHours" class="taCard"> 
         <h5 class="text-center">Go On Duty</h5>
-        <div class="row text-center"><input id="TAHQ" type="text" placeholder="Where are you camped?"/> </div>
-        <div class="row text-center"><input id="dtPick" type="text" placeholder="When are you done?"/></div>
+        <div class="row">
+            <label for="TAHQ" class="white_bckgd_lbl"> Where are you camped?</label>
+            <input id="TAHQ" type="text"/> 
+        </div>
+        <div class="row">
+            <label for="dtPick" class="white_bckgd_lbl"> When are you done?</label>
+            <input id="dtPick" type="text" />
+        </div>
         <div class="row text-center"><div class="tiny button extend" id="clockInBtn">Clock In</div></div>
     </li>
 </script>

@@ -1,18 +1,20 @@
 from django.contrib.auth.models import User
 from django.utils.timezone import now
-# from tastypie import fields
+from tastypie import fields
 from tastypie.http import HttpUnauthorized
-import logging
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
-from tastypie.authorization import DjangoAuthorization
+from tastypie.authorization import DjangoAuthorization, ReadOnlyAuthorization
 from tastypie.resources import ModelResource
-from .authorization import NoEditAuthorization, RequestAuthorization
-from .authorization import OfficeHourAuthorization
-from .models import Course, TA, OfficeHour, Request
-# from .models import Student
+from tastypie.constants import ALL_WITH_RELATIONS
+import logging
+import datetime
+from .authorizations import RequestAuthorization, OfficeHourAuthorization
+from .validations import RequestValidation, OfficeHourValidation
+from .models import Course, TA, OfficeHour, Request, Student
+from .views import QueueNamespace
 from HalliganAvailability.authentication import OAuth20Authentication
-# from .tasks import cancel_hours
 logger = logging.getLogger('api')
+
 
 
 class CommonMeta(object):
@@ -20,12 +22,13 @@ class CommonMeta(object):
     authentication = MultiAuthentication(OAuth20Authentication(),
                                          SessionAuthentication())
     limit = 0
+    always_return_data = True
 
 
 class CourseResource(ModelResource):
     class Meta(CommonMeta):
         queryset = Course.objects.all()
-        authorization = NoEditAuthorization()
+        authorization = ReadOnlyAuthorization()
         filtering = {
             'Name': ['exact', 'iexact', 'startswith', ],
             'Number': ['exact', 'lte', 'lt', 'gte', 'gt', ],
@@ -37,7 +40,7 @@ class CourseResource(ModelResource):
 
 class TAResource(ModelResource):
     class Meta(CommonMeta):
-        authorization = NoEditAuthorization()
+        authorization = ReadOnlyAuthorization()
         queryset = TA.objects.active()
         fields = ['headshot', 'active']
         allowed_methods = ['get']
@@ -54,25 +57,87 @@ class TAResource(ModelResource):
 
 
 class OfficeHourResource(ModelResource):
-    class Meta:
+    ta = fields.ForeignKey(TAResource, 'ta', full=True)
+    course = fields.ForeignKey(CourseResource, 'course', full=False)
+
+    class Meta(CommonMeta):
         queryset = OfficeHour.objects.all()
         authorization = OfficeHourAuthorization()
-        allowed_list_methods = ['get']
-        allowed_detail_methods = ['get', 'post', 'patch']
+        allowed_list_methods = ['get', 'post']
+        allowed_detail_methods = ['get', 'patch']
+        validation = OfficeHourValidation()
+        fields = ['id', 'start_time', 'end_time', 'location',
+                  'ta']
+
+        filtering = {
+            'course': ALL_WITH_RELATIONS
+        }
+
+    def get_object_list(self, request):
+        query_set = super(OfficeHourResource, self).get_object_list(request)
+        return query_set.filter(end_time__gte=now())
 
     def dehydrate(self, bundle):
-        bundle.data['first_name'] = bundle.obj.ta.usr.first_name
-        bundle.data['last_name'] = bundle.obj.ta.usr.last_name
         bundle.data['is_me'] = bundle.request.user.pk == bundle.obj.ta.usr.pk
         return bundle
 
+    def alter_list_data_to_serialize(self, request, data):
+        try:
+            data['meta']['is_ta'] = request.user.ta.active
+        except TA.DoesNotExist:
+            data['meta']['is_ta'] = False
+
+        return data
+
+    def obj_create(self, bundle, **kwargs):
+        try:
+            course_num = int(bundle.data.get('course_num', None))
+            course = Course.objects.get(Number=course_num)
+            bundle.data['course'] = course
+        except ValueError, e:
+            logger.exception(e)
+
+        bundle.data['ta'] = bundle.request.user.ta
+        bundle.data['start_time'] = now()
+        bundle.data['end_time'] = bundle.data['end_time'].replace('T', ' ')
+
+        return_val = super(OfficeHourResource, self).obj_create(bundle, **kwargs)
+        QueueNamespace.notify_office_hour(bundle.obj.pk,
+                                          bundle.obj.course.Number,
+                                          'office_hour_create')
+        return return_val
+
+    def obj_update(self, bundle, **kwargs):
+        return_val = super(OfficeHourResource, self).obj_create(bundle, **kwargs)
+        QueueNamespace.notify_office_hour(bundle.obj.pk,
+                                          bundle.obj.course.Number,
+                                          'office_hour_update')
+        return return_val
+
 
 class RequestResource(ModelResource):
+    course = fields.ForeignKey(CourseResource, 'course', full=False)
+
     class Meta(CommonMeta):
         queryset = Request.objects.all()
-        list_allowed_methods = ['get']
+        list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get', 'post', 'patch']
         authorization = RequestAuthorization()
+        validation = RequestValidation()
+
+        fields = ['whenAsked', 'first_name', 'last_name', 'course',
+                  'whereLocated', 'question', 'checked_out', 'id',
+                  'solved', 'cancelled']
+        filtering = {
+            'course': ALL_WITH_RELATIONS
+        }
+
+    def get_object_list(self, request):
+        query_set = super(RequestResource, self).get_object_list(request)
+        five_hours = datetime.timedelta(hours=5)
+        return query_set.filter(whenAsked__gte=now() - five_hours,
+                                cancelled=False,
+                                solved=False)
 
     def _can_student_update(self, user, new_keys, item_id):
         student_allowed_updates = set(['whereLocated',
@@ -112,9 +177,30 @@ class RequestResource(ModelResource):
         ta_update = self._can_ta_update(request.user, new_keys)
 
         if ta_update and 'solved' in new_keys and bundle.obj.whenSolved is None:
-            bundle.data['whenSolved'] = now()
+            bundle.obj.whenSolved = now()
 
-        return super(RequestResource, self).obj_update(bundle, **kwargs)
+        return_val = super(RequestResource, self).obj_update(bundle, **kwargs)
+        QueueNamespace.notify_request(bundle.obj.pk,
+                                      bundle.obj.course.Number,
+                                      'request_update')
+        return return_val
+
+    def obj_create(self, bundle, **kwargs):
+        try:
+            course_num = int(bundle.data.get('course', None))
+            course = Course.objects.get(Number=course_num)
+            bundle.data['course'] = course
+            student = Student.objects.get(usr__pk=bundle.request.user.pk)
+            kwargs['student'] = student
+
+        except ValueError, e:
+            logger.exception(e)
+
+        return_val = super(RequestResource, self).obj_create(bundle, **kwargs)
+        QueueNamespace.notify_request(bundle.obj.pk,
+                                      bundle.obj.course.Number,
+                                      'request_create')
+        return return_val
 
     def patch_detail(self, request, **kwargs):
         data = self.deserialize(request,
@@ -132,6 +218,18 @@ class RequestResource(ModelResource):
         return super(RequestResource, self).patch_detail(request, **kwargs)
 
     def dehydrate(self, bundle):
+        user = bundle.request.user
+
+        try:
+            bundle.data['allow_resolve'] = user.ta.active
+        except TA.DoesNotExist:
+            bundle.data['allow_resolve'] = False
+
+        if bundle.obj.student.usr.pk == user.pk:
+            bundle.data['allow_edit'] = True
+        else:
+            bundle.data['allow_edit'] = False
+
         bundle.data['first_name'] = bundle.obj.student.usr.first_name
         bundle.data['last_name'] = bundle.obj.student.usr.last_name
         return bundle
