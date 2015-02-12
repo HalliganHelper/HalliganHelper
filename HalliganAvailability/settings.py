@@ -164,10 +164,15 @@ LOGGING = {
         },
         'deprecation': {
             'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': '../logs/view_deprecation.log',
+            'class': 'logging.StreamHandler',
             'formatter': 'deprecation'
         },
+        # 'deprecation': {
+        #     'level': 'ERROR',
+        #     'class': 'logging.FileHandler',
+        #     'filename': '../logs/view_deprecation.log',
+        #     'formatter': 'deprecation'
+        # },
         'exception': {
             'level': 'ERROR',
             'class': 'logging.StreamHandler',
