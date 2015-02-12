@@ -165,7 +165,7 @@ LOGGING = {
         'deprecation': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': 'view_deprecation.log',
+            'filename': '../logs/view_deprecation.log',
             'formatter': 'deprecation'
         },
         'exception': {
