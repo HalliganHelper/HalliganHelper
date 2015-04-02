@@ -5,6 +5,7 @@ import requests
 import json
 
 from django.conf import settings
+from django.contrib.models import User
 from datetime import timedelta
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
@@ -19,14 +20,15 @@ from django.template.loader import get_template
 from django.utils.html import escape
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
+from django.core.mail import send_mail
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from registration.backends.default.views import RegistrationView
 from registration.signals import user_registered, user_activated
 from socketio import socketio_manage
 from socketio.namespace import BaseNamespace
 
-from forms import TuftsEmail, RequestForm, OfficeHourForm, CancelHoursForm
-from forms import TAPhotoChangeForm
+from .forms import TuftsEmail, RequestForm, OfficeHourForm, CancelHoursForm
+from .forms import TAPhotoChangeForm, ForgotUsernameForm
 from models import Student, Request, TA, Course, OfficeHour
 
 
@@ -120,6 +122,27 @@ class TuftsRegistrationView(RegistrationView):
 
 def courseList(request):
     return render_to_response('courseList.html')
+
+
+def forgot_username(request):
+    if request.method == 'POST':
+        form = ForgotUsernameForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                u = User.objects.get(email=email)
+                #TODO: Send the email
+            except User.DoesNotExist:
+                # This means that the email does not exist
+                pass
+#TODO: Create this view
+            return HttpResponseRedirect(reverse('sent_username'))
+    else:
+        form = ForgotUsernameForm()
+
+    #TODO: Create this template
+    return render(request, 'registration/forgot_email.html', {'form': form})
+
 
 
 @login_required

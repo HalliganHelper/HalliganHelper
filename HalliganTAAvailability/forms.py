@@ -85,3 +85,7 @@ register.generator('HalliganTAAvailability:Headshot', HeadShot)
 
 class TAPhotoChangeForm(forms.Form):
     image = ProcessedImageField(spec_id='HalliganTAAvailability:Headshot')
+
+class ForgotUsernameForm(forms.Form):
+    email = forms.EmailField()
+
