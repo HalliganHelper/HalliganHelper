@@ -90,12 +90,13 @@ $(function() {
 
     app.currentTASocket = io.connect('/taqueue');
     app.currentTASocket.on("message", function(rq_data) {
-        console.log(rq_data);
         var rq_course;
+        var item;
+        var request_count;
         switch (rq_data.type) {
             case 'office_hour_update':
                 if ( Boolean ( app.ohView ) && rq_data.course == app.currentCourseNumber ) {
-                    var item = app.ohView.collection.get(rq_data.data.id);
+                    item = app.ohView.collection.get(rq_data.data.id);
                     if ( Boolean( item ) ) {
                         app.ohView.listenToOnce(item, 'change', function() {
                             app.ohView.hideEmptyDivIfNecessary();
@@ -112,8 +113,13 @@ $(function() {
                 break;
 
             case 'request_update':
+                console.log(rq_data);
+                if ( rq_data.data.cancelled || rq_data.data.solved ) {
+                    request_count = $('#' + rq_data.course + '-count');
+                    request_count.text(Number(request_count.text()) - 1);
+                }
                 if ( Boolean( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
-                    var item = app.currentView.collection.get(rq_data.data.id);
+                    item = app.currentView.collection.get(rq_data.data.id);
                     if ( Boolean( item ) ) {
                         item.set(rq_data.data);
                         if ( item.get('cancelled') || item.get('solved') ) {
@@ -125,6 +131,8 @@ $(function() {
                 break;
 
             case 'request_create':
+                request_count = $('#' + rq_data.course + '-count');
+                request_count.text(Number(request_count.text()) + 1);
                 if ( Boolean ( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
                     app.currentView.collection.add ( new app.QueueItem( rq_data.data ) );
                     app.currentView.hideEmptyDivIfNecessary();
