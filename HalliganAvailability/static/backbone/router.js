@@ -97,6 +97,9 @@ $(function() {
                 if ( Boolean ( app.ohView ) && rq_data.course == app.currentCourseNumber ) {
                     var item = app.ohView.collection.get(rq_data.data.id);
                     if ( Boolean( item ) ) {
+                        app.ohView.listenToOnce(item, 'change', function() {
+                            app.ohView.hideEmptyDivIfNecessary();
+                        });
                         item.set(rq_data.data);
                     }
                 }
@@ -113,6 +116,10 @@ $(function() {
                 if ( Boolean( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
                     var item = app.currentView.collection.get(rq_data.data.id);
                     if ( Boolean( item ) ) {
+                        console.log("UPDATE", item);
+                        app.currentView.listenToOnce(item, 'change', function() {
+                            app.currentView.hideEmptyDivIfNecessary();
+                        });
                         item.set(rq_data.data);
                     }
                 }
@@ -121,6 +128,7 @@ $(function() {
             case 'request_create':
                 if ( Boolean ( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
                     app.currentView.collection.add ( new app.QueueItem( rq_data.data ) );
+                    app.currentView.hideEmptyDivIfNecessary();
                 }
                 break;
         }

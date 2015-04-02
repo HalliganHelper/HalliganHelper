@@ -41,12 +41,15 @@ app.queueItemView = Backbone.View.extend({
         
         this.model.save(updates, {patch: true,
             success: function() {
+                _this.listenToOnce(_this, 'destroy', function() {
+                    app.currentView.hideEmptyDivIfNecessary();
+                });
                 _this.model.trigger('destroy', _this.model);
-                //_this.remove();
             },
             error: function(model, response, options) {
             }
         });
+
     },
     checkout: function(ev) {
         this.model.save({'checked_out': true}, {patch: true,

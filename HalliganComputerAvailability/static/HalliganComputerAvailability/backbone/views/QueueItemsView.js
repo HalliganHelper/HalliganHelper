@@ -30,8 +30,15 @@ app.queueItemsView = Backbone.View.extend({
         }, this);
     },
     hideEmptyDivIfNecessary: function() {
+        console.log('HIDING?');
+        var emptyDiv = this.$el.find('#emptyList');
+
         if (this.collection.length !== 0) {
-            this.$el.find('#emptyList').addClass('hide');
+            console.log('HIDING');
+            emptyDiv.addClass('hide');
+        } else {
+            console.log('SHOWING');
+            emptyDiv.removeClass('hide');
         }
     },
     kill: function() {
