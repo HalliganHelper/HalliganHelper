@@ -80,11 +80,8 @@ app.queueItemsView = Backbone.View.extend({
             'course': this.courseNum,
         });
 
-        console.log('MADE REQUEST');
-
         newRequest.save({}, {
             success: function requestSuccess(){
-                console.log('SAVED');
                 locationField.val(''); 
                 problemField.val('');
                 $requestButton.prop('disabled', false);

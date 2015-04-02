@@ -106,7 +106,6 @@ $(function() {
                 break;
 
             case 'office_hour_create':
-                console.log ("CREATING");
                 if ( Boolean ( app.ohView ) && rq_data.course == app.currentCourseNumber ) {
                     app.ohView.collection.add ( new app.OfficeHour ( rq_data.data ) );
                 }
@@ -116,11 +115,11 @@ $(function() {
                 if ( Boolean( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
                     var item = app.currentView.collection.get(rq_data.data.id);
                     if ( Boolean( item ) ) {
-                        console.log("UPDATE", item);
-                        app.currentView.listenToOnce(item, 'change', function() {
-                            app.currentView.hideEmptyDivIfNecessary();
-                        });
                         item.set(rq_data.data);
+                        if ( item.get('cancelled') || item.get('solved') ) {
+                            app.currentView.collection.remove(item);
+                            app.currentView.hideEmptyDivIfNecessary();
+                        }
                     }
                 }
                 break;
