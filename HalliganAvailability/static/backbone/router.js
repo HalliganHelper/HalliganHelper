@@ -59,7 +59,6 @@ $(function() {
     app.ohView = null;
     app.announcementSocket = io.connect('/announcements');
     app.announcementSocket.on("message", function(data) {
-        console.log(data);
         switch (data.type) {
             case 'request_update':
                 var lbl = $('#' + data.course_number + '-count');
@@ -90,7 +89,6 @@ $(function() {
 
     app.currentTASocket = io.connect('/taqueue');
     app.currentTASocket.on("message", function(rq_data) {
-        console.log('GOT MESSAGE:' , rq_data);
         var rq_course;
         var item;
         var request_count;
@@ -105,7 +103,6 @@ $(function() {
                         } else {
                             item.set(rq_data.data);
                         }
-                        console.log('SAME END TIME:', rq_data.end_time == item.get('end_time'));
                     }
                 }
                 break;
@@ -117,7 +114,6 @@ $(function() {
                 break;
 
             case 'request_update':
-                console.log(rq_data);
                 if ( rq_data.data.cancelled || rq_data.data.solved ) {
                     request_count = $('#' + rq_data.course + '-count');
                     request_count.text(Number(request_count.text()) - 1);
