@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.utils.timezone import now
+from django.utils.html import conditional_escape, escape
 from tastypie import fields
 from tastypie.http import HttpUnauthorized
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
@@ -78,6 +79,7 @@ class OfficeHourResource(ModelResource):
         return query_set.filter(end_time__gte=now())
 
     def dehydrate(self, bundle):
+        bundle.data['location'] = conditional_escape(bundle.data['location'])
         bundle.data['is_me'] = bundle.request.user.pk == bundle.obj.ta.usr.pk
         return bundle
 
@@ -219,6 +221,11 @@ class RequestResource(ModelResource):
 
     def dehydrate(self, bundle):
         user = bundle.request.user
+
+        # Html escape vulnerable properties
+        bundle.data['whereLocated'] = conditional_escape(bundle.data['whereLocated'])
+        bundle.data['question'] = conditional_escape(bundle.data['question'])
+        print bundle.data['whereLocated']
 
         try:
             bundle.data['allow_resolve'] = user.ta.active
