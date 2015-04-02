@@ -1,6 +1,5 @@
-from django.contrib.auth.models import User
 from django.utils.timezone import now
-from django.utils.html import conditional_escape, escape
+from django.utils.html import conditional_escape
 from tastypie import fields
 from tastypie.http import HttpUnauthorized
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
@@ -12,10 +11,9 @@ import datetime
 from .authorizations import RequestAuthorization, OfficeHourAuthorization
 from .validations import RequestValidation, OfficeHourValidation
 from .models import Course, TA, OfficeHour, Request, Student
-from .views import QueueNamespace
+from .views import QueueNamespace, AnnouncementNamespace
 from HalliganAvailability.authentication import OAuth20Authentication
 logger = logging.getLogger('api')
-
 
 
 class CommonMeta(object):
@@ -202,6 +200,10 @@ class RequestResource(ModelResource):
         QueueNamespace.notify_request(bundle.obj.pk,
                                       bundle.obj.course.Number,
                                       'request_create')
+        # TODO: Make sure course_num is a number after switching to full paths above
+        AnnouncementNamespace.notify_ta(bundle.request.user.get_full_name(),
+                                        course_num)
+
         return return_val
 
     def patch_detail(self, request, **kwargs):

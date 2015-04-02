@@ -568,14 +568,19 @@ class AnnouncementNamespace(BaseNamespace):
         }
 
         for _, connection in AnnouncementNamespace._connections.items():
+            print 'Notifying {}'.format(connection['user'].get_full_name())
+            # If the connectoin isn't a ta, then bail out
             try:
                 ta = connection['user'].ta
-                if ta.active:
-                    courses = [c.Number for c in ta.course.all()]
-                    if course_number in courses:
-                        connection['socket'].send(msg, json_parse)
-            except Exception:
+            except TA.DoesNotExist:
                 continue
+
+            course_office_hours = OfficeHour.objects.on_duty_for_course(course_number)
+
+            active_for_course = ta.course.filter(Number=course_number).exists()
+            on_duty = course_office_hours.filter(ta__pk=ta.pk).exists()
+            if ta.active and active_for_course and on_duty:
+                connection['socket'].send(msg, json_parse)
 
     @staticmethod
     def notify_user(which_user, ta_name, json_parse=True):
