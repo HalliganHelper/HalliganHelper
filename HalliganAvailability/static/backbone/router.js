@@ -90,6 +90,7 @@ $(function() {
 
     app.currentTASocket = io.connect('/taqueue');
     app.currentTASocket.on("message", function(rq_data) {
+        console.log('GOT MESSAGE:' , rq_data);
         var rq_course;
         var item;
         var request_count;
@@ -98,10 +99,13 @@ $(function() {
                 if ( Boolean ( app.ohView ) && rq_data.course == app.currentCourseNumber ) {
                     item = app.ohView.collection.get(rq_data.data.id);
                     if ( Boolean( item ) ) {
-                        app.ohView.listenToOnce(item, 'change', function() {
-                            app.ohView.hideEmptyDivIfNecessary();
-                        });
-                        item.set(rq_data.data);
+                        var same_end_time = rq_data.end_time == item.get('end_time');
+                        if ( ! same_end_time ) {
+                            app.ohView.collection.remove(item);
+                        } else {
+                            item.set(rq_data.data);
+                        }
+                        console.log('SAME END TIME:', rq_data.end_time == item.get('end_time'));
                     }
                 }
                 break;
