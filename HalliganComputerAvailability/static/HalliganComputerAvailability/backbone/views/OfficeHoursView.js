@@ -45,10 +45,14 @@ app.OfficeHoursView = Backbone.View.extend({
         }
     },
     clockIn: function(ev) {
+        var btnElement = ev.currentTarget;
         var _this = this;
         if (! this.collection.recent_meta.is_ta) {
             return;
         }
+
+        btnElement.setAttribute('disabled', 'disabled');
+
         if (Notification.permission != 'enabled') {
             Notification.requestPermission();
         }
@@ -63,6 +67,9 @@ app.OfficeHoursView = Backbone.View.extend({
             course_num: _this.courseNum
         });
 
+
+
+
         newHour.save({}, 
             {
                 success: function(model, response, options) {
@@ -70,7 +77,7 @@ app.OfficeHoursView = Backbone.View.extend({
                    hq.val('');
                    timeLabel.removeClass('error');
                    hqLabel.removeClass('error');
-
+                    btnElement.removeAttribute('disabled');
                 },
                 error: function(model, response, options) {
                     responseJSON = response.responseJSON;
@@ -84,6 +91,7 @@ app.OfficeHoursView = Backbone.View.extend({
                     } else {
                         hqLabel.removeClass('error');
                     }
+                    btnElement.removeAttribute('disabled');
                 }
             }
         );
