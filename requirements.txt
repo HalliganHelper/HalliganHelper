@@ -1,10 +1,11 @@
-Django==1.5
+Django==1.6.11
 Pillow==2.5.3
-South==0.8.2
+South==1.0.2
 Werkzeug==0.9.6
 amqp==1.4.6
 anyjson==0.3.3
 argparse==1.2.1
+beautifulsoup4==4.3.2
 billiard==3.3.0.18
 celery==3.1.15
 coverage==3.7.1
@@ -16,6 +17,7 @@ django-appconf==0.6
 django-bower==5.0.1
 django-compressor==1.4
 django-extensions==1.2.5
+django-htmlmin==0.7.0
 django-imagekit==3.2.4
 django-oauth2-provider==0.2.6
 django-pylibmc-sasl==0.2.4
@@ -29,6 +31,7 @@ gevent-socketio==0.3.6
 gevent-websocket==0.9.3
 greenlet==0.4.2
 gunicorn==18.0
+html5lib==0.999
 kombu==3.0.23
 lxml==3.3.5
 manifesto==0.5
