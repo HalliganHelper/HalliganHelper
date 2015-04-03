@@ -114,7 +114,9 @@ $(function() {
                 break;
 
             case 'request_update':
+                console.log("UPDATE: ", rq_data);
                 if ( rq_data.data.cancelled || rq_data.data.solved ) {
+
                     request_count = $('#' + rq_data.course + '-count');
                     request_count.text(Number(request_count.text()) - 1);
                 }

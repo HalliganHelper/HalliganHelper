@@ -8,7 +8,6 @@ app.queueItemView = Backbone.View.extend({
     events: {},
     initialize: function() {
         this.model.on('change', this.render, this);
-        this.model.on('destroy', this.remove, this);
         this.events['click .cancel-button'] = this.cancel;
         this.events['click .resolve-button'] = this.resolve;
         this.events['click .checkout-button'] = this.checkout;
@@ -20,7 +19,7 @@ app.queueItemView = Backbone.View.extend({
         this.delegateEvents(this.events);
     },
     render: function() {
-        if (this.model.get('cancelled') ) {
+        if (this.model.get('cancelled') || this.model.get('solved') ) {
             var _this = this;
             this.$el.fadeOut(1000, function() {
                 _this.model.trigger('destroy', this.model);
@@ -41,10 +40,13 @@ app.queueItemView = Backbone.View.extend({
         
         this.model.save(updates, {patch: true,
             success: function() {
+                console.log('SAVED');
                 _this.model.collection.remove(_this.model);
                 app.currentView.hideEmptyDivIfNecessary();
             },
             error: function(model, response, options) {
+                console.log("UPDATE FAILED");
+                console.log(model, response, options);
             }
         });
 
