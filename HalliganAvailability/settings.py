@@ -94,7 +94,6 @@ INSTALLED_APPS = (
     'registration',
     'widget_tweaks',
     'django_extensions',
-    'south',
     'tastypie',
     'provider',
     'provider.oauth2',
@@ -103,6 +102,7 @@ INSTALLED_APPS = (
     'imagekit',
 )
 
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
