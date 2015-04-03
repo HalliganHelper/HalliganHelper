@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="row text-center">
+    <p>{% trans "If a user with your email exists, a reminder email has been sent" %}</p>
+</div>
+
+<div class="row text-center">
+    <p class="large primary btn">
+        <a href="{% url 'auth_login' %}">{% trans "Log in" %}</a>
+    </p>
+</div>
+
+{% endblock %}

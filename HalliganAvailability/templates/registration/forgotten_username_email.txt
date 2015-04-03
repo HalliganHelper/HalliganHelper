@@ -1,0 +1,7 @@
+Hey {{ user.get_full_name }},
+
+    Seems like you've forgotten your username. 
+
+    Good news! It's "{{ user.username }}".
+
+-Halligan Helper Admins

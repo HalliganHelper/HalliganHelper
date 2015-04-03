@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="row login-card">
+    <div class="small-12 columns text-center">
+        <h2> Forgot Your Username?</h2>
+    </div>
+</div>
+
+<form method="post" action=".">
+    <div class="row login-card">
+        {% csrf_token %} 
+        {% if form.email.errors %}
+        <div class="small-12 columns text-center">
+            <label class="error">
+            {% render_field form.email class="narrow input error" type="email" placeholder="Enter your Tufts email" %}
+            </label>
+            <small class="error"> {{form.email.errors.0}}</small> 
+        </div>
+        {% else %}
+        <div class="small-12 columns text-center">
+            {% render_field form.email class="narrow input" type="email" placeholder="Enter your Tufts email" %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="row login-card">
+        <div class="small-12 columns text-center">
+            <input class="button success extend" type="submit" value="{% trans 'Submit' %}" />
+        </div>
+    </div>
+</form>
+{% endblock %}
