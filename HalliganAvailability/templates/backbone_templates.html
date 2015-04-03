@@ -159,13 +159,13 @@
 
         <div class="large-2 medium-2 small-12 columns queue-location">
             <label> Where are you? 
-                <input type="text" id="whereLocated" value="<%= whereLocated %>"/> 
+                <input type="text" id="whereLocated" value="<%= whereLocated %>" maxlength=50/> 
             </label>
         </div>
 
         <div class="large-4 medium-4 small-12 columns queue-problem">
             <label> What's your problem?
-                <input type="text" id="question" value="<%= question %>">
+                <input type="text" id="question" value="<%= question %>" maxlength=50>
             </label>
         </div>
 
@@ -198,7 +198,7 @@
             <div class="medium-9 small-12 columns queue-problem" id="questionField">
                 <label>
                     What's your problem?
-                    <input type="text" maxlength=51 id="problem"/>
+                    <input type="text" maxlength=50 id="problem"/>
                 </label>
             </div>
         </div>
