@@ -178,6 +178,7 @@ class RequestResource(ModelResource):
 
         if ta_update and 'solved' in new_keys and bundle.obj.whenSolved is None:
             bundle.obj.whenSolved = now()
+            bundle.obj.who_solved = request.user.ta
 
         return_val = super(RequestResource, self).obj_update(bundle, **kwargs)
         QueueNamespace.notify_request(bundle.obj.pk,
