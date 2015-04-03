@@ -5,9 +5,8 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 import datetime as dt
 from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo
+from .models import Lab
 from HalliganTAAvailability.models import Student, Course, Request
-
-from test_api import *
 
 
 class TestComputer(TestCase):
