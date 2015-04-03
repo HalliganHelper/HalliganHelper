@@ -300,10 +300,12 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         self.assertHttpOK(response)
         self.assertValidJSONResponse(response)
         data = self.deserialize(response)
-        self.assertKeys(data, ['whenAsked', 'first_name', 'last_name', 'course',
-                               'whereLocated', 'question', 'checked_out', 'id',
-                               'solved', 'resource_uri', 'allow_edit',
-                               'allow_resolve'])
+        expected_keys = ['whenAsked', 'first_name', 'last_name', 'course',
+                         'whereLocated', 'question', 'checked_out', 'id',
+                         'solved', 'cancelled', 'resource_uri', 'allow_edit',
+                         'allow_resolve']
+
+        self.assertKeys(data, expected_keys)
 
     def test_single_request_unauthenticated(self):
         self._break_session()
@@ -449,7 +451,6 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
                                     question='Dummy Question 2',
                                     whereLocated='Dummy Location 2')
 
-
         self.api_client.client.login(username=self.second_user.username,
                                      password=self.password)
         response = self.api_client.patch(self.single_url.format(rq.pk),
@@ -457,7 +458,3 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
                                          data={'whereLocated': 'there'})
 
         self.assertHttpUnauthorized(response)
-
-
-
-

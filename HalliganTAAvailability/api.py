@@ -228,7 +228,6 @@ class RequestResource(ModelResource):
         # Html escape vulnerable properties
         bundle.data['whereLocated'] = conditional_escape(bundle.data['whereLocated'])
         bundle.data['question'] = conditional_escape(bundle.data['question'])
-        print bundle.data['whereLocated']
 
         try:
             bundle.data['allow_resolve'] = user.ta.active
