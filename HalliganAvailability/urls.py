@@ -4,6 +4,8 @@ from tastypie.api import Api
 from django.conf import settings
 from django.conf.urls.static import static
 
+from manifesto.views import ManifestView
+
 # Computer Availability api
 from HalliganComputerAvailability.api import CourseUsageInfoResource
 from HalliganComputerAvailability.api import LabResource, ComputerResource
@@ -43,6 +45,7 @@ urlpatterns = patterns('',
                        url(r'^api/', include('HalliganComputerAvailability.urls')),
                        url(r'^', include('HalliganTAAvailability.urls')),
                        url(r'^$', 'HalliganComputerAvailability.views.ModularHomePage', name='ModularHomePage'),
+                       url(r'^manifest\.appcache$', ManifestView.as_view(), name='cache_manifest'),
                        )
 
 if settings.DEBUG:

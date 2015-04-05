@@ -91,6 +91,7 @@ INSTALLED_APPS = (
     'provider.oauth2',
     'djangobower',
     'imagekit',
+    'manifesto',
 )
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
