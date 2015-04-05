@@ -34,14 +34,6 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-# List of finder classes that know how to find static files in
-# various locations.
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'djangobower.finders.BowerFinder',
-    'compressor.finders.CompressorFinder',
-)
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -98,7 +90,6 @@ INSTALLED_APPS = (
     'provider',
     'provider.oauth2',
     'djangobower',
-    'compressor',
     'imagekit',
 )
 
@@ -216,31 +207,20 @@ BOWER_INSTALLED_APPS = ('foundation#5.3.3',
                         'fastclick#1.0.3',
                         'jquery.cookie#1.4.1')
 
-COMPRESS_PRECOMPILERS = (
-    ('text/x-sass', 'sass --compass -E "UTF-8" "{infile}" "{outfile}"'),
-    ('text/x-scss', 'sass --scss --compass -E "UTF-8" -I "%s/bower_components/foundation/scss" "{infile}" "{outfile}"' % BOWER_COMPONENTS_ROOT),
-)
-
-COMPRESS_CSS_FILTERS = [
-    'compressor.filters.cssmin.CSSMinFilter'
-]
-
-COMPRESS_JS_FILTERS = [
-    'compressor.filters.jsmin.JSMinFilter'
-]
+# COMPRESS_PRECOMPILERS = (
+#     ('text/x-sass', 'sass --compass -E "UTF-8" "{infile}" "{outfile}"'),
+#     ('text/x-scss', 'sass --scss --compass -E "UTF-8" -I "%s/bower_components/foundation/scss" "{infile}" "{outfile}"' % BOWER_COMPONENTS_ROOT),
+# )
+#
+# COMPRESS_CSS_FILTERS = [
+#     'compressor.filters.cssmin.CSSMinFilter'
+# ]
+#
+# COMPRESS_JS_FILTERS = [
+#     'compressor.filters.jsmin.JSMinFilter'
+# ]
 
 # COMPRESS_OFFLINE = True
-
-# PIPELINE_JS = {
-#     'backbone': {
-#         'source_filenames': (
-#             'HalliganComputerAvailability/backbone/models/*',
-#             'HalliganComputerAvailability/backbone/collections/*',
-#             'HalliganComputerAvailability/backbone/views/*',
-#         ),
-#         'output_filename': 'js/backbone.js'
-#     }
-# }
 
 # COMPRESS_URL = '/static/'
 
@@ -250,3 +230,84 @@ LOGIN_URL = 'login_or_register'
 LOGIN_REDIRECT_URL = '/'
 BROKER_URL = 'redis://localhost:6379/0'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 10850}
+
+
+# DJANGO PIPELINE
+INSTALLED_APPS += ('pipeline',)
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'djangobower.finders.BowerFinder',
+    'pipeline.finders.PipelineFinder',
+)
+
+
+# STATICFILES_FINDERS = (
+#     'pipeline.finders.FileSystemFinder',
+#     'pipeline.finders.AppDirectoriesFinder',
+#     'pipeline.finders.CachedFileFinder',
+#     'pipeline.finders.PipelineFinder',
+# )
+
+PIPELINE_COMPILERS = (
+    'pipeline.compilers.sass.SASSCompiler',
+)
+
+# PIPELINE_SASS_ARGUMENTS = '--scss --compass -E "UTF-8" -I "/home/tyler/Documents/HH/components/bower_components/foundation/scss"'
+PIPELINE_SASS_ARGUMENTS = '--scss --compass -E "UTF-8" -I "{}"'.format(FOUNDATION_PATH)
+
+PIPELINE_CSS = {
+    'all_styles': {
+        'source_filenames': (
+            'HalliganAvailability/scss/extend_foundation.scss',
+        ),
+        'output_filename': 'css/styles.css',
+    }
+}
+
+PIPELINE_DISABLE_WRAPPER = True
+
+PIPELINE_JS = {
+    'backbone': {
+        'source_filenames': (
+            'HalliganAvailability/backbone/TastyPie_Backbone_Shim.js',
+            'HalliganAvailability/backbone/app.js',
+            'HalliganAvailability/backbone/router.js',
+            'HalliganAvailability/backbone/models/Lab.js',
+            'HalliganAvailability/backbone/models/Computer.js',
+            'HalliganAvailability/backbone/models/OfficeHour.js',
+            'HalliganAvailability/backbone/models/QueueItem.js',
+            'HalliganAvailability/backbone/models/Room.js',
+            'HalliganAvailability/backbone/collections/Labs.js',
+            'HalliganAvailability/backbone/collections/Computers.js',
+            'HalliganAvailability/backbone/collections/OfficeHours.js',
+            'HalliganAvailability/backbone/collections/QueueItems.js',
+            'HalliganAvailability/backbone/collections/Rooms.js',
+            'HalliganAvailability/backbone/views/ComputerView.js',
+            'HalliganAvailability/backbone/views/ComputersView.js',
+            'HalliganAvailability/backbone/views/LabView.js',
+            'HalliganAvailability/backbone/views/LabsView.js',
+            'HalliganAvailability/backbone/views/OfficeHourView.js',
+            'HalliganAvailability/backbone/views/OfficeHoursView.js',
+            'HalliganAvailability/backbone/views/QueueItemView.js',
+            'HalliganAvailability/backbone/views/QueueItemsView.js',
+            'HalliganAvailability/backbone/views/RoomView.js',
+            'HalliganAvailability/backbone/views/RoomsView.js',
+        ),
+        'output_filename': 'js/backbone.js',
+    },
+    'dependencies': {
+        'source_filenames': (
+            'modernizr/modernizr.js',
+            'fastclick/lib/fastclick.js',
+            'foundation/js/foundation.min.js',
+            'foundation/js/foundation/foundation.dropdown.js',
+            'js/jquery.titlealert.js',
+        ),
+        'output_filename': 'js/dependencies.js',
+    }
+}
