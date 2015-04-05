@@ -610,7 +610,6 @@ class AnnouncementNamespace(BaseNamespace):
         }
 
         for _, connection in AnnouncementNamespace._connections.items():
-            print 'Notifying {}'.format(connection['user'].get_full_name())
             # If the connectoin isn't a ta, then bail out
             try:
                 ta = connection['user'].ta

@@ -8,7 +8,6 @@ from imagekit.admin import AdminThumbnail
 
 
 def not_empty_string(value):
-    print len(value)
     if len(value) == 0:
         raise ValidationError("No value for field")
 

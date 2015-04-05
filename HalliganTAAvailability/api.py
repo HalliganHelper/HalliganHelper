@@ -90,12 +90,6 @@ class OfficeHourResource(ModelResource):
         return data
 
     def obj_create(self, bundle, **kwargs):
-        # bundle.data['ta'] = bundle.request.user.ta
-        # bundle.data['start_time'] = now()
-        # bundle.data['end_time'] = bundle.data['end_time'].replace('T', ' ')
-        print 'DATA'
-        print bundle.data
-
         kwargs['ta'] = bundle.request.user.ta
         kwargs['start_time'] = now()
         kwargs['end_time'] = bundle.data['end_time'].replace('T', ' ')
