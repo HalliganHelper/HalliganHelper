@@ -90,16 +90,15 @@ class OfficeHourResource(ModelResource):
         return data
 
     def obj_create(self, bundle, **kwargs):
-        try:
-            course_num = int(bundle.data.get('course_num', None))
-            course = Course.objects.get(Number=course_num)
-            bundle.data['course'] = course
-        except ValueError, e:
-            logger.exception(e)
+        # bundle.data['ta'] = bundle.request.user.ta
+        # bundle.data['start_time'] = now()
+        # bundle.data['end_time'] = bundle.data['end_time'].replace('T', ' ')
+        print 'DATA'
+        print bundle.data
 
-        bundle.data['ta'] = bundle.request.user.ta
-        bundle.data['start_time'] = now()
-        bundle.data['end_time'] = bundle.data['end_time'].replace('T', ' ')
+        kwargs['ta'] = bundle.request.user.ta
+        kwargs['start_time'] = now()
+        kwargs['end_time'] = bundle.data['end_time'].replace('T', ' ')
 
         return_val = super(OfficeHourResource, self).obj_create(bundle, **kwargs)
         QueueNamespace.notify_office_hour(bundle.obj.pk,
@@ -187,15 +186,8 @@ class RequestResource(ModelResource):
         return return_val
 
     def obj_create(self, bundle, **kwargs):
-        try:
-            course_num = int(bundle.data.get('course', None))
-            course = Course.objects.get(Number=course_num)
-            bundle.data['course'] = course
-            student = Student.objects.get(usr__pk=bundle.request.user.pk)
-            kwargs['student'] = student
-
-        except ValueError, e:
-            logger.exception(e)
+        student = Student.objects.get(usr__pk=bundle.request.user.pk)
+        kwargs['student'] = student
 
         return_val = super(RequestResource, self).obj_create(bundle, **kwargs)
         QueueNamespace.notify_request(bundle.obj.pk,
@@ -203,7 +195,7 @@ class RequestResource(ModelResource):
                                       'request_create')
         # TODO: Make sure course_num is a number after switching to full paths above
         AnnouncementNamespace.notify_ta(bundle.request.user.get_full_name(),
-                                        course_num)
+                                        bundle.obj.course.Number)
 
         return return_val
 

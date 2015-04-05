@@ -237,5 +237,5 @@ class TestHomePage(TestCase):
     def test_home_page_has_sorted_courses(self):
         response = self._get_home_page()
         courses = response.context['courses']
-        sorted_courses = sorted(courses, key=lambda k: k['num'])
+        sorted_courses = sorted(courses, key=lambda k: k.Number)
         self.assertSequenceEqual(courses, sorted_courses)

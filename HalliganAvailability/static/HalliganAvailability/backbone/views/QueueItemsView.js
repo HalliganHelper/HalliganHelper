@@ -5,8 +5,12 @@ app.queueItemsView = Backbone.View.extend({
     events: {},
     initialize: function(prevModels, options) {
         this.courseNum = options.courseNum;
+        this.coursePk = options.coursePk;
         this.courseUrl = options.courseUrl;
-        this.collection = new app.queueItems([], options.courseNum);
+        this.collection = new app.queueItems([], {
+            'courseNum': this.courseNum,
+            'coursePk': this.coursePk
+        });
         app.fetchXhr = this.collection.fetch({reset: true});
 
         this.listenTo(this.collection, 'add', this.renderQueueItem);
@@ -18,13 +22,20 @@ app.queueItemsView = Backbone.View.extend({
     },
     template: _.template( $('#queueItemHeaderTemplate').html() ),
     render: function() {
-        this.$el.append( this.template({'courseNum': this.courseNum}) );
+        this.$el.append( this.template({
+            'courseNum': this.courseNum,
+            'coursePk': this.coursePk
+        }));
         this.$el.append( _.template( $('#emptyListTemplate').html() )() );    
         this.hideEmptyDivIfNecessary();
         this.$el.append( _.template( $('#makeRequestTemplate').html() )() );    
         var taDiv = $('<div/>');
         this.$el.find('#get-help').after(taDiv);
-        app.ohView = new app.OfficeHoursView([], {'courseNum': this.courseNum, 'el': taDiv});
+        app.ohView = new app.OfficeHoursView([], {
+            'courseNum': this.courseNum, 
+            'el': taDiv,
+            'coursePk': this.coursePk
+        });
         this.collection.each(function(item) {
             this.renderQueueItem( item );
         }, this);
@@ -77,7 +88,7 @@ app.queueItemsView = Backbone.View.extend({
         var newRequest = new app.QueueItem({
             'question': problem,
             'whereLocated': whereLocated,
-            'course': this.courseNum,
+            'course': '/api/v2/course/' + this.coursePk + '/'
         });
 
         newRequest.save({}, {

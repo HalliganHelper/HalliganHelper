@@ -171,10 +171,14 @@ $(function() {
         app.currentRoomNumber = null;
         app.currentCourseNumber = courseNum;
         $('.custom-sidenav > li > a').removeClass('active');
-        $('#queue'+courseNum).addClass('active');
+        var queueItem = $('#queue'+courseNum);
+        queueItem.addClass('active');
         $('#content').fadeOut(100, function() {
             $('#content').empty();      
-            app.currentView = new app.queueItemsView([], {'courseNum': courseNum});
+            app.currentView = new app.queueItemsView([], {
+                'courseNum': courseNum, 
+                'coursePk': queueItem.data('pk')
+            });
             $('#content').fadeIn(100);
         });
     });

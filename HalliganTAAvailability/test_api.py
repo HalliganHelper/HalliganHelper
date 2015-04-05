@@ -431,11 +431,12 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
 
     def test_create_request(self):
         self._setup_basic_session()
+        course = Course.objects.first()
 
         post_data = {
             'question': 'Hello There',
             'whereLocated': 'Up There',
-            'course': 11,
+            'course': '/api/v2/course/{}/'.format(course.pk),
             'allow_edit': False
         }
 

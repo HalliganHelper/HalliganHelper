@@ -5,7 +5,7 @@ app.OfficeHoursView = Backbone.View.extend({
     initialize: function(prevModels, options) {
         this.$el = options.el;
         this.courseNum = options.courseNum;
-        this.courseUrl = options.courseUrl;
+        this.coursePk = options.coursePk;
         this.collection = new app.OfficeHours([], this.courseNum);
         this.listenTo(this.collection, 'fetch', this.showWaiting);
         this.listenTo(this.collection, 'add', this.renderOfficeHour);
@@ -64,7 +64,7 @@ app.OfficeHoursView = Backbone.View.extend({
         var newHour = new app.OfficeHour({
             location: hq.val(),
             end_time: moment().startOf('day').minute(date_obj.mins).hour(date_obj.hour).toISOString(),
-            course_num: _this.courseNum
+            course: '/api/v2/course/' + this.coursePk + '/'
         });
 
 

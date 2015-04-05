@@ -24,21 +24,13 @@ def ModularHomePage(request):
         room_nums = rooms.values_list('room_number', flat=True)
         cache.set(ROOMS_CACHE_KEY, room_nums)
 
+    courses = Course.objects.all()
     open_requests = Request.objects.still_open()
-    courses = Course.objects.distinct('Number').order_by('Number')
-    course_numbers = courses.values_list('Number', flat=True)
-    course_data = []
-    for course_number in course_numbers:
-        open_request_course = open_requests.filter(course__Number=course_number)
 
-        data = {
-            'num': course_number,
-            'count': open_request_course.count()
-        }
-
-        course_data.append(data)
+    for course in courses:
+        course.count = open_requests.filter(course=course).count()
 
     template_params['rooms'] = room_nums
-    template_params['courses'] = course_data
+    template_params['courses'] = courses
 
     return render(request, 'logged_in.html', template_params)
