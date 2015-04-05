@@ -78,7 +78,7 @@ class CourseResourceSessionTest(CourseResourceTestData, ResourceTestCase):
         self.assertValidJSONResponse(response)
         clean_response = self.deserialize(response)
         self.assertKeys(clean_response,
-                        ['Name', 'Number', 'Professor', 'resource_uri'])
+                        ['Name', 'Number', 'department', 'resource_uri'])
 
     def test_post_not_allowed_unauthorized(self):
         self._break_session()
@@ -170,7 +170,7 @@ class CourseResourceTokenTest(CourseResourceTestData, ResourceTestCase):
         self.assertValidJSONResponse(response)
         clean_response = self.deserialize(response)
         self.assertKeys(clean_response,
-                        ['Name', 'Number', 'Professor', 'resource_uri'])
+                        ['Name', 'Number', 'department', 'resource_uri'])
 
     def test_post_not_allowed_unauthorized(self):
         self._break_session()

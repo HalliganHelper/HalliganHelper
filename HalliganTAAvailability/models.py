@@ -33,9 +33,9 @@ class Course(models.Model):
     """
     Name = models.CharField(max_length=100,
                             help_text='The name of the course')
+    department = models.CharField(max_length=50,
+                                  help_text='The department the course belongs to')
     Number = models.IntegerField(help_text='The identifying course number')
-    Professor = models.CharField(max_length=50,
-                                 help_text='The name of the course\'s professor')
 
     # NOTE: This is not currently used
     students = models.ForeignKey(Student,
@@ -44,7 +44,13 @@ class Course(models.Model):
                                  help_text='A list of students enrolled in the course')
 
     def __str__(self):
-        return str(self.Number) + ": " + self.Name
+        return '{} {} -- {}'.format(self.department,
+                              self.Number,
+                              self.Name)
+
+
+    class Meta:
+        ordering = ['department', 'Number']
 
 admin.site.register(Course)
 

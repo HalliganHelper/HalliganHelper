@@ -45,7 +45,7 @@
                     {% for course in courses %}
                     <li>
                         <a href="#/ta/queue/{{ course.Number }}" id="queue{{course.Number}}" data-pk="{{course.pk}}">
-                            Comp {{ course.Number }}
+                            {{course.department}} {{ course.Number }}
                         </a>
                     </li>
                     {% endfor %}
@@ -82,7 +82,7 @@
                                 <li class="heading">TA Queues</li>
                                 {% for course in courses %}
                                 <li><a href="#/ta/queue/{{ course.Number }}" id="queue{{course.Number}}" data-pk="{{course.pk}}">
-                                    Comp {{ course.Number }}
+                                    {{ course.department }} {{ course.Number }}
                                     {% if course.count <= 20 %}
                                         <span class="round success label float-right" id="{{course.Number}}-count">{{ course.count}}</span>
                                     {% else %}

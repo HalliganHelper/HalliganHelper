@@ -4,7 +4,7 @@
     "model": "HalliganTAAvailability.course", 
     "fields": {
         "students": null, 
-        "Professor": "Mark Sheldon", 
+        "department": "Comp",
         "Name": "Intro to Computer Science", 
         "Number": 11
     }
@@ -14,7 +14,7 @@
     "model": "HalliganTAAvailability.course", 
     "fields": {
         "students": null, 
-        "Professor": "Chris Gregg", 
+        "department": "Comp",
         "Name": "Data Structures", 
         "Number": 15
     }
@@ -24,7 +24,7 @@
     "model": "HalliganTAAvailability.course", 
     "fields": {
         "students": null, 
-        "Professor": "Ming Chow", 
+        "department": "Comp",
         "Name": "Web Programming", 
         "Number": 20
     }
@@ -34,7 +34,7 @@
     "model": "HalliganTAAvailability.course", 
     "fields": {
         "students": null, 
-        "Professor": "Ming Chow", 
+        "department": "Comp",
         "Name": "Game Development", 
         "Number": 23
     }
@@ -44,7 +44,7 @@
     "model": "HalliganTAAvailability.course", 
     "fields": {
         "students": null, 
-        "Professor": "Noah Mendelsohn", 
+        "department": "Comp",
         "Name": "Machine Structure & Assembly Language", 
         "Number": 40
     }
@@ -54,7 +54,7 @@
     "model": "HalliganTAAvailability.course", 
     "fields": {
         "students": null, 
-        "Professor": "Sam Guyer", 
+        "department": "Comp",
         "Name": "Programming Languages", 
         "Number": 105
     }
@@ -64,7 +64,7 @@
     "model": "HalliganTAAvailability.course", 
     "fields": {
         "students": null, 
-        "Professor": "Anselm Blumer", 
+        "department": "Comp",
         "Name": "Algorithms", 
         "Number": 160
     }
@@ -74,7 +74,7 @@
     "model": "HalliganTAAvailability.course", 
     "fields": {
         "students": null, 
-        "Professor": "Ben Hescott", 
+        "department": "Comp",
         "Name": "Computational Theory", 
         "Number": 170
     }

@@ -18,7 +18,7 @@ class TestTA(TestCase):
         self.password = 'pass'
         self.course = Course.objects.create(Name='Test Course',
                                             Number=1,
-                                            Professor='John Doe')
+                                            department='Comp')
         self.user = User.objects.create_user(self.username,
                                              'test@test.com',
                                              self.password)

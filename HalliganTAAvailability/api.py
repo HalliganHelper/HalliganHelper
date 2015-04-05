@@ -31,9 +31,9 @@ class CourseResource(ModelResource):
         filtering = {
             'Name': ['exact', 'iexact', 'startswith', ],
             'Number': ['exact', 'lte', 'lt', 'gte', 'gt', ],
-            'Professor': ['exact', 'iexact', 'startswith', ],
+            'department': ['exact', 'iexact', 'startswith', ],
         }
-        fields = ['Name', 'Number', 'Professor', 'students']
+        fields = ['Name', 'Number', 'department', 'students']
         allowed_methods = ['get']
 
 
