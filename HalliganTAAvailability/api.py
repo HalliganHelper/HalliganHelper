@@ -33,7 +33,7 @@ class CourseResource(ModelResource):
             'Number': ['exact', 'lte', 'lt', 'gte', 'gt', ],
             'department': ['exact', 'iexact', 'startswith', ],
         }
-        fields = ['Name', 'Number', 'department', 'students']
+        fields = ['Name', 'Number', 'department', 'students', 'id']
         allowed_methods = ['get']
 
 

@@ -77,8 +77,8 @@ class CourseResourceSessionTest(CourseResourceTestData, ResourceTestCase):
         self.assertHttpOK(response)
         self.assertValidJSONResponse(response)
         clean_response = self.deserialize(response)
-        self.assertKeys(clean_response,
-                        ['Name', 'Number', 'department', 'resource_uri'])
+        expected_keys = ['Name', 'Number', 'department', 'resource_uri', 'id']
+        self.assertKeys(clean_response, expected_keys)
 
     def test_post_not_allowed_unauthorized(self):
         self._break_session()
@@ -169,8 +169,8 @@ class CourseResourceTokenTest(CourseResourceTestData, ResourceTestCase):
         self.assertHttpOK(response)
         self.assertValidJSONResponse(response)
         clean_response = self.deserialize(response)
-        self.assertKeys(clean_response,
-                        ['Name', 'Number', 'department', 'resource_uri'])
+        expected_keys = ['Name', 'Number', 'department', 'resource_uri', 'id']
+        self.assertKeys(clean_response, expected_keys)
 
     def test_post_not_allowed_unauthorized(self):
         self._break_session()
