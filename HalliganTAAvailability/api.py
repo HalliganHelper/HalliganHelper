@@ -18,8 +18,10 @@ logger = logging.getLogger('api')
 
 class CommonMeta(object):
     authorization = DjangoAuthorization()
-    authentication = MultiAuthentication(OAuth20Authentication(),
-                                         SessionAuthentication())
+#     authentication = MultiAuthentication(OAuth20Authentication(),
+#                                          SessionAuthentication())
+    authentication = MultiAuthentication(SessionAuthentication(),
+                                         OAuth20Authentication())
     limit = 0
     always_return_data = True
 
@@ -182,6 +184,7 @@ class RequestResource(ModelResource):
     def obj_create(self, bundle, **kwargs):
         student = Student.objects.get(usr__pk=bundle.request.user.pk)
         kwargs['student'] = student
+        kwargs['whenAsked'] = now()
 
         return_val = super(RequestResource, self).obj_create(bundle, **kwargs)
         QueueNamespace.notify_request(bundle.obj.pk,
