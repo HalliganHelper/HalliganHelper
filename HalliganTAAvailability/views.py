@@ -522,19 +522,14 @@ class QueueNamespace(BaseNamespace):
 
     @staticmethod
     def notify_request(request_id, course_number, change_type):
-        from api import RequestResource
-
-        resource = RequestResource()
-
         message = {
             'type': change_type,
-            'course': course_number
+            'course': course_number,
+            'id': request_id
         }
 
-        request = Request.objects.get(pk=request_id)
-
-        QueueNamespace.send_message(resource, request, message)
-
+        for _, connection in QueueNamespace._connections.items():
+            connection['socket'].send(message, True)
 
     @staticmethod
     def notify_office_hour(office_hour_id, course_number, change_type):

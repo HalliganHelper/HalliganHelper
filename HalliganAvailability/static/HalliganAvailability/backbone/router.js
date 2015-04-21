@@ -92,6 +92,7 @@ $(function() {
         var rq_course;
         var item;
         var request_count;
+        console.log(rq_data);
         switch (rq_data.type) {
             case 'office_hour_update':
                 if ( Boolean ( app.ohView ) && rq_data.course == app.currentCourseNumber ) {
@@ -114,30 +115,20 @@ $(function() {
                 break;
 
             case 'request_update':
-                console.log("UPDATE: ", rq_data);
-                if ( rq_data.data.cancelled || rq_data.data.solved ) {
-
-                    request_count = $('#' + rq_data.course + '-count');
-                    request_count.text(Number(request_count.text()) - 1);
-                }
                 if ( Boolean( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
-                    item = app.currentView.collection.get(rq_data.data.id);
+                    item = app.currentView.collection.get(rq_data.id);
                     if ( Boolean( item ) ) {
-                        item.set(rq_data.data);
-                        if ( item.get('cancelled') || item.get('solved') ) {
-                            app.currentView.collection.remove(item);
-                            app.currentView.hideEmptyDivIfNecessary();
-                        }
+                        item.fetch();
                     }
                 }
                 break;
 
             case 'request_create':
-                request_count = $('#' + rq_data.course + '-count');
-                request_count.text(Number(request_count.text()) + 1);
-                if ( Boolean ( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
-                    app.currentView.collection.add ( new app.QueueItem( rq_data.data ) );
-                    app.currentView.hideEmptyDivIfNecessary();
+                if ( Boolean( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
+                    var newRequest = new app.QueueItem({id: rq_data.id});
+                    newRequest.fetch();
+                    console.log(newRequest);
+                    app.currentView.collection.add(newRequest);
                 }
                 break;
         }

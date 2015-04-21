@@ -51,6 +51,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
     'htmlmin.middleware.HtmlMinifyMiddleware',
     'htmlmin.middleware.MarkRequestMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -312,3 +313,9 @@ PIPELINE_JS = {
         'output_filename': 'js/dependencies.js',
     }
 }
+
+# Opbeat stuff
+
+INSTALLED_APPS += (
+    'opbeat.contrib.django',
+)
