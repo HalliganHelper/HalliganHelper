@@ -15,6 +15,8 @@ app.queueItemsView = Backbone.View.extend({
 
         this.listenTo(this.collection, 'add', this.renderQueueItem);
         this.listenTo(this.collection, 'reset', this.render);
+        this.listenTo(this.collection, 'remove', this.hideEmptyDivIfNecessary);
+        this.listenTo(this.collection, 'add', this.hideEmptyDivIfNecessary);
         this.events["click #makeRequestButton"] = this.makeRequest;
         this.events["keyup #location"] = this.enterPressed;
         this.events["keyup #problem"] = this.enterPressed;

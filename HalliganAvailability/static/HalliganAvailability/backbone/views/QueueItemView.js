@@ -8,6 +8,7 @@ app.queueItemView = Backbone.View.extend({
     events: {},
     initialize: function() {
         this.model.on('change', this.render, this);
+        this.model.on('remove', this.removeFromPage, this);
         this.events['click .cancel-button'] = this.cancel;
         this.events['click .resolve-button'] = this.resolve;
         this.events['click .checkout-button'] = this.checkout;
@@ -18,12 +19,15 @@ app.queueItemView = Backbone.View.extend({
         this.events['keyup #question'] = this.enterKeyUpdate;
         this.delegateEvents(this.events);
     },
+    removeFromPage: function() {
+        var _this = this;
+        this.$el.fadeOut(1000, function() {
+            _this.model.trigger('destroy', this.model);
+        });
+    },
     render: function() {
         if (this.model.get('cancelled') || this.model.get('solved') ) {
-            var _this = this;
-            this.$el.fadeOut(1000, function() {
-                _this.model.trigger('destroy', this.model);
-            });
+            this.removeFromPage();
         } else {
             this.$el.html( this.template( this.model.toJSON() ) );
         }

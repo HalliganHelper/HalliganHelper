@@ -117,7 +117,10 @@ $(function() {
             case 'request_update':
                 if ( Boolean( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
                     item = app.currentView.collection.get(rq_data.id);
-                    if ( Boolean( item ) ) {
+                    if ( Boolean(item) && rq_data.remove ) {
+                        item.collection.remove(item);
+                        //app.currentView.collection.remove(item);
+                    } else if ( Boolean( item ) ) {
                         item.fetch();
                     }
                 }
@@ -126,9 +129,12 @@ $(function() {
             case 'request_create':
                 if ( Boolean( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
                     var newRequest = new app.QueueItem({id: rq_data.id});
-                    newRequest.fetch();
-                    console.log(newRequest);
-                    app.currentView.collection.add(newRequest);
+                    newRequest.fetch({
+                        success: function(model, response, options) {
+                            console.log(model);
+                            app.currentView.collection.add(model);
+                        }    
+                    });
                 }
                 break;
         }

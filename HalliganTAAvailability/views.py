@@ -522,10 +522,12 @@ class QueueNamespace(BaseNamespace):
 
     @staticmethod
     def notify_request(request_id, course_number, change_type):
+        obj = Request.objects.get(pk=request_id)
         message = {
             'type': change_type,
             'course': course_number,
-            'id': request_id
+            'id': request_id,
+            'remove': obj.cancelled or obj.solved
         }
 
         for _, connection in QueueNamespace._connections.items():
