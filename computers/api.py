@@ -2,8 +2,8 @@ from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
 from tastypie.authorization import DjangoAuthorization
-from HalliganComputerAvailability.models import RoomInfo, CourseUsageInfo
-from HalliganComputerAvailability.models import Lab, Computer, Server
+from computers.models import RoomInfo, CourseUsageInfo
+from computers.models import Lab, Computer, Server
 from HalliganAvailability.authentication import OAuth20Authentication
 from django.utils.timezone import now
 from .authorizations import AdminWriteAuthorization
@@ -43,7 +43,7 @@ class ComputerResource(ModelResource):
 
 class RoomInfoResource(ModelResource):
     cuis = fields.ToManyField(
-        'HalliganComputerAvailability.api.CourseUsageInfoResource',
+        'computers.api.CourseUsageInfoResource',
         'cuis', full=True
         )
 

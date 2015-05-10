@@ -4,7 +4,7 @@ import requests
 import csv
 import datetime
 from dateutil.parser import parse as date_parser
-from HalliganComputerAvailability.models import Lab
+from computers.models import Lab
 
 
 class Command(BaseCommand):

@@ -82,7 +82,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     # 'django.contrib.admindocs',
-    'HalliganComputerAvailability',
+    'computers',
     'HalliganTAAvailability',
     'registration',
     'widget_tweaks',
@@ -181,7 +181,7 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG'
         },
-        'HalliganComputerAvailability.views': {
+        'computers.views': {
             'handlers': ['console'],
             'level': 'DEBUG'
         },

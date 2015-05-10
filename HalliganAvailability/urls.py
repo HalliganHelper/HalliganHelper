@@ -7,9 +7,9 @@ from django.conf.urls.static import static
 from manifesto.views import ManifestView
 
 # Computer Availability api
-from HalliganComputerAvailability.api import CourseUsageInfoResource
-from HalliganComputerAvailability.api import LabResource, ComputerResource
-from HalliganComputerAvailability.api import ServerResource, RoomInfoResource
+from computers.api import CourseUsageInfoResource
+from computers.api import LabResource, ComputerResource
+from computers.api import ServerResource, RoomInfoResource
 
 # TA Availability api
 from HalliganTAAvailability.api import CourseResource, OfficeHourResource
@@ -42,9 +42,9 @@ urlpatterns = patterns('',
                        url(r'^admin/', include(admin.site.urls)),
                        url(r'^api/', include(v1_api.urls)),
                        url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
-                       url(r'^api/', include('HalliganComputerAvailability.urls')),
+                       url(r'^api/', include('computers.urls')),
                        url(r'^', include('HalliganTAAvailability.urls')),
-                       url(r'^$', 'HalliganComputerAvailability.views.ModularHomePage', name='ModularHomePage'),
+                       url(r'^$', 'computers.views.ModularHomePage', name='ModularHomePage'),
 #                        url(r'^manifest\.appcache$', ManifestView.as_view(), name='cache_manifest'),
                        )
 
