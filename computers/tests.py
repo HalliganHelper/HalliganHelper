@@ -6,7 +6,7 @@ from django.utils.timezone import now
 import datetime as dt
 from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo
 from .models import Lab
-from HalliganTAAvailability.models import Student, Course, Request
+from tas.models import Student, Course, Request
 
 
 class TestComputer(TestCase):

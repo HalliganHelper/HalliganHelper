@@ -1,7 +1,7 @@
 __author__ = 'tyler'
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
-from HalliganTAAvailability.models import Course, TA
+from tas.models import Course, TA
 from django.db import IntegrityError
 import requests
 from django.core.mail import send_mail

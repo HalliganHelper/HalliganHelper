@@ -83,7 +83,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # 'django.contrib.admindocs',
     'computers',
-    'HalliganTAAvailability',
+    'tas',
     'registration',
     'widget_tweaks',
     'django_extensions',
@@ -173,7 +173,7 @@ LOGGING = {
         }
     },
     'loggers': {
-        'HalliganTAAvailability.views': {
+        'tas.views': {
             'handlers': ['console'],
             'level': 'DEBUG'
         },

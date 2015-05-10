@@ -418,7 +418,7 @@ def login_or_register(request):
         'login': login_form
     }
     return render(request,
-                  'HalliganTAAvailability/login_or_register.html',
+                  'tas/login_or_register.html',
                   template_vars)
 
 
@@ -441,7 +441,7 @@ def update_photo(request):
 
     template_params = {'form': image_form}
     return render(request,
-                  'HalliganTAAvailability/update_photo.html',
+                  'tas/update_photo.html',
                   template_params)
 
 ############################################################################

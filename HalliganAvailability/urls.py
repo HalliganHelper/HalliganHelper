@@ -12,8 +12,8 @@ from computers.api import LabResource, ComputerResource
 from computers.api import ServerResource, RoomInfoResource
 
 # TA Availability api
-from HalliganTAAvailability.api import CourseResource, OfficeHourResource
-from HalliganTAAvailability.api import TAResource, RequestResource
+from tas.api import CourseResource, OfficeHourResource
+from tas.api import TAResource, RequestResource
 
 v1_api = Api(api_name='v2')
 
@@ -43,7 +43,7 @@ urlpatterns = patterns('',
                        url(r'^api/', include(v1_api.urls)),
                        url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
                        url(r'^api/', include('computers.urls')),
-                       url(r'^', include('HalliganTAAvailability.urls')),
+                       url(r'^', include('tas.urls')),
                        url(r'^$', 'computers.views.ModularHomePage', name='ModularHomePage'),
 #                        url(r'^manifest\.appcache$', ManifestView.as_view(), name='cache_manifest'),
                        )

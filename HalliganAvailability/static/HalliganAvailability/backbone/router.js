@@ -1,7 +1,7 @@
 function show_notification(msg) {
     var options = {
         'body': msg,
-        'icon': '/static/HalliganTAAvailability/imgs/HH_Logo.jpg'
+        'icon': '/static/tas/imgs/HH_Logo.jpg'
     };
     var notification = new Notification("Halligan Helper", options);
 }

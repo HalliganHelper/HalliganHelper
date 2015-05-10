@@ -1,7 +1,7 @@
 [
 {
     "pk": 1, 
-    "model": "HalliganTAAvailability.course", 
+    "model": "tas.course", 
     "fields": {
         "students": null, 
         "department": "Comp",
@@ -11,7 +11,7 @@
 },
 {
     "pk": 2, 
-    "model": "HalliganTAAvailability.course", 
+    "model": "tas.course", 
     "fields": {
         "students": null, 
         "department": "Comp",
@@ -21,7 +21,7 @@
 },
 {
     "pk": 3, 
-    "model": "HalliganTAAvailability.course", 
+    "model": "tas.course", 
     "fields": {
         "students": null, 
         "department": "Comp",
@@ -31,7 +31,7 @@
 },
 {
     "pk": 4, 
-    "model": "HalliganTAAvailability.course", 
+    "model": "tas.course", 
     "fields": {
         "students": null, 
         "department": "Comp",
@@ -41,7 +41,7 @@
 },
 {
     "pk": 5, 
-    "model": "HalliganTAAvailability.course", 
+    "model": "tas.course", 
     "fields": {
         "students": null, 
         "department": "Comp",
@@ -51,7 +51,7 @@
 },
 {
     "pk": 6, 
-    "model": "HalliganTAAvailability.course", 
+    "model": "tas.course", 
     "fields": {
         "students": null, 
         "department": "Comp",
@@ -61,7 +61,7 @@
 },
 {
     "pk": 7, 
-    "model": "HalliganTAAvailability.course", 
+    "model": "tas.course", 
     "fields": {
         "students": null, 
         "department": "Comp",
@@ -71,7 +71,7 @@
 },
 {
     "pk": 8, 
-    "model": "HalliganTAAvailability.course", 
+    "model": "tas.course", 
     "fields": {
         "students": null, 
         "department": "Comp",

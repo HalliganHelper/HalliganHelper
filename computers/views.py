@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import Computer
-from HalliganTAAvailability.models import Course, Request
+from tas.models import Course, Request
 from django.core.cache import cache
 
 import logging

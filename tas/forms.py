@@ -80,11 +80,11 @@ class HeadShot(ImageSpec):
     format = 'JPEG'
     options = {'quality': 60}
 
-register.generator('HalliganTAAvailability:Headshot', HeadShot)
+register.generator('tas:Headshot', HeadShot)
 
 
 class TAPhotoChangeForm(forms.Form):
-    image = ProcessedImageField(spec_id='HalliganTAAvailability:Headshot')
+    image = ProcessedImageField(spec_id='tas:Headshot')
 
 class ForgotUsernameForm(forms.Form):
     email = forms.EmailField()
