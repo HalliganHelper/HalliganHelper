@@ -2,9 +2,7 @@ __author__ = 'tyler'
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from tas.models import Course, TA
-from django.db import IntegrityError
 import requests
-from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
@@ -19,11 +17,11 @@ class Command(BaseCommand):
         from_email = 'halliganhelper@tylerlubeck.com'
         to_email = user.email
         if adding_ta:
-            plaintext = get_template('ta_activation.txt')
-            htmly = get_template('ta_activation.html')
+            plaintext = get_template('tas/ta_activation.txt')
+            htmly = get_template('tas/ta_activation.html')
         else:
-            plaintext = get_template('remove_ta.txt')
-            htmly = get_template('remove_ta.txt')
+            plaintext = get_template('tas/remove_ta.txt')
+            htmly = get_template('tas/remove_ta.txt')
 
         d = Context({'user': user, 'courses': courses})
         text_content = plaintext.render(d)
@@ -39,7 +37,7 @@ class Command(BaseCommand):
 
         for user in users:
             print("Checking {0}: {1}".format(user.get_full_name(), user))
-            email = user.email
+            email = user.email.replace('@', ':')
             url = "http://www.cs.tufts.edu/~molay/compta/isata.cgi/{0}"
             r = requests.get(url.format(email))
             is_ta = r.text.strip() != 'NONE'
@@ -60,5 +58,4 @@ class Command(BaseCommand):
                     ta.courses = []
                     ta.save()
                     self.notify(user, None, False)
-            #Email TA based on activated or removed as TA
-
+            # Email TA based on activated or removed as TA

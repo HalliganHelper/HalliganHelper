@@ -1,10 +1,7 @@
-import datetime
 import logging
-import pytz
 import requests
 import json
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
@@ -29,22 +26,16 @@ logger = logging.getLogger(__name__)
 socket_logger = logging.getLogger('sockets')
 
 
-def _now():
-    tz = pytz.timezone(settings.TIME_ZONE)
-    now = datetime.datetime.now(tz)
-    return now
-
-
 def notify(user, courses, adding_ta=True):
     subject = 'TA Activation'
     from_email = 'halliganhelper@tylerlubeck.com'
     to_email = user.email
     if adding_ta:
-        plaintext = get_template('ta_activation.txt')
-        htmly = get_template('ta_activation.html')
+        plaintext = get_template('tas/ta_activation.txt')
+        htmly = get_template('tas/ta_activation.html')
     else:
-        plaintext = get_template('remove_ta.txt')
-        htmly = get_template('remove_ta.html')
+        plaintext = get_template('tas/remove_ta.txt')
+        htmly = get_template('tas/remove_ta.html')
 
     d = Context({'user': user, 'courses': courses})
     text_content = plaintext.render(d)
@@ -111,10 +102,6 @@ def ta_test(user):
 
 class TuftsRegistrationView(RegistrationView):
     form_class = EmailUserCreationForm
-
-
-def courseList(request):
-    return render_to_response('courseList.html')
 
 
 def send_forgotten_username_email(user):
@@ -225,61 +212,6 @@ class QueueNamespace(BaseNamespace):
         del self._connections[id(self)]
         socket_logger.debug("Deleting socket with ID {}".format(id(self)))
         super(QueueNamespace, self).disconnect(*args, **kwargs)
-
-    @staticmethod
-    def emit(msg, json=True):
-        for connection_id, connection in QueueNamespace._connections.items():
-            msg['ta'] = ta_test(connection['user'])
-            connection['socket'].send(msg, json)
-
-    @staticmethod
-    def emit_to_ta(msg, json=True):
-        for connection_id, connection in QueueNamespace._connections.items():
-            if ta_test(connection['user']):
-                connection['socket'].send(msg, json)
-
-    @staticmethod
-    def emit_to_test(msg, test, json=True):
-        """
-            test is a function that will receive two parameters:
-                connection_id - the id of the socket connectoin
-                connection - a dictionary that has two keys:
-                    socket - the socket object itself
-                    user - the user object. This is the real point of this
-                    msg - the same message passed to emit_to_test
-            test is expected to return True or False
-        """
-        for connection_id, connection in QueueNamespace._connections.items():
-            if test(connection_id, connection, msg):
-                connection['socket'].send(msg, json)
-
-    @staticmethod
-    def emit_checkout_request(course_num, rq_id, json_parse=True):
-        msg = {
-            'type': 'checkout',
-            'id': rq_id,
-            'course_num': course_num,
-        }
-        for connection_id, connection in QueueNamespace._connections.items():
-            connection['socket'].send(msg, json_parse)
-
-    @staticmethod
-    def send_ta_update(course_number, office_hour_id, json_parse=True):
-        from .api import OfficeHourResource
-        br = OfficeHourResource()
-
-        msg = {
-            'type': 'add_oh',
-            'course_number': course_number,
-        }
-
-        for _, connection in QueueNamespace._connections.items():
-            o = OfficeHour.objects.get(id=office_hour_id)
-            resource = br.build_bundle(obj=o, request=connection['request'])
-            data = br.full_dehydrate(resource)
-            srl = br.serialize(None, data, 'application/json')
-            msg['resource'] = json.loads(srl)
-            connection['socket'].send(msg, json_parse)
 
     @staticmethod
     def notify_request(request_id, course_number, change_type):
