@@ -6,7 +6,8 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .models import TA, Course
 
 
@@ -14,16 +15,15 @@ class TestTA(TestCase):
     fixtures = ['courses.json']
 
     def setUp(self):
+        User = get_user_model()
         self.username = 'john'
         self.password = 'pass'
         self.course = Course.objects.create(name='Test Course',
                                             number=1,
                                             department='Comp')
-        self.user = User.objects.create_user(self.username,
-                                             'test@test.com',
+        self.user = User.objects.create_user('test@test.com',
                                              self.password)
-        self.other_user = User.objects.create_user('jim',
-                                                   'test@test.com',
+        self.other_user = User.objects.create_user('test1@test.com',
                                                    self.password)
         self.active_ta = TA.objects.create(user=self.user)
         self.nonactive_ta = TA.objects.create(user=self.other_user,

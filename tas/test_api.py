@@ -1,4 +1,5 @@
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from tastypie.test import ResourceTestCase
 from provider.oauth2.models import Client, AccessToken
@@ -8,16 +9,15 @@ from .models import Course, TA, Request, Student
 
 class BasicTestData(object):
     def set_vars(self):
-        self.basic_username = 'john'
-        self.super_username = 'super'
+        self.basic_username = 'john1@example.com'
+        self.super_username = 'john2@example.com'
         self.password = 'password'
+        User = get_user_model()
 
         self.user = User.objects.create_user(self.basic_username,
-                                             'john@example.com',
                                              self.password)
 
         self.super_user = User.objects.create_superuser(self.super_username,
-                                                        'john@example.com',
                                                         self.password)
 
     def _setup_super_session(self):
@@ -282,10 +282,10 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
 
     def setUp(self):
         super(RequestResourceSessionTest, self).setUp()
+        User = get_user_model()
         self.set_vars()
         self.s = Student.objects.create(user=self.user)
-        self.second_user = User.objects.create_user('user_two',
-                                                    'jim@jim.com',
+        self.second_user = User.objects.create_user('jim@jim.com',
                                                     'password')
         self.s2 = Student.objects.create(user=self.second_user)
         self.request = Request.objects.create(course=Course.objects.all()[0],
@@ -351,16 +351,16 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         self.assertNotEqual(request, new_data['question'])
 
     def test_owner_can_update(self):
+        User = get_user_model()
         self._break_session()
-        person = User.objects.create_user('kate',
-                                          'kate@kate.com',
+        person = User.objects.create_user('kate@kate.com',
                                           'thisismypassword')
         s = Student.objects.create(user=person)
         request = Request.objects.create(course=Course.objects.all()[0],
                                          student=s,
                                          question='q',
                                          where_located='w')
-        self.api_client.client.login(username='kate',
+        self.api_client.client.login(username='kate@kate.com',
                                      password='thisismypassword')
 
         url = self.single_url.format(request.pk)
@@ -452,7 +452,7 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
                                     question='Dummy Question 2',
                                     where_located='Dummy Location 2')
 
-        self.api_client.client.login(username=self.second_user.username,
+        self.api_client.client.login(username=self.second_user.email,
                                      password=self.password)
         response = self.api_client.patch(self.single_url.format(rq.pk),
                                          format='json',
