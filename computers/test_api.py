@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from tastypie.test import ResourceTestCase
 from provider.oauth2.models import Client, AccessToken
 from .models import Computer
@@ -8,15 +8,14 @@ class ComputerResourceTestData(object):
     fixtures = ['computers.json']
 
     def create_vars(self):
-        self.basic_username = 'john'
+        User = get_user_model()
+        self.basic_username = 'john@example.com'
         self.password = 'pass'
-        self.super_username = 'super'
+        self.super_username = 'super@example.com'
         self.user = User.objects.create_user(self.basic_username,
-                                             'john@example.com',
                                              self.password)
 
         self.super_user = User.objects.create_superuser(self.super_username,
-                                                        'john@example.com',
                                                         self.password)
 
         self.computer_one = Computer.objects.get(number='116A')

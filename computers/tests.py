@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.db import IntegrityError
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 import datetime as dt
 from .models import RoomInfo, Server, Computer, CourseUsageInfo, ServerInfo
@@ -197,10 +197,14 @@ class TestHomePage(TestCase):
     fixtures = ['courses.json', 'computers.json']
 
     def setUp(self):
-        self.user = User.objects.create_user(username='john', password='pass',
-                                             first_name='john', last_name='doe')
+        User = get_user_model()
+        self.username = 'john@example.com'
+        self.password = 'pass'
+        self.user = User.objects.create_user(self.username,
+                                             self.password)
         self.student = Student.objects.create(user=self.user)
-        self.client.login(username='john', password='pass')
+        self.client.login(username=self.username,
+                          password=self.password)
 
         Request.objects.create(course=Course.objects.all()[0],
                                student=self.student,
