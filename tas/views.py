@@ -65,7 +65,8 @@ def notify(user, courses, adding_ta=True):
 
 
 def check_ta(user):
-    email = user.email
+    # Because apparently having an '@' in the email gives a 403 back from Tufts
+    email = user.email.replace('@', ':')
     url = "http://www.cs.tufts.edu/~molay/compta/isata.cgi/{0}"
     r = requests.get(url.format(email))
     is_ta = r.text.strip() != 'NONE'
