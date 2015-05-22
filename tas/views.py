@@ -6,35 +6,27 @@ import json
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from datetime import timedelta
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
-from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render, render_to_response
-from django.shortcuts import HttpResponseRedirect, get_object_or_404
+from django.shortcuts import HttpResponseRedirect
 from django.template import Context
 from django.template.loader import get_template
-from django.utils.html import escape
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from registration.backends.default.views import RegistrationView
 from registration.signals import user_registered, user_activated
 from socketio import socketio_manage
 from socketio.namespace import BaseNamespace
 
-from .forms import TuftsEmail, RequestForm, OfficeHourForm, CancelHoursForm
 from .forms import TAPhotoChangeForm, ForgotUsernameForm
-from models import Student, Request, TA, Course, OfficeHour
+from .models import Student, Request, TA, Course, OfficeHour
 from .custom_user_forms import EmailUserCreationForm
 
 
 logger = logging.getLogger(__name__)
 socket_logger = logging.getLogger('sockets')
-deprecated_views_logger = logging.getLogger('deprecated_views')
 
 
 def _now():
@@ -95,7 +87,7 @@ def user_confirmed(sender, user, request, **kwargs):
 
 
 def user_created(sender, user, request, **kwargs):
-    form = TuftsEmail(request.POST)
+    form = EmailUserCreationForm(request.POST)
     stu, created = Student.objects.get_or_create(user=user)
     stu.save()
     user.first_name = form.data['first_name']
@@ -118,12 +110,12 @@ def ta_test(user):
 
 
 class TuftsRegistrationView(RegistrationView):
-    # form_class = TuftsEmail
     form_class = EmailUserCreationForm
 
 
 def courseList(request):
     return render_to_response('courseList.html')
+
 
 def send_forgotten_username_email(user):
     subject = 'Forgotten HalliganHelper Username'
@@ -140,6 +132,7 @@ def send_forgotten_username_email(user):
                                  from_email, [to_email])
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
+
 
 def forgot_username(request):
     if request.method == 'POST':
@@ -160,260 +153,26 @@ def forgot_username(request):
                   'registration/forgot_username_form.html',
                   {'form': form})
 
+
 def sent_username(request):
     return render(request,
                   'registration/forgot_username_complete.html',
                   {})
 
 
-
-@login_required
-def getHelp(request, course=None):
-    """ DEPRECATED """
-    deprecated_views_logger.debug('getHelp')
-    if request.method == 'POST':
-        form = RequestForm(request.POST)
-        if form.is_valid():
-            rq = form.save(commit=False)
-            user_id = request.user.id
-            stu, create = Student.objects.get_or_create(user__id=user_id)
-            rq.student = stu
-            rq.emailed = False
-            rq.save()
-            d = {
-                'pk': rq.pk,
-                'name': escape('{0} {1}'.format(stu.user.first_name.title(),
-                                                stu.user.last_name[0].upper())),
-                'location': escape(rq.where_located),
-                'problem': escape(rq.question),
-                'when': rq.whenAsked.strftime('%m/%d %I:%M %p'),
-                'course': rq.course.number,
-                'type': 'add'
-            }
-            QueueNamespace.emit(d, json=True)
-            d = {
-                'course': rq.course.number,
-                'problem': rq.question,
-                'location': rq.where_located,
-                'name': '{0} {1}'.format(stu.user.first_name.title(),
-                                         stu.user.last_name[0].upper()),
-                'when': rq.whenAsked.strftime('%I:%M %p'),
-                'type': 'notify'
-            }
-
-            def course_test(conn_id, conn, msg):
-                if conn['user'].is_authenticated():
-                    try:
-                        ta = conn['user'].ta
-                        if ta in [o.ta for o in OfficeHour.objects.on_duty()]:
-                            nums = [c.number for c in ta.course.all()]
-                            if msg['course'] in nums:
-                                return True
-                    except TA.DoesNotExist:
-                        pass
-                return False
-
-            QueueNamespace.emit_to_test(d, course_test)
-            return HttpResponseRedirect(reverse('taSystem'))
-    else:
-        form = RequestForm()
-
-    data = {'form': form}
-    return render(request, 'getHelp.html', data)
-
-
-@login_required()
-def listRequests(request):
-    """ DEPRECATED """
-    deprecated_views_logger.debug('listRequests')
-
-    try:
-        stu = Student.objects.get(user__id=request.user.id)
-        rqs = stu.request_set.order_by('-whenAsked')
-    except Student.DoesNotExist:
-        rqs = None
-
-    return render(request, 'listRequests.html', {'requests': rqs})
-
-
-@login_required()
-def profile(request):
-    """ DEPRECATED """
-    deprecated_views_logger.debug('PROFILE')
-
-    user = request.user
-    data = {}
-    try:
-        ta = TA.objects.get(user__pk=user.pk)
-        data['is_ta'] = True
-    except TA.DoesNotExist:
-        ta = None
-        data['is_ta'] = False
-
-    page = request.GET.get('page', None)
-    if ta:
-        resolved_requests = ta.request_set.all().order_by('-whenSolved')
-        paginator = Paginator(resolved_requests, 20)
-        try:
-            resolved = paginator.page(page)
-        except PageNotAnInteger:
-            resolved = paginator.page(1)
-        except EmptyPage:
-            resolved = paginator.page(paginator.num_pages)
-        data['resolved'] = resolved
-
-    return render(request, 'profile.html', data)
-
-
-@ensure_csrf_cookie
-def onlineQueue(request):
-    tz = pytz.timezone(settings.TIME_ZONE)
-    before = datetime.datetime.now(tz) - datetime.timedelta(hours=5)
-
-    expiredReqs = Request.objects.filter(whenAsked__lt=before)
-    expiredReqs = expiredReqs.filter(Q(timedOut=False))
-    for e in expiredReqs:
-        e.timeOut()
-
-    allReqs = Request.objects.filter(whenAsked__gte=before)
-    allReqs = allReqs.order_by('whenAsked')
-    courses = Course.objects.all().order_by('number')
-    ohs = OfficeHour.objects.on_duty()
-    requestData = []
-
-    for course in courses:
-        reqs = allReqs.filter(course=course)
-        reqs = reqs.filter(timedOut=False).filter(solved=False)
-        course_hours = ohs.filter(course=course)
-        insert = (course, reqs, course_hours)
-        requestData.append(insert)
-
-    is_ta = TA.objects.filter(user__id=request.user.id).exists()
-
-    responseData = {
-        'requestData': requestData,
-        'is_ta': is_ta
-    }
-
-    return render(request, 'taSystem.html', responseData)
-
-
-@require_POST
-@login_required()
-def resolveRequest(request):
-    """ DEPRECATED """
-    deprecated_views_logger.debug('RESOLVE REQUEST')
-
-    rq_id = request.POST.get('requestID', None)
-    student = Student.objects.get(user__id=request.user.id)
-    try:
-        ta = TA.objects.get(user__id=request.user.id)
-    except TA.DoesNotExist:
-        ta = None
-    if not rq_id:
-        # TODO: add error message
-        return HttpResponse(status=400)
-    try:
-        rq_id = int(rq_id)
-    except ValueError:
-        # TODO: add error message
-        return HttpResponse(status=400)
-
-    req = get_object_or_404(Request, pk=rq_id)
-    is_the_student = req.student.pk == student.pk
-
-    if not is_the_student and not ta:
-        return HttpResponse(status=401)
-
-    if ta and not is_the_student:
-        req.who_solved = ta
-    req.solved = True
-    req.whenSolved = _now()
-    req.checked_out = False
-    req.save()
-    QueueNamespace.emit({'type': 'resolve',
-                         'rq': rq_id,
-                         'course': req.course.number},
-                        json=True)
-    return HttpResponse(status=200)
-
-
 def is_ta(user):
     try:
         return user.ta.active
-    except Exception:
+    except TA.DoesNotExist:
         return False
-
-
-@login_required()
-@user_passes_test(is_ta)
-def go_on_duty(request):
-    user = request.user
-
-    ta = user.ta
-    if ta and OfficeHour.objects.on_duty().filter(ta=ta):
-        cancel = True
-    else:
-        cancel = False
-
-    if request.method == 'POST':
-        ca_form = CancelHoursForm(request.POST, prefix='ca_form')
-        oh_form = OfficeHourForm(request.POST, prefix='oh_form')
-        if oh_form.is_valid():
-            my_tz = pytz.timezone(settings.TIME_ZONE)
-            new_hours = oh_form.save(commit=False)
-            new_hours.end_time = new_hours.end_time.astimezone(my_tz)
-            new_hours.ta = user.ta
-            new_hours.start_time = _now()
-            new_hours.save()
-            return HttpResponseRedirect(reverse('taSystem'))
-
-        elif ca_form.is_valid() and cancel:
-            if ca_form.cleaned_data['confirm']:
-                try:
-                    oh = OfficeHour.objects.on_duty().filter(ta=user.ta)[0]
-                    oh.end_time = _now() - timedelta(minutes=1)
-                    oh.save()
-                    return HttpResponseRedirect(reverse('go_on_duty'))
-                except OfficeHour.DoesNotExist:
-                    logger.debug('No Office hours exist')
-                    pass
-            else:
-                return HttpResponseRedirect(reverse('taSystem'))
-    else:
-        oh_form = OfficeHourForm(prefix='oh_form')
-        ca_form = CancelHoursForm(prefix='ca_form')
-    return render(request, 'go_on_duty.html', {'oh_form': oh_form,
-                                               'ca_form': ca_form,
-                                               'cancel': cancel})
-
-
-@login_required()
-@user_passes_test(is_ta)
-def cancel_hours(request):
-    user = request.user
-    if request.method == "POST":
-        form = CancelHoursForm(request.POST)
-        if form.is_valid():
-            if form.cleaned_data['confirm']:
-                oh = OfficeHour.objects.on_duty().filter(ta=user.ta)[0]
-                oh.end_time = _now() - timedelta(minutes=1)
-                oh.save()
-                return HttpResponseRedirect(reverse('go_on_duty'))
-            else:
-                return HttpResponseRedirect(reverse('taSystem'))
-    else:
-        form = CancelHoursForm()
-
-    return render(request, 'cancel_hours.html', {'form': form})
 
 
 def login_or_register(request):
     if request.method == 'POST':
-        register_form = TuftsEmail(request.POST)
+        register_form = EmailUserCreationForm(request.POST)
         login_form = AuthenticationForm(request.POST)
     else:
-        register_form = TuftsEmail()
+        register_form = EmailUserCreationForm()
         login_form = AuthenticationForm()
     template_vars = {
         'register': register_form,
@@ -506,7 +265,7 @@ class QueueNamespace(BaseNamespace):
 
     @staticmethod
     def send_ta_update(course_number, office_hour_id, json_parse=True):
-        from api import OfficeHourResource
+        from .api import OfficeHourResource
         br = OfficeHourResource()
 
         msg = {
@@ -537,7 +296,7 @@ class QueueNamespace(BaseNamespace):
 
     @staticmethod
     def notify_office_hour(office_hour_id, course_number, change_type):
-        from api import OfficeHourResource
+        from .api import OfficeHourResource
 
         resource = OfficeHourResource()
 
@@ -550,7 +309,6 @@ class QueueNamespace(BaseNamespace):
 
         QueueNamespace.send_message(resource, office_hour, message)
 
-
     @staticmethod
     def send_message(br, item, message):
         for _, connection in QueueNamespace._connections.items():
@@ -561,7 +319,6 @@ class QueueNamespace(BaseNamespace):
                                            'application/json')
             message['data'] = json.loads(serialized_data)
             connection['socket'].send(message, True)
-
 
 
 class AnnouncementNamespace(BaseNamespace):
@@ -615,7 +372,8 @@ class AnnouncementNamespace(BaseNamespace):
             except TA.DoesNotExist:
                 continue
 
-            course_office_hours = OfficeHour.objects.on_duty_for_course(course_number)
+            course_office_hours = OfficeHour.objects.on_duty_for_course(
+                course_number)
 
             active_for_course = ta.course.filter(number=course_number).exists()
             on_duty = course_office_hours.filter(ta__pk=ta.pk).exists()
@@ -631,7 +389,10 @@ class AnnouncementNamespace(BaseNamespace):
 
         logger.debug("NOTIFY USER")
         for _, connection in AnnouncementNamespace._connections.items():
-            logger.debug("Looking for user {} with user {}".format(connection['user'].pk, which_user))
+            logger.debug(
+                "Looking for user {} with user {}".format(
+                    connection['user'].pk,
+                    which_user))
             if connection['user'].pk == which_user:
                 logger.debug("SENDING NOTIFICATION")
                 connection['socket'].send(msg, json_parse)

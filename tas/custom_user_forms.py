@@ -19,8 +19,8 @@ class EmailUserCreationForm(CustomUserCreationForm):
         email = self.cleaned_data['email']
         domain = email.split('@')[1].lower()
         if domain not in allowed_domains:
-            msg = 'Emails must belong to one of the following domains: {}'
-            raise forms.ValidationError(msg.format(' '.join(allowed_domains)))
+            msg = 'Emails must belong to one of the following domains: \{{}\}'
+            raise forms.ValidationError(msg.format(','.join(allowed_domains)))
         return email
 
 
