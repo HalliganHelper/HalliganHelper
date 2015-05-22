@@ -16,8 +16,8 @@ class TestTA(TestCase):
     def setUp(self):
         self.username = 'john'
         self.password = 'pass'
-        self.course = Course.objects.create(Name='Test Course',
-                                            Number=1,
+        self.course = Course.objects.create(name='Test Course',
+                                            number=1,
                                             department='Comp')
         self.user = User.objects.create_user(self.username,
                                              'test@test.com',
@@ -25,14 +25,14 @@ class TestTA(TestCase):
         self.other_user = User.objects.create_user('jim',
                                                    'test@test.com',
                                                    self.password)
-        self.active_ta = TA.objects.create(usr=self.user)
-        self.nonactive_ta = TA.objects.create(usr=self.other_user,
+        self.active_ta = TA.objects.create(user=self.user)
+        self.nonactive_ta = TA.objects.create(user=self.other_user,
                                               active=False)
 
     def test_ta_created(self):
-        ta = TA.objects.get(usr=self.user)
+        ta = TA.objects.get(user=self.user)
         self.assertEqual(ta.pk, self.active_ta.pk)
-        self.assertEqual(ta.usr.pk, self.active_ta.usr.pk)
+        self.assertEqual(ta.user.pk, self.active_ta.user.pk)
         self.assertEqual(str(ta.headshot), str(self.active_ta.headshot))
 
     def test_active_holds_active(self):

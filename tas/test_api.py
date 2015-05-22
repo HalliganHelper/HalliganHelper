@@ -77,7 +77,7 @@ class CourseResourceSessionTest(CourseResourceTestData, ResourceTestCase):
         self.assertHttpOK(response)
         self.assertValidJSONResponse(response)
         clean_response = self.deserialize(response)
-        expected_keys = ['Name', 'Number', 'department', 'resource_uri', 'id']
+        expected_keys = ['name', 'number', 'department', 'resource_uri', 'id']
         self.assertKeys(clean_response, expected_keys)
 
     def test_post_not_allowed_unauthorized(self):
@@ -169,7 +169,7 @@ class CourseResourceTokenTest(CourseResourceTestData, ResourceTestCase):
         self.assertHttpOK(response)
         self.assertValidJSONResponse(response)
         clean_response = self.deserialize(response)
-        expected_keys = ['Name', 'Number', 'department', 'resource_uri', 'id']
+        expected_keys = ['name', 'number', 'department', 'resource_uri', 'id']
         self.assertKeys(clean_response, expected_keys)
 
     def test_post_not_allowed_unauthorized(self):
@@ -219,9 +219,9 @@ class TAResourceTestData(BasicTestData):
         self.get_url = '/api/v2/ta/'
         self.get_single_url = '/api/v2/ta/{}/'
         self.authorization_header = ''
-        self.ta = TA(usr=self.user)
+        self.ta = TA(user=self.user)
         self.ta.save()
-        self.deactive_ta = TA(usr=self.super_user, active=False)
+        self.deactive_ta = TA(user=self.super_user, active=False)
         self.deactive_ta.save()
 
 
@@ -264,7 +264,7 @@ class TAResourceSessionTest(TAResourceTestData, ResourceTestCase):
         self.assertEqual(ta['headshot'].split('/')[-1],
                          str(self.ta.headshot).split('/')[-1])
 
-        self.assertEqual(ta['full_name'], self.ta.usr.get_full_name())
+        self.assertEqual(ta['full_name'], self.ta.user.get_full_name())
         self.assertEqual(ta['active'], self.ta.active)
 
 
@@ -274,7 +274,7 @@ class RequestResourceTestData(BasicTestData):
         self.get_url = '/api/v2/request/'
         self.single_url = '/api/v2/request/{}/'
         self.authorization_header = ''
-        self.ta = TA.objects.create(usr=self.super_user)
+        self.ta = TA.objects.create(user=self.super_user)
 
 
 class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
@@ -283,15 +283,15 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
     def setUp(self):
         super(RequestResourceSessionTest, self).setUp()
         self.set_vars()
-        self.s = Student.objects.create(usr=self.user)
+        self.s = Student.objects.create(user=self.user)
         self.second_user = User.objects.create_user('user_two',
                                                     'jim@jim.com',
                                                     'password')
-        self.s2 = Student.objects.create(usr=self.second_user)
+        self.s2 = Student.objects.create(user=self.second_user)
         self.request = Request.objects.create(course=Course.objects.all()[0],
                                               student=self.s,
                                               question='Dummy Question',
-                                              whereLocated='Dummy Location')
+                                              where_located='Dummy Location')
 
     def test_single_request_basic_user(self):
         self._setup_basic_session()
@@ -301,7 +301,7 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         self.assertValidJSONResponse(response)
         data = self.deserialize(response)
         expected_keys = ['whenAsked', 'first_name', 'last_name', 'course',
-                         'whereLocated', 'question', 'checked_out', 'id',
+                         'where_located', 'question', 'checked_out', 'id',
                          'solved', 'cancelled', 'resource_uri', 'allow_edit',
                          'allow_resolve']
 
@@ -355,11 +355,11 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         person = User.objects.create_user('kate',
                                           'kate@kate.com',
                                           'thisismypassword')
-        s = Student.objects.create(usr=person)
+        s = Student.objects.create(user=person)
         request = Request.objects.create(course=Course.objects.all()[0],
                                          student=s,
                                          question='q',
-                                         whereLocated='w')
+                                         where_located='w')
         self.api_client.client.login(username='kate',
                                      password='thisismypassword')
 
@@ -398,7 +398,7 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         request = Request.objects.create(course=Course.objects.all()[0],
                                          student=self.s,
                                          question='Dummy Question',
-                                         whereLocated='Dummy Location')
+                                         where_located='Dummy Location')
 
         url = self.single_url.format(request.pk)
         new_data = {'solved': True}
@@ -412,7 +412,7 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         rq = Request.objects.create(course=Course.objects.all()[0],
                                     student=self.s,
                                     question='Dummy Question 2',
-                                    whereLocated='Dummy Location 2')
+                                    where_located='Dummy Location 2')
 
         self._setup_super_session()
         response = self.api_client.patch(self.single_url.format(rq.pk),
@@ -435,7 +435,7 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
 
         post_data = {
             'question': 'Hello There',
-            'whereLocated': 'Up There',
+            'where_located': 'Up There',
             'course': '/api/v2/course/{}/'.format(course.pk),
             'allow_edit': False
         }
@@ -450,12 +450,12 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         rq = Request.objects.create(course=Course.objects.first(),
                                     student=self.s,
                                     question='Dummy Question 2',
-                                    whereLocated='Dummy Location 2')
+                                    where_located='Dummy Location 2')
 
         self.api_client.client.login(username=self.second_user.username,
                                      password=self.password)
         response = self.api_client.patch(self.single_url.format(rq.pk),
                                          format='json',
-                                         data={'whereLocated': 'there'})
+                                         data={'where_located': 'there'})
 
         self.assertHttpUnauthorized(response)

@@ -199,14 +199,14 @@ class TestHomePage(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='john', password='pass',
                                              first_name='john', last_name='doe')
-        self.student = Student.objects.create(usr=self.user)
+        self.student = Student.objects.create(user=self.user)
         self.client.login(username='john', password='pass')
 
         Request.objects.create(course=Course.objects.all()[0],
                                student=self.student,
                                question='Some Question',
                                whenAsked=now(),
-                               whereLocated='Some Place')
+                               where_located='Some Place')
 
     def _get_home_page(self):
         return self.client.get(reverse('ModularHomePage'))
@@ -237,5 +237,5 @@ class TestHomePage(TestCase):
     def test_home_page_has_sorted_courses(self):
         response = self._get_home_page()
         courses = response.context['courses']
-        sorted_courses = sorted(courses, key=lambda k: k.Number)
+        sorted_courses = sorted(courses, key=lambda k: k.number)
         self.assertSequenceEqual(courses, sorted_courses)

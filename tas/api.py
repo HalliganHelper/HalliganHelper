@@ -31,11 +31,11 @@ class CourseResource(ModelResource):
         queryset = Course.objects.all()
         authorization = ReadOnlyAuthorization()
         filtering = {
-            'Name': ['exact', 'iexact', 'startswith', ],
-            'Number': ['exact', 'lte', 'lt', 'gte', 'gt', ],
+            'name': ['exact', 'iexact', 'startswith', ],
+            'number': ['exact', 'lte', 'lt', 'gte', 'gt', ],
             'department': ['exact', 'iexact', 'startswith', ],
         }
-        fields = ['Name', 'Number', 'department', 'students', 'id']
+        fields = ['name', 'number', 'department', 'students', 'id']
         allowed_methods = ['get']
 
 
@@ -53,7 +53,7 @@ class TAResource(ModelResource):
             return TA.objects.active()
 
     def dehydrate(self, bundle):
-        bundle.data['full_name'] = bundle.obj.usr.get_full_name()
+        bundle.data['full_name'] = bundle.obj.user.get_full_name()
         return bundle
 
 
@@ -80,7 +80,7 @@ class OfficeHourResource(ModelResource):
 
     def dehydrate(self, bundle):
         bundle.data['location'] = conditional_escape(bundle.data['location'])
-        bundle.data['is_me'] = bundle.request.user.pk == bundle.obj.ta.usr.pk
+        bundle.data['is_me'] = bundle.request.user.pk == bundle.obj.ta.user.pk
         return bundle
 
     def alter_list_data_to_serialize(self, request, data):
@@ -98,14 +98,14 @@ class OfficeHourResource(ModelResource):
 
         return_val = super(OfficeHourResource, self).obj_create(bundle, **kwargs)
         QueueNamespace.notify_office_hour(bundle.obj.pk,
-                                          bundle.obj.course.Number,
+                                          bundle.obj.course.number,
                                           'office_hour_create')
         return return_val
 
     def obj_update(self, bundle, **kwargs):
         return_val = super(OfficeHourResource, self).obj_create(bundle, **kwargs)
         QueueNamespace.notify_office_hour(bundle.obj.pk,
-                                          bundle.obj.course.Number,
+                                          bundle.obj.course.number,
                                           'office_hour_update')
         return return_val
 
@@ -121,7 +121,7 @@ class RequestResource(ModelResource):
         validation = RequestValidation()
 
         fields = ['whenAsked', 'first_name', 'last_name', 'course',
-                  'whereLocated', 'question', 'checked_out', 'id',
+                  'where_located', 'question', 'checked_out', 'id',
                   'solved', 'cancelled']
         filtering = {
             'course': ALL_WITH_RELATIONS
@@ -135,12 +135,12 @@ class RequestResource(ModelResource):
                                 solved=False)
 
     def _can_student_update(self, user, new_keys, item_id):
-        student_allowed_updates = set(['whereLocated',
+        student_allowed_updates = set(['where_located',
                                        'question',
                                        'cancelled'])
         item_to_update = Request.objects.get(pk=item_id)
 
-        is_owner = item_to_update.student.usr.pk == user.pk
+        is_owner = item_to_update.student.user.pk == user.pk
 
         changes_allowed = new_keys.issubset(student_allowed_updates)
 
@@ -177,22 +177,22 @@ class RequestResource(ModelResource):
 
         return_val = super(RequestResource, self).obj_update(bundle, **kwargs)
         QueueNamespace.notify_request(bundle.obj.pk,
-                                      bundle.obj.course.Number,
+                                      bundle.obj.course.number,
                                       'request_update')
         return return_val
 
     def obj_create(self, bundle, **kwargs):
-        student = Student.objects.get(usr__pk=bundle.request.user.pk)
+        student = Student.objects.get(user__pk=bundle.request.user.pk)
         kwargs['student'] = student
         kwargs['whenAsked'] = now()
 
         return_val = super(RequestResource, self).obj_create(bundle, **kwargs)
         QueueNamespace.notify_request(bundle.obj.pk,
-                                      bundle.obj.course.Number,
+                                      bundle.obj.course.number,
                                       'request_create')
         # TODO: Make sure course_num is a number after switching to full paths above
         AnnouncementNamespace.notify_ta(bundle.request.user.get_full_name(),
-                                        bundle.obj.course.Number)
+                                        bundle.obj.course.number)
 
         return return_val
 
@@ -215,7 +215,7 @@ class RequestResource(ModelResource):
         user = bundle.request.user
 
         # Html escape vulnerable properties
-        bundle.data['whereLocated'] = conditional_escape(bundle.data['whereLocated'])
+        bundle.data['where_located'] = conditional_escape(bundle.data['where_located'])
         bundle.data['question'] = conditional_escape(bundle.data['question'])
 
         try:
@@ -223,11 +223,11 @@ class RequestResource(ModelResource):
         except TA.DoesNotExist:
             bundle.data['allow_resolve'] = False
 
-        if bundle.obj.student.usr.pk == user.pk:
+        if bundle.obj.student.user.pk == user.pk:
             bundle.data['allow_edit'] = True
         else:
             bundle.data['allow_edit'] = False
 
-        bundle.data['first_name'] = bundle.obj.student.usr.first_name
-        bundle.data['last_name'] = bundle.obj.student.usr.last_name
+        bundle.data['first_name'] = bundle.obj.student.user.first_name
+        bundle.data['last_name'] = bundle.obj.student.user.last_name
         return bundle

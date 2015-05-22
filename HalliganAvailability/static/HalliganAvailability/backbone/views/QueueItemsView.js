@@ -74,7 +74,7 @@ app.queueItemsView = Backbone.View.extend({
 
         var locationField = this.$el.find('#location'),
             problemField = $('#problem'),
-            whereLocated = locationField.val(),
+            where_located = locationField.val(),
             problem = problemField.val(),
             $requestButton = $($('#makeRequestButton')[0]),
             $questionField = $('#questionField'),
@@ -89,7 +89,7 @@ app.queueItemsView = Backbone.View.extend({
 
         var newRequest = new app.QueueItem({
             'question': problem,
-            'whereLocated': whereLocated,
+            'where_located': where_located,
             'course': '/api/v2/course/' + this.coursePk + '/'
         });
 
@@ -106,7 +106,7 @@ app.queueItemsView = Backbone.View.extend({
                 if ('question' in errors) {
                     $questionField.addClass('error');
                 }
-                if ('whereLocated' in errors) {
+                if ('where_located' in errors) {
                     $locationField.addClass('error');
                 }
                 $requestButton.prop('disabled', false);

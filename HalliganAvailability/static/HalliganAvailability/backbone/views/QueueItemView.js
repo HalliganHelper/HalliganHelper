@@ -78,7 +78,7 @@ app.queueItemView = Backbone.View.extend({
         var whereLocated = this.$el.find('#whereLocated'),
             question = this.$el.find('#question'),
             updates = {
-                'whereLocated': whereLocated.val(),
+                'where_located': whereLocated.val(),
                 'question': question.val()
             },
             _this = this;
@@ -94,9 +94,9 @@ app.queueItemView = Backbone.View.extend({
                     $(question).parent().addClass('error');
                     console.log( responseJSON.request.question );
                 }
-                if ( Boolean( responseJSON.request.whereLocated ) ) {
+                if ( Boolean( responseJSON.request.where_located ) ) {
                     $(whereLocated).parent().addClass('error');
-                    console.log( responseJSON.request.whereLocated );
+                    console.log( responseJSON.request.where_located );
                 }
             },
             silent: true,

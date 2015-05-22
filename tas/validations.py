@@ -14,9 +14,9 @@ class RequestValidation(Validation):
         if question is not None and len(question) == 0:
             errors['question'] = 'Please provide a question'
 
-        location = bundle.data.get('whereLocated', None)
+        location = bundle.data.get('where_located', None)
         if location is not None and len(location) == 0:
-            errors['whereLocated'] = 'Please provide a location'
+            errors['where_located'] = 'Please provide a location'
 
         return errors
 

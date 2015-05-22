@@ -45,17 +45,17 @@ class Command(BaseCommand):
             is_ta = r.text.strip() != 'NONE'
             if is_ta:
                 course_nums = r.text.strip().split(' ')
-                courses = Course.objects.filter(Number__in=course_nums)
+                courses = Course.objects.filter(number__in=course_nums)
                 print("{0} is a TA for {1}".format(user.get_full_name(),
                                                    map(str, courses)))
-                ta, created = TA.objects.get_or_create(usr=user)
+                ta, created = TA.objects.get_or_create(user=user)
                 ta.active = True
                 ta.course = courses
                 ta.save()
                 self.notify(user, courses)
             else:
-                if TA.objects.filter(usr__email=email).exists():
-                    ta = TA.objects.get(usr__email=email)
+                if TA.objects.filter(user__email=email).exists():
+                    ta = TA.objects.get(user__email=email)
                     ta.active = False
                     ta.courses = []
                     ta.save()

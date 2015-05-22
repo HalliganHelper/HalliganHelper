@@ -5,8 +5,8 @@
     "fields": {
         "students": null, 
         "department": "Comp",
-        "Name": "Intro to Computer Science", 
-        "Number": 11
+        "name": "Intro to Computer Science", 
+        "number": 11
     }
 },
 {
@@ -15,8 +15,8 @@
     "fields": {
         "students": null, 
         "department": "Comp",
-        "Name": "Data Structures", 
-        "Number": 15
+        "name": "Data Structures", 
+        "number": 15
     }
 },
 {
@@ -25,8 +25,8 @@
     "fields": {
         "students": null, 
         "department": "Comp",
-        "Name": "Web Programming", 
-        "Number": 20
+        "name": "Web Programming", 
+        "number": 20
     }
 },
 {
@@ -35,8 +35,8 @@
     "fields": {
         "students": null, 
         "department": "Comp",
-        "Name": "Game Development", 
-        "Number": 23
+        "name": "Game Development", 
+        "number": 23
     }
 },
 {
@@ -45,8 +45,8 @@
     "fields": {
         "students": null, 
         "department": "Comp",
-        "Name": "Machine Structure & Assembly Language", 
-        "Number": 40
+        "name": "Machine Structure & Assembly Language", 
+        "number": 40
     }
 },
 {
@@ -55,8 +55,8 @@
     "fields": {
         "students": null, 
         "department": "Comp",
-        "Name": "Programming Languages", 
-        "Number": 105
+        "name": "Programming Languages", 
+        "number": 105
     }
 },
 {
@@ -65,8 +65,8 @@
     "fields": {
         "students": null, 
         "department": "Comp",
-        "Name": "Algorithms", 
-        "Number": 160
+        "name": "Algorithms", 
+        "number": 160
     }
 },
 {
@@ -75,8 +75,8 @@
     "fields": {
         "students": null, 
         "department": "Comp",
-        "Name": "Computational Theory", 
-        "Number": 170
+        "name": "Computational Theory", 
+        "number": 170
     }
 }
 ]

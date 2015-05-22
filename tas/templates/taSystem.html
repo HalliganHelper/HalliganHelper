@@ -70,17 +70,17 @@
                         </thead>
                         <tbody>
                         {% for r in rq.1 %}
-                            {% if r.student.usr == request.user %}
+                            {% if r.student.user == request.user %}
                             <tr class="myRequest" data-rqID='{{ r.id }}'>
                             {% else %}
                             <tr data-rqID="{{ r.id }}">
                             {% endif %}
-                                <td>{{ r.student.usr.first_name|escape }} {{ r.student.usr.last_name|first|capfirst|escape}}.</td>
+                                <td>{{ r.student.user.first_name|escape }} {{ r.student.user.last_name|first|capfirst|escape}}.</td>
                                 <td>{{ r.whereLocated|escape }}</td>
                                 <td wraptext>{{ r.question|escape }}</td>
                                 <td>{{ r.whenAsked|date:"m/d P" }}</td>
                                 <td>
-                                    {% if r.student.usr == request.user %}
+                                    {% if r.student.user == request.user %}
                                         <div class="medium info btn">
                                             <a href="#" class="resolveBtn" data-id="{{ r.pk }}">Resolve</a>
                                         </div>
@@ -123,7 +123,7 @@
                     {% if rq.2 %}
                         <ul class="two_up tiles">
                         {% for oh in rq.2 %}
-                             <li>{{ oh.ta.usr.get_full_name|escape }} in {{ oh.location|escape }} until {{ oh.end_time|date:"P" }} </li>
+                             <li>{{ oh.ta.user.get_full_name|escape }} in {{ oh.location|escape }} until {{ oh.end_time|date:"P" }} </li>
                         {% endfor %}
                         </ul>
                     {% else %}

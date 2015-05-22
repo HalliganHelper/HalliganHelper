@@ -29,6 +29,7 @@ from socketio.namespace import BaseNamespace
 from .forms import TuftsEmail, RequestForm, OfficeHourForm, CancelHoursForm
 from .forms import TAPhotoChangeForm, ForgotUsernameForm
 from models import Student, Request, TA, Course, OfficeHour
+from .custom_user_forms import EmailUserCreationForm
 
 
 logger = logging.getLogger(__name__)
@@ -70,17 +71,17 @@ def check_ta(user):
     is_ta = r.text.strip() != 'NONE'
     if is_ta:
         course_nums = r.text.strip().split(' ')
-        courses = Course.objects.filter(Number__in=course_nums)
+        courses = Course.objects.filter(number__in=course_nums)
 
         logger.debug("{0} has been added as a ta".format(user))
-        ta, created = TA.objects.get_or_create(usr=user)
+        ta, created = TA.objects.get_or_create(user=user)
         ta.active = True
         ta.course = courses
         ta.save()
         notify(user, courses, adding_ta=True)
     else:
-        if TA.objects.filter(usr__email=email).exists():
-            ta = TA.objects.get(usr__email=email)
+        if TA.objects.filter(user__email=email).exists():
+            ta = TA.objects.get(user__email=email)
             ta.active = False
             ta.courses = []
             ta.save()
@@ -94,7 +95,7 @@ def user_confirmed(sender, user, request, **kwargs):
 
 def user_created(sender, user, request, **kwargs):
     form = TuftsEmail(request.POST)
-    stu, created = Student.objects.get_or_create(usr=user)
+    stu, created = Student.objects.get_or_create(user=user)
     stu.save()
     user.first_name = form.data['first_name']
     user.last_name = form.data['last_name']
@@ -116,7 +117,8 @@ def ta_test(user):
 
 
 class TuftsRegistrationView(RegistrationView):
-    form_class = TuftsEmail
+    # form_class = TuftsEmail
+    form_class = EmailUserCreationForm
 
 
 def courseList(request):
@@ -172,28 +174,28 @@ def getHelp(request, course=None):
         form = RequestForm(request.POST)
         if form.is_valid():
             rq = form.save(commit=False)
-            usr_id = request.user.id
-            stu, create = Student.objects.get_or_create(usr__id=usr_id)
+            user_id = request.user.id
+            stu, create = Student.objects.get_or_create(user__id=user_id)
             rq.student = stu
             rq.emailed = False
             rq.save()
             d = {
                 'pk': rq.pk,
-                'name': escape('{0} {1}'.format(stu.usr.first_name.title(),
-                                                stu.usr.last_name[0].upper())),
-                'location': escape(rq.whereLocated),
+                'name': escape('{0} {1}'.format(stu.user.first_name.title(),
+                                                stu.user.last_name[0].upper())),
+                'location': escape(rq.where_located),
                 'problem': escape(rq.question),
                 'when': rq.whenAsked.strftime('%m/%d %I:%M %p'),
-                'course': rq.course.Number,
+                'course': rq.course.number,
                 'type': 'add'
             }
             QueueNamespace.emit(d, json=True)
             d = {
-                'course': rq.course.Number,
+                'course': rq.course.number,
                 'problem': rq.question,
-                'location': rq.whereLocated,
-                'name': '{0} {1}'.format(stu.usr.first_name.title(),
-                                         stu.usr.last_name[0].upper()),
+                'location': rq.where_located,
+                'name': '{0} {1}'.format(stu.user.first_name.title(),
+                                         stu.user.last_name[0].upper()),
                 'when': rq.whenAsked.strftime('%I:%M %p'),
                 'type': 'notify'
             }
@@ -203,7 +205,7 @@ def getHelp(request, course=None):
                     try:
                         ta = conn['user'].ta
                         if ta in [o.ta for o in OfficeHour.objects.on_duty()]:
-                            nums = [c.Number for c in ta.course.all()]
+                            nums = [c.number for c in ta.course.all()]
                             if msg['course'] in nums:
                                 return True
                     except TA.DoesNotExist:
@@ -225,7 +227,7 @@ def listRequests(request):
     deprecated_views_logger.debug('listRequests')
 
     try:
-        stu = Student.objects.get(usr__id=request.user.id)
+        stu = Student.objects.get(user__id=request.user.id)
         rqs = stu.request_set.order_by('-whenAsked')
     except Student.DoesNotExist:
         rqs = None
@@ -241,7 +243,7 @@ def profile(request):
     user = request.user
     data = {}
     try:
-        ta = TA.objects.get(usr__pk=user.pk)
+        ta = TA.objects.get(user__pk=user.pk)
         data['is_ta'] = True
     except TA.DoesNotExist:
         ta = None
@@ -274,7 +276,7 @@ def onlineQueue(request):
 
     allReqs = Request.objects.filter(whenAsked__gte=before)
     allReqs = allReqs.order_by('whenAsked')
-    courses = Course.objects.all().order_by('Number')
+    courses = Course.objects.all().order_by('number')
     ohs = OfficeHour.objects.on_duty()
     requestData = []
 
@@ -285,7 +287,7 @@ def onlineQueue(request):
         insert = (course, reqs, course_hours)
         requestData.append(insert)
 
-    is_ta = TA.objects.filter(usr__id=request.user.id).exists()
+    is_ta = TA.objects.filter(user__id=request.user.id).exists()
 
     responseData = {
         'requestData': requestData,
@@ -302,9 +304,9 @@ def resolveRequest(request):
     deprecated_views_logger.debug('RESOLVE REQUEST')
 
     rq_id = request.POST.get('requestID', None)
-    student = Student.objects.get(usr__id=request.user.id)
+    student = Student.objects.get(user__id=request.user.id)
     try:
-        ta = TA.objects.get(usr__id=request.user.id)
+        ta = TA.objects.get(user__id=request.user.id)
     except TA.DoesNotExist:
         ta = None
     if not rq_id:
@@ -326,12 +328,11 @@ def resolveRequest(request):
         req.who_solved = ta
     req.solved = True
     req.whenSolved = _now()
-    req.timedOut = False
     req.checked_out = False
     req.save()
     QueueNamespace.emit({'type': 'resolve',
                          'rq': rq_id,
-                         'course': req.course.Number},
+                         'course': req.course.number},
                         json=True)
     return HttpResponse(status=200)
 
@@ -580,7 +581,7 @@ class AnnouncementNamespace(BaseNamespace):
     @staticmethod
     def send_request_update(course_num, json=True):
         num_requests = Request.objects.still_open()
-        num_requests = num_requests.filter(course__Number=course_num).count()
+        num_requests = num_requests.filter(course__number=course_num).count()
         msg = {
             'type': 'request_update',
             'course_number': course_num,
@@ -615,7 +616,7 @@ class AnnouncementNamespace(BaseNamespace):
 
             course_office_hours = OfficeHour.objects.on_duty_for_course(course_number)
 
-            active_for_course = ta.course.filter(Number=course_number).exists()
+            active_for_course = ta.course.filter(number=course_number).exists()
             on_duty = course_office_hours.filter(ta__pk=ta.pk).exists()
             if ta.active and active_for_course and on_duty:
                 connection['socket'].send(msg, json_parse)

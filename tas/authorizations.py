@@ -20,7 +20,7 @@ class RequestAuthorization(ReadOnlyAuthorization):
         """ Only the student who created the request or a TA should be able
         to update the request
         """
-        if bundle.obj.student.usr.pk == bundle.request.user.pk:
+        if bundle.obj.student.user.pk == bundle.request.user.pk:
             return True
         try:
             if bundle.request.user.ta.active:
@@ -49,7 +49,7 @@ class OfficeHourAuthorization(ReadOnlyAuthorization):
     def update_detail(self, object_list, bundle):
         """ Only the TA that created the OfficeHour can update it"""
         try:
-            if bundle.obj.ta.usr.pk == bundle.request.user.pk:
+            if bundle.obj.ta.user.pk == bundle.request.user.pk:
                 return True
         except TA.DoesNotExist:
             raise Unauthorized("You are not authorized!")

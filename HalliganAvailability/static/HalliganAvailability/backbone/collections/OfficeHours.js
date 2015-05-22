@@ -6,7 +6,7 @@ app.OfficeHours = Backbone.TastypieCollection.extend({
         this.courseNum = courseNum; 
     },
     url: function() {
-        return '/api/v2/officehour/?course__Number=' + this.courseNum;
+        return '/api/v2/officehour/?course__number=' + this.courseNum;
     },
     comparator: function (collection) {
         return collection.get('end_time');

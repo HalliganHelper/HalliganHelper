@@ -99,6 +99,8 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
+AUTH_USER_MODEL = 'tas.CustomUser'
+
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -319,3 +321,9 @@ PIPELINE_JS = {
 INSTALLED_APPS += (
     'opbeat.contrib.django',
 )
+
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+ALLOWED_REGISTRATION_DOMAINS = ('tufts.edu', 'cs.tufts.edu')

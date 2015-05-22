@@ -1,10 +1,13 @@
 from django.db import models
 from django.contrib import admin
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 import datetime
 from imagekit.admin import AdminThumbnail
+
+from .custom_user import CustomUser
 
 
 def not_empty_string(value):
@@ -17,10 +20,10 @@ class Student(models.Model):
         Every User object has a Student associated with it, and these Students
         are created when the user is registered.
     """
-    usr = models.OneToOneField(User)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
 
     def __str__(self):
-        return self.usr.first_name + ' ' + self.usr.last_name
+        return self.user.first_name + ' ' + self.user.last_name
 
 
 admin.site.register(Student)
@@ -30,11 +33,11 @@ class Course(models.Model):
     """ A Course is the representation of an academic course.
         Requests and TAs are associated with courses.
     """
-    Name = models.CharField(max_length=100,
+    name = models.CharField(max_length=100,
                             help_text='The name of the course')
     department = models.CharField(max_length=50,
                                   help_text='The department the course belongs to')
-    Number = models.IntegerField(help_text='The identifying course number')
+    number = models.IntegerField(help_text='The identifying course number')
 
     # NOTE: This is not currently used
     students = models.ForeignKey(Student,
@@ -44,12 +47,12 @@ class Course(models.Model):
 
     def __str__(self):
         return '{} {} -- {}'.format(self.department,
-                              self.Number,
-                              self.Name)
+                              self.number,
+                              self.name)
 
 
     class Meta:
-        ordering = ['department', 'Number']
+        ordering = ['department', 'number']
 
 admin.site.register(Course)
 
@@ -61,7 +64,7 @@ class TAAdmin(admin.ModelAdmin):
 
     def list_courses(ta):
         """ Create a CSV of the courses that a TA is registered for """
-        courses = map(str, ta.course.all().values_list('Number', flat=True))
+        courses = map(str, ta.course.all().values_list('number', flat=True))
         return ', '.join(courses)
 
     list_courses.short_description = 'Courses'
@@ -91,8 +94,8 @@ class TA(models.Model):
 
     default_image = 'headshots/None/ming.jpg'
 
-    usr = models.OneToOneField(User,
-                               help_text='The user the TA is associated with.')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                help_text='The user the TA is associated with.')
     course = models.ManyToManyField(Course,
                                     help_text='The courses a TA is registered to TA for')
     active = models.BooleanField(default=True,
@@ -106,7 +109,7 @@ class TA(models.Model):
     objects = TAManager()
 
     def __str__(self):
-        return self.usr.get_full_name()
+        return self.user.get_full_name()
 
     def __repr__(self):
         return self.__str__()
@@ -139,23 +142,22 @@ class Request(models.Model):
     """
     course = models.ForeignKey(Course,
                                help_text='The course the request is for')
+
     student = models.ForeignKey(Student,
                                 help_text='The student who made the request')
 
     question = models.CharField(max_length=51,
                                 validators=[not_empty_string],
                                 help_text='The question associated with the request')
-    whereLocated = models.CharField(max_length=50,
-                                    validators=[not_empty_string],
-                                    help_text='Where the user is located')
+
+    where_located = models.CharField(max_length=50,
+                                     validators=[not_empty_string],
+                                     help_text='Where the user is located')
 
     whenAsked = models.DateTimeField(help_text='When the request was made')
+
     cancelled = models.BooleanField(default=False, blank=True,
                                     help_text='Did the student cancel the request?')
-
-    # TODO: What is this for?
-    emailed = models.BooleanField(default=False,
-                                  help_text='Not really sure why I included this')
 
     solved = models.BooleanField(default=False,
                                  help_text='Has the request been resolved?')
@@ -166,9 +168,6 @@ class Request(models.Model):
     checked_out = models.BooleanField(default=False,
                                       help_text='Has a TA started working on the request?')
 
-    # TODO: Do I still use this?
-    timedOut = models.BooleanField(default=False,
-                                   help_text='Has the request timed out?')
     objects = RequestDisplayManager()
 
     def save(self, *args, **kwargs):
@@ -189,8 +188,8 @@ class Request(models.Model):
         return self.whenSolved - self.whenAsked
 
     def __str__(self):
-        return '{0} - Comp {1}'.format(self.student.usr.first_name,
-                                       self.course.Number)
+        return '{0} - Comp {1}'.format(self.student.user.first_name,
+                                       self.course.number)
 
 admin.site.register(Request)
 
@@ -207,7 +206,7 @@ class OfficeHourManager(models.Manager):
     def on_duty_for_course(self, course_number):
         """Returns active office hours for the specified course"""
         qs = self.on_duty()
-        return qs.filter(course__Number=course_number)
+        return qs.filter(course__number=course_number)
 
 
 class OfficeHour(models.Model):

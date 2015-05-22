@@ -5,6 +5,7 @@ from imagekit import ImageSpec, register
 from imagekit.processors import ResizeToFit
 from imagekit.forms import ProcessedImageField
 from django.utils.translation import ugettext_lazy as _
+from .custom_user_forms import CustomUserCreationForm, CustomUserChangeForm
 
 
 class TuftsEmail(RegistrationFormUniqueEmail):
@@ -12,10 +13,13 @@ class TuftsEmail(RegistrationFormUniqueEmail):
     first_name = forms.CharField()
     last_name = forms.CharField()
 
+    def is_valid(self):
+        print 'CALLING IS_VALID'
+        return super(TuftsEmail, self).is_valid()
+
     def clean_email(self):
         data = super(TuftsEmail, self).clean_email()
         domain = data.split('@')[1].lower()
-        # TODO: Make this be 'if not in'
         if domain != 'tufts.edu' and domain != 'cs.tufts.edu':
             msg = 'Only @tufts.edu email addresses are allowed.'
             raise forms.ValidationError(msg)
@@ -34,7 +38,7 @@ class RequestForm(forms.ModelForm):
 
     class Meta:
         model = Request
-        fields = ['question', 'whereLocated', 'course']
+        fields = ['question', 'where_located', 'course']
 
     def __init__(self, *args, **kwargs):
         super(RequestForm, self).__init__(*args, **kwargs)
