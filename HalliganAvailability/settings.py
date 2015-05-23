@@ -204,7 +204,7 @@ LOGGING = {
 
 BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
 
-BOWER_INSTALLED_APPS = ('foundation#5.3.3',
+BOWER_INSTALLED_APPS = ('foundation#5.4.7',
                         'jquery-placeholder#2.0.8',
                         'modernizr#2.8.3',
                         'jquery#2.1.1',

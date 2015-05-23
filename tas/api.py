@@ -190,7 +190,6 @@ class RequestResource(ModelResource):
         QueueNamespace.notify_request(bundle.obj.pk,
                                       bundle.obj.course.number,
                                       'request_create')
-        # TODO: Make sure course_num is a number after switching to full paths above
         AnnouncementNamespace.notify_ta(bundle.request.user.get_full_name(),
                                         bundle.obj.course.number)
 

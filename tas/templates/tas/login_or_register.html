@@ -10,10 +10,10 @@
 </div>
 <div class="row show-for-small">
     <div class="medium-6 small-12 columns login-card left">
-        <a href="#" data-reveal-id="login-modal" class="button expand"> Login </a>
+        <a href="#" data-reveal-id="login-modal" class="button expand"> Sign In </a>
     </div>
     <div class="medium-6 small-12 columns login-card right">
-        <a href="#" data-reveal-id="signup-modal" class="button expand success">Sign Up</a>
+        <a href="#" data-reveal-id="signup-modal" class="button expand success">Register</a>
     </div>
 </div>
 {% comment %}
@@ -44,10 +44,10 @@
 </div>
 <div class="row hide-for-small">
     <div class="medium-6 small-12 columns login-card left">
-        <a href="#" data-reveal-id="login-modal" class="button expand"> Login </a>
+        <a href="#" data-reveal-id="login-modal" class="button expand"> Sign In </a>
     </div>
     <div class="medium-6 small-12 columns login-card right">
-        <a href="#" data-reveal-id="signup-modal" class="button expand success">Sign Up</a>
+        <a href="#" data-reveal-id="signup-modal" class="button expand success">Register</a>
     </div>
 </div>
 <div id="login-modal" class="reveal-modal" data-reveal>
@@ -64,8 +64,11 @@
         </div>
         {% endfor %}
         <div class="row">
-            <div class="small-1 small-centered columns">
-                <input type="submit" value="Login" class="button extend"/>
+            <div class="small-12 columns text-center">
+                <input type="submit" value="Sign In" class="button extend primary"/>
+            </div>
+            <div class="small-12 columns text-center">
+                <a class="" href="{% url 'auth_password_reset' %}">Forgot your password?</a>
             </div>
         </div>
         <input type="hidden" name="next" value="{{ next }}" />
@@ -89,7 +92,7 @@
         {% endfor %}
         <div class="row">
             <div class="small-1 small-centered columns">
-                <input type="submit" value="Sign Up" class="button success extend"/>
+                <input type="submit" value="Register" class="button success extend"/>
             </div>
         </div>
         <input type="hidden" name="next" value="{{ next }}" />
@@ -106,25 +109,4 @@
             Created by <a href="mailto:tyler@tylerlubeck.com">Tyler Lubeck</a>
         </div>
     </div>
-{% endblock %}
-
-{% block styles %}
-<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.3.7/slick.css"/>
-<link href="{% static 'computers/css/jquery.vegas.min.css' %}" rel="stylesheet"/>
-{% endblock %}
-
-{% block endscripts %}
-<script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.3.7/slick.min.js"></script>
-<script src="{% static 'computers/js/jquery.vegas.min.js' %}"></script>
-<script>
-    $(function() {
-        $.vegas({
-            src: "{% static 'tas/imgs/Halligan_Background.jpg' %}"
-        });
-
-        $('.ta-slider').slick({
-            'dots': true            
-        });
-    });
-</script>
 {% endblock %}

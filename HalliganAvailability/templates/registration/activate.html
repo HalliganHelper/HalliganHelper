@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Yay! Your account is now active</h2>
-    <a href="/accounts/login">Login</a>
+<div class="row">
+    <div class="small-12 columns login-card text-center">
+        <h2>Yay! Your account is now active.</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 columns login-card text-center">
+        <a class="large success button" href="{% url 'auth_login' %}">Login</a>
+    </div>
+</div>
 {% endblock %}

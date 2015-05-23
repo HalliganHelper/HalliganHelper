@@ -3,108 +3,35 @@
 {% load widget_tweaks %}
 
 {% block content %}
+    
     <div class="row">
-        <form method="post">{% csrf_token %}
-
-            <div class="row">
-                <div class="field centered six columns">
-                    {% render_field form.username class="wide text input" type="text" placeholder="Username (For login only)" %}
+        <div class="small-12 columns login-card">
+            <h2 class="text-center">Welcome!</h2>
+            <p class="text-center">Fill out this form and we'll get you started.</p>
+            <form method="post" action="{% url 'register' %}">
+                {% for field in form %}
+                <div class="row collapse">
+                    <div class="small-4 columns">
+                        <span class="prefix">{{ field.label }}</span>
+                    </div>
+                    <div class="small-8 columns">
+                        {% if field.errors %}
+                            {% render_field field class="error" %}
+                            <small class="error">{{ field.errors.0 }}</small>
+                        {% else %}
+                            {{ field }} 
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-            {% if form.username.errors %}
+                {% endfor %}
                 <div class="row">
-                    <div class="centered ten columns">
-                        <li class="danger alert text-center">{{ form.username.errors }}</li>
+                    <div class="small-1 small-centered columns">
+                        <input type="submit" value="Register" class="button success extend"/>
                     </div>
                 </div>
-            {% endif %}
-
-            <div class="row">
-                <div class="field centered six columns">
-                    {% render_field form.first_name class="wide text input" type="text" placeholder="First Name" %}
-                </div>
-            </div>
-            {% if form.first_name.errors %}
-                <div class="row">
-                    <div class="centered ten columns">
-                        <li class="danger alert text-center">{{ form.first_name.errors }}</li>
-                    </div>
-                </div>
-            {% endif %}
-
-            <div class="row">
-                <div class="field centered six columns">
-                    {% render_field form.last_name class="wide text input" type="text" placeholder="Last Name" %}
-                </div>
-            </div>
-            {% if form.last_name.errors %}
-                <div class="row">
-                    <div class="centered ten columns">
-                        <li class="danger alert text-center">{{ form.last_name.errors }}</li>
-                    </div>
-                </div>
-            {% endif %}
-
-
-            <div class="row">
-                <div class="field centered six columns">
-                    {% render_field form.email class="wide text input" type="text" placeholder="Tufts Email" %}
-                </div>
-            </div>
-            {% if form.email.errors %}
-                <div class="row">
-                    <div class="centered ten columns">
-                        <li class="danger alert text-center">{{ form.email.errors }}</li>
-                    </div>
-                </div>
-            {% endif %}
-
-
-            <div class="row">
-                <div class="field centered six columns">
-                    {% render_field form.password1 class="wide password input" type="password" placeholder="Password" %}
-                </div>
-            </div>
-            {% if form.password1.errors %}
-                <div class="row">
-                    <div class="centered ten columns">
-                        <li class="danger alert text-center">{{ form.password1.errors }}</li>
-                    </div>
-                </div>
-            {% endif %}
-
-
-            <div class="row">
-                <div class="field centered six columns">
-                    {% render_field form.password2 class="wide password input" type="password" placeholder="Password (again)" %}
-                </div>
-            </div>
-            {% if form.password2.errors %}
-                <div class="row">
-                    <div class="centered ten columns">
-                        <li class="danger alert text-center">{{ form.password2.errors }}</li>
-                    </div>
-                </div>
-            {% endif %}
-            {% if form.non_field_errors %}
-                <div class="row">
-                    <div class="centered ten columns">
-                        <li class="danger alert text-center">{{ form.non_field_errors }}</li>
-                    </div>
-                </div>
-            {% endif %}
-
-
-            <div class="row">
-                <div class="centered four columns">
-                    <div class="medium primary btn">
-                        <input type="submit" value="Register"/>
-                    </div>
-                </div>
-            </div>
-
-
-        </form>
+                <input type="hidden" name="next" value="{{ next }}" />
+                {% csrf_token %}
+            </form>
+        </div>
     </div>
-
 {% endblock %}

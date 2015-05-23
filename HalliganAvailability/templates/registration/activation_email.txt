@@ -2,7 +2,7 @@ Hi There,
 
     Welcome to HalliganHelper! Please be sure to activate in the next {{expiration_days}} days.
 
-    http://{{ site.domain }}/accounts/activate/{{ activation_key }}
+    {{ protocol }}://{{ domain }}/accounts/activate/{{ activation_key }}
 
 
 Thanks!
