@@ -33,8 +33,6 @@ class Computer(models.Model):
     def __repr__(self):
         return self.__str__()
 
-admin.site.register(Computer)
-
 
 class RoomInfo(models.Model):
     lab = models.CharField(max_length=10)
@@ -56,7 +54,6 @@ class RoomInfo(models.Model):
                                  self.num_available,
                                  self.num_unavailable,
                                  self.num_error, self.last_updated)
-admin.site.register(RoomInfo)
 
 
 class CourseUsageInfo(models.Model):
@@ -77,40 +74,6 @@ class CourseUsageInfo(models.Model):
     def __repr__(self):
         return self.__str__()
 
-admin.site.register(CourseUsageInfo)
-
-
-class Server(models.Model):
-    OFF = 'OFF'
-    ON = 'ON'
-    ERROR = 'ERROR'
-
-    CHOICES = [OFF, ON, ERROR]
-
-    STATUS_CHOICES = (
-        (OFF, 'Off'),
-        (ON, 'On'),
-        (ERROR, 'Error')
-    )
-
-    name = models.CharField(max_length=20,
-                            primary_key=True)
-    num_users = models.IntegerField()
-
-    status = models.CharField(max_length=40,
-                              choices=STATUS_CHOICES,
-                              default=ON)
-
-    last_updated = models.DateTimeField(auto_now=True)
-
-admin.site.register(Server)
-
-
-class ServerInfo(models.Model):
-    name = models.CharField(max_length=20)
-    last_updated = models.DateTimeField(auto_now=True)
-    num_users = models.IntegerField()
-
 
 class Lab(models.Model):
     course_name = models.CharField(max_length=30)
@@ -120,6 +83,12 @@ class Lab(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     day_of_week = models.IntegerField(max_length=1)
+
+    def __str__(self):
+        return '{}: {} {:%I:%M%p}'.format(self.course_name,
+                                          self.day_of_week_name(),
+                                          self.start_time)
+
 
     def day_of_week_name(self, short_name=False):
         def long(x):
@@ -168,4 +137,3 @@ class Lab(models.Model):
             return True
 
         return False
-admin.site.register(Lab)

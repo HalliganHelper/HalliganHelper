@@ -9,7 +9,7 @@ from manifesto.views import ManifestView
 # Computer Availability api
 from computers.api import CourseUsageInfoResource
 from computers.api import LabResource, ComputerResource
-from computers.api import ServerResource, RoomInfoResource
+from computers.api import RoomInfoResource
 
 # TA Availability api
 from tas.api import CourseResource, OfficeHourResource
@@ -22,13 +22,11 @@ v1_api.register(CourseUsageInfoResource())
 v1_api.register(RoomInfoResource())
 v1_api.register(LabResource())
 v1_api.register(ComputerResource())
-v1_api.register(ServerResource())
 
 # TA Availability api
 v1_api.register(CourseResource())
 v1_api.register(OfficeHourResource())
 v1_api.register(TAResource())
-# v1_api.register(UserResource())
 v1_api.register(RequestResource())
 
 

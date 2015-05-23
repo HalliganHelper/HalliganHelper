@@ -3,7 +3,7 @@ from tastypie.resources import ModelResource
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
 from tastypie.authorization import DjangoAuthorization
 from computers.models import RoomInfo, CourseUsageInfo
-from computers.models import Lab, Computer, Server
+from computers.models import Lab, Computer
 from HalliganAvailability.authentication import OAuth20Authentication
 from django.utils.timezone import now
 from .authorizations import AdminWriteAuthorization
@@ -65,20 +65,6 @@ class CourseUsageInfoResource(ModelResource):
 
     class Meta(CommonMeta):
         queryset = CourseUsageInfo.objects.all()
-        allowed_methods = ['get']
-
-
-class ServerResource(ModelResource):
-
-    class Meta(CommonMeta):
-        queryset = Server.objects.all()
-        filtering = {
-            'name': ['exact', 'iexact'],
-            'num_users': ['exact', ],
-            'status': ['exact', 'iexact', ],
-        }
-        resource_name = 'server'
-        fields = ['name', 'num_users', 'status', 'last_updated']
         allowed_methods = ['get']
 
 
