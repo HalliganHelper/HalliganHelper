@@ -10,6 +10,6 @@ app.queueItems = Backbone.TastypieCollection.extend({
         return '/api/v2/request/?course=' + this.coursePk;
     },
     comparator: function (collection) {
-        return collection.get('whenAsked');
+        return collection.get('when_asked');
     }
 });

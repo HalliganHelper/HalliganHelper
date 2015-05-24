@@ -150,7 +150,7 @@ class TestHomePage(TestCase):
         Request.objects.create(course=Course.objects.all()[0],
                                student=self.student,
                                question='Some Question',
-                               whenAsked=now(),
+                               when_asked=now(),
                                where_located='Some Place')
 
     def _get_home_page(self):

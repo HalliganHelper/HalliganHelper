@@ -7,7 +7,7 @@ app.QueueItem = Backbone.TastypieModel.extend({
     defaults: {
         course: -1,
         question: '',
-        whenAsked: new Date(),
+        when_asked: new Date(),
         where_located: '',
         allow_resolve: false,
         allow_edit: false,

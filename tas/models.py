@@ -131,7 +131,7 @@ class RequestDisplayManager(models.Manager):
             since_when defaults to 5
         """
         timeout = datetime.timedelta(hours=since_when)
-        return self.get_query_set().filter(whenAsked__gte=now() - timeout,
+        return self.get_query_set().filter(when_asked__gte=now() - timeout,
                                            cancelled=False,
                                            solved=False)
 
@@ -154,14 +154,14 @@ class Request(models.Model):
                                      validators=[not_empty_string],
                                      help_text='Where the user is located')
 
-    whenAsked = models.DateTimeField(help_text='When the request was made')
+    when_asked = models.DateTimeField(help_text='When the request was made')
 
     cancelled = models.BooleanField(default=False, blank=True,
                                     help_text='Did the student cancel the request?')
 
     solved = models.BooleanField(default=False,
                                  help_text='Has the request been resolved?')
-    whenSolved = models.DateTimeField(blank=True, null=True,
+    when_solved = models.DateTimeField(blank=True, null=True,
                                       help_text='When the request was resolved')
     who_solved = models.ForeignKey(TA, null=True, blank=True,
                                    help_text='The TA who resolved the request')
@@ -171,11 +171,11 @@ class Request(models.Model):
     objects = RequestDisplayManager()
 
     def save(self, *args, **kwargs):
-        """ Note that whenAsked is set to the current time if
+        """ Note that when_asked is set to the current time if
             this is a new request
         """
         if self.pk is None:
-            self.whenAsked = now()
+            self.when_asked = now()
         return super(Request, self).save(*args, **kwargs)
 
     def timeOut(self):
@@ -183,9 +183,9 @@ class Request(models.Model):
         self.save()
 
     def resolutionTime(self):
-        if not self.whenSolved:
+        if not self.when_solved:
             return None
-        return self.whenSolved - self.whenAsked
+        return self.when_solved - self.when_asked
 
     def __str__(self):
         return '{0} - Comp {1}'.format(self.student.user.first_name,

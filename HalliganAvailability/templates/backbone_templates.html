@@ -110,7 +110,7 @@
                 <span class="show-for-small-only">
                     Asked at: 
                 </span>
-                <%= moment(whenAsked).format("MM/DD h:mm a") %>
+                <%= moment(when_asked).format("MM/DD h:mm a") %>
             </div>
 
             <div class="large-2 medium-2 small-12 columns end queue-resolve text-center">
@@ -127,7 +127,7 @@
                 <span class="show-for-small-only">
                     Asked at: 
                 </span>
-                <%= moment(whenAsked).format("MM/DD h:mm a") %>
+                <%= moment(when_asked).format("MM/DD h:mm a") %>
             </div>
 
             <div class="large-2 medium-2 small-12 columns end text-center queue-resolve">
@@ -143,7 +143,7 @@
                 <span class="show-for-small-only">
                     Asked at: 
                 </span>
-                <%= moment(whenAsked).format("MM/DD h:mm a") %>
+                <%= moment(when_asked).format("MM/DD h:mm a") %>
             </div>
         <% } %>
     </div>
@@ -169,7 +169,7 @@
             </label>
         </div>
 
-        <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(whenAsked).format("MM/DD h:mm a") %></div>
+        <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(when_asked).format("MM/DD h:mm a") %></div>
         <div class="large-2 medium-2 small-12 columns end text-center queue-resolve">
             <div class="tiny secondary button undo-button">
                Undo 

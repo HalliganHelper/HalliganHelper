@@ -300,7 +300,7 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         self.assertHttpOK(response)
         self.assertValidJSONResponse(response)
         data = self.deserialize(response)
-        expected_keys = ['whenAsked', 'first_name', 'last_name', 'course',
+        expected_keys = ['when_asked', 'first_name', 'last_name', 'course',
                          'where_located', 'question', 'checked_out', 'id',
                          'solved', 'cancelled', 'resource_uri', 'allow_edit',
                          'allow_resolve']
@@ -389,7 +389,7 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
         self.assertEqual(modded_request, self.request)
         self.assertEqual(modded_request.solved, True)
         self.assertEqual(modded_request.checked_out, True)
-        self.assertAlmostEqual(modded_request.whenSolved,
+        self.assertAlmostEqual(modded_request.when_solved,
                                now(),
                                delta=datetime.timedelta(seconds=10))
 
@@ -420,12 +420,12 @@ class RequestResourceSessionTest(RequestResourceTestData, ResourceTestCase):
                                          data={'solved': True})
 
         self.assertHttpAccepted(response)
-        first_solved = Request.objects.get(pk=rq.pk).whenSolved
+        first_solved = Request.objects.get(pk=rq.pk).when_solved
 
         response = self.api_client.patch(self.single_url.format(rq.pk),
                                          format='json',
                                          data={'solved': True})
-        second_solved = Request.objects.get(pk=rq.pk).whenSolved
+        second_solved = Request.objects.get(pk=rq.pk).when_solved
 
         self.assertEqual(first_solved, second_solved)
 

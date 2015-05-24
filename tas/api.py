@@ -120,7 +120,7 @@ class RequestResource(ModelResource):
         authorization = RequestAuthorization()
         validation = RequestValidation()
 
-        fields = ['whenAsked', 'first_name', 'last_name', 'course',
+        fields = ['when_asked', 'first_name', 'last_name', 'course',
                   'where_located', 'question', 'checked_out', 'id',
                   'solved', 'cancelled']
         filtering = {
@@ -130,7 +130,7 @@ class RequestResource(ModelResource):
     def get_object_list(self, request):
         query_set = super(RequestResource, self).get_object_list(request)
         five_hours = datetime.timedelta(hours=5)
-        return query_set.filter(whenAsked__gte=now() - five_hours,
+        return query_set.filter(when_asked__gte=now() - five_hours,
                                 cancelled=False,
                                 solved=False)
 
@@ -171,8 +171,8 @@ class RequestResource(ModelResource):
         new_keys = set(data.keys())
         ta_update = self._can_ta_update(request.user, new_keys)
 
-        if ta_update and 'solved' in new_keys and bundle.obj.whenSolved is None:
-            bundle.obj.whenSolved = now()
+        if ta_update and 'solved' in new_keys and bundle.obj.when_solved is None:
+            bundle.obj.when_solved = now()
             bundle.obj.who_solved = request.user.ta
 
         return_val = super(RequestResource, self).obj_update(bundle, **kwargs)
@@ -184,7 +184,7 @@ class RequestResource(ModelResource):
     def obj_create(self, bundle, **kwargs):
         student = Student.objects.get(user__pk=bundle.request.user.pk)
         kwargs['student'] = student
-        kwargs['whenAsked'] = now()
+        kwargs['when_asked'] = now()
 
         return_val = super(RequestResource, self).obj_create(bundle, **kwargs)
         QueueNamespace.notify_request(bundle.obj.pk,
