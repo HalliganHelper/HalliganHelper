@@ -19,7 +19,7 @@ from socketio.namespace import BaseNamespace
 
 from .forms import TAPhotoChangeForm, ForgotUsernameForm
 from .models import Student, Request, TA, Course, OfficeHour
-from .custom_user_forms import EmailUserCreationForm
+from .custom_user_forms import EmailUserCreationForm, EmailAuthenticationForm
 
 
 logger = logging.getLogger(__name__)
@@ -157,10 +157,10 @@ def is_ta(user):
 def login_or_register(request):
     if request.method == 'POST':
         register_form = EmailUserCreationForm(request.POST)
-        login_form = AuthenticationForm(request.POST)
+        login_form = EmailAuthenticationForm(request.POST)
     else:
         register_form = EmailUserCreationForm()
-        login_form = AuthenticationForm()
+        login_form = EmailAuthenticationForm()
     template_vars = {
         'register': register_form,
         'login': login_form
