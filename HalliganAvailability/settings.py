@@ -68,10 +68,9 @@ ROOT_URLCONF = 'HalliganAvailability.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'HalliganAvailability.wsgi.application'
 
-# TEMPLATE_DIRS = (
-#     os.path.join(PROJECT_ROOT, 'templates').replace('\\', '/'),
-# )
-TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),)
+TEMPLATE_DIRS = (
+    os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),
+)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -204,29 +203,12 @@ LOGGING = {
 
 BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
 
-BOWER_INSTALLED_APPS = ('foundation#5.4.7',
+BOWER_INSTALLED_APPS = ('foundation#5.5.2',
                         'jquery-placeholder#2.0.8',
                         'modernizr#2.8.3',
                         'jquery#2.1.1',
                         'fastclick#1.0.3',
                         'jquery.cookie#1.4.1')
-
-# COMPRESS_PRECOMPILERS = (
-#     ('text/x-sass', 'sass --compass -E "UTF-8" "{infile}" "{outfile}"'),
-#     ('text/x-scss', 'sass --scss --compass -E "UTF-8" -I "%s/bower_components/foundation/scss" "{infile}" "{outfile}"' % BOWER_COMPONENTS_ROOT),
-# )
-#
-# COMPRESS_CSS_FILTERS = [
-#     'compressor.filters.cssmin.CSSMinFilter'
-# ]
-#
-# COMPRESS_JS_FILTERS = [
-#     'compressor.filters.jsmin.JSMinFilter'
-# ]
-
-# COMPRESS_OFFLINE = True
-
-# COMPRESS_URL = '/static/'
 
 TASTYPIE_DEFAULT_FORMATS = ['json']
 
@@ -249,6 +231,10 @@ STATICFILES_FINDERS = (
     'pipeline.finders.PipelineFinder',
 )
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
 
 # STATICFILES_FINDERS = (
 #     'pipeline.finders.FileSystemFinder',
@@ -261,7 +247,6 @@ PIPELINE_COMPILERS = (
     'pipeline.compilers.sass.SASSCompiler',
 )
 
-# PIPELINE_SASS_ARGUMENTS = '--scss --compass -E "UTF-8" -I "/home/tyler/Documents/HH/components/bower_components/foundation/scss"'
 PIPELINE_SASS_ARGUMENTS = '--scss --compass -E "UTF-8" -I "{}"'.format(FOUNDATION_PATH)
 
 PIPELINE_CSS = {
