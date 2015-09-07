@@ -1,13 +1,10 @@
 {% extends "base.html" %}
 {% load pipeline %}
 {% load static %}
-{% block styles %}
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.3/compressed/themes/default.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.3/compressed/themes/default.time.css">
-{% endblock %}
 
 {% block endscripts %}
     {% include "backbone_templates.html" %}
+    {% comment %}
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone.js"></script>
@@ -16,6 +13,9 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.3/compressed/picker.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.3/compressed/picker.time.js"></script>
+    {% endcomment %}
+    {% javascript 'dependencies' %}
+    {% javascript 'packages' %}
     {% javascript 'backbone' %}
 {% endblock %}
 
