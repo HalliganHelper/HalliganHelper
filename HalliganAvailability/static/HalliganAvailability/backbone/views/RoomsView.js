@@ -5,11 +5,11 @@ app.RoomsView = Backbone.View.extend({
     initialize: function() {
         this.collection = new app.Rooms();
         this.listenTo(this.collection, 'fetch', this.showWaiting);
-        app.fetchXhr = this.collection.fetch({reset: true});
-        this.render();
-
         this.listenTo(this.collection, 'add', this.renderRoom);
         this.listenTo(this.collection, 'reset', this.render);
+
+        app.fetchXhr = this.collection.fetch({reset: true});
+        this.render();
     },
 
     render: function() {

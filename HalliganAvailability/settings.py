@@ -208,7 +208,14 @@ BOWER_INSTALLED_APPS = ('foundation#5.5.2',
                         'modernizr#2.8.3',
                         'jquery#2.1.1',
                         'fastclick#1.0.3',
-                        'jquery.cookie#1.4.1')
+                        'jquery.cookie#1.4.1',
+                        'pickadate#3.5.3',
+                        'underscore#1.6.0',
+                        'backbone#1.1.2',
+                        'moment#2.7.0',
+                        'livestamp#1.1.2',
+                        'socket.io-client#0.9.10',
+                        )
 
 TASTYPIE_DEFAULT_FORMATS = ['json']
 
@@ -253,6 +260,8 @@ PIPELINE_CSS = {
     'all_styles': {
         'source_filenames': (
             'HalliganAvailability/scss/extend_foundation.scss',
+            os.path.join('pickadate', 'lib', 'compressed', 'themes', 'default.css'),
+            os.path.join('pickadate', 'lib', 'compressed', 'themes', 'default.time.css'),
         ),
         'output_filename': 'css/styles.css',
     }
@@ -289,8 +298,21 @@ PIPELINE_JS = {
         ),
         'output_filename': 'js/backbone.js',
     },
+    'packages': {
+        'source_filenames': (
+            os.path.join('jquery.cookie', 'jquery.cookie.js'),
+            os.path.join('underscore', 'underscore.js'),
+            os.path.join('backbone', 'backbone.js'),
+            os.path.join('moment', 'min', 'moment.min.js'),
+            os.path.join('livestamp', 'livestamp.min.js'),
+            os.path.join('socket.io-client', 'dist', 'socket.io.min.js'),
+            os.path.join('pickadate', 'lib', 'compressed', 'picker.js'),
+        ),
+        'output_filename': 'js/packages.js'
+    },
     'dependencies': {
         'source_filenames': (
+            os.path.join('jquery', 'dist', 'jquery.min.js'),
             'modernizr/modernizr.js',
             'fastclick/lib/fastclick.js',
             'foundation/js/foundation.min.js',
@@ -300,6 +322,8 @@ PIPELINE_JS = {
         'output_filename': 'js/dependencies.js',
     }
 }
+
+print(PIPELINE_JS['packages'])
 
 # Opbeat stuff
 
