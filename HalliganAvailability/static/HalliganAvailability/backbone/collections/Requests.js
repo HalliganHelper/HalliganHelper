@@ -1,9 +1,8 @@
 app = typeof app !== "undefined" ? app : {};
 
-app.queueItems = Backbone.TastypieCollection.extend({
-    model: app.QueueItem,
+app.Requests = Backbone.TastypieCollection.extend({
+    model: app.Request,
     initialize: function(initialModels, options) {
-        this.courseNum = options.courseNum;
         this.coursePk = options.coursePk;
     },
     url: function() {

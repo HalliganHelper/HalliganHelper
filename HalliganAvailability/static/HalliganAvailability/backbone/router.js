@@ -6,11 +6,12 @@ function show_notification(msg) {
     var notification = new Notification("Halligan Helper", options);
 }
 
+
 var AppRouter = Backbone.Router.extend({
     routes: {
         "room/:roomNum": "roomRoute",
         "labs": "labRoute",
-        "ta/queue/:courseNum": "taQueueRoute",
+        "ta/queue/:coursePk": "taQueueRoute",
         "*actions": "defaultRoute",
     }
 });
@@ -33,8 +34,8 @@ function checkXhrAndAbort() {
     }
 }
 
-
 $(function() {
+
     function ajaxSetup() {
        var csrftoken = $.cookie('csrftoken'); 
 
@@ -54,7 +55,7 @@ $(function() {
     ajaxSetup();
     var app_router = new AppRouter();
     app.currentRoomNumber = null;
-    app.currentCourseNumber = null;
+    app.currentCoursePk = null;
     app.currentView = null;
     app.ohView = null;
     app.announcementSocket = io.connect('/announcements');
@@ -72,7 +73,7 @@ $(function() {
                 }
                 break;
             case 'cancel_hours':
-                if (Boolean(app.ohView) && app.currentCourseNumber == data.course_number) {
+                if (Boolean(app.ohView) && app.currentCoursePk == data.course_number) {
                     app.ohView.collection.remove(data.office_hour_id);
                 }
                 break;
@@ -95,7 +96,7 @@ $(function() {
         console.log(rq_data);
         switch (rq_data.type) {
             case 'office_hour_update':
-                if ( Boolean ( app.ohView ) && rq_data.course == app.currentCourseNumber ) {
+                if ( Boolean ( app.ohView ) && rq_data.course == app.currentCoursePk ) {
                     item = app.ohView.collection.get(rq_data.data.id);
                     if ( Boolean( item ) ) {
                         var same_end_time = rq_data.end_time == item.get('end_time');
@@ -109,13 +110,13 @@ $(function() {
                 break;
 
             case 'office_hour_create':
-                if ( Boolean ( app.ohView ) && rq_data.course == app.currentCourseNumber ) {
+                if ( Boolean ( app.ohView ) && rq_data.course == app.currentCoursePk ) {
                     app.ohView.collection.add ( new app.OfficeHour ( rq_data.data ) );
                 }
                 break;
 
             case 'request_update':
-                if ( Boolean( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
+                if ( Boolean( app.currentView ) && rq_data.course == app.currentCoursePk ) {
                     item = app.currentView.collection.get(rq_data.id);
                     if ( Boolean(item) && rq_data.remove ) {
                         item.collection.remove(item);
@@ -127,7 +128,7 @@ $(function() {
                 break;
 
             case 'request_create':
-                if ( Boolean( app.currentView ) && rq_data.course == app.currentCourseNumber ) {
+                if ( Boolean( app.currentView ) && rq_data.course == app.currentCoursePk ) {
                     var newRequest = new app.QueueItem({id: rq_data.id});
                     newRequest.fetch({
                         success: function(model, response, options) {
@@ -153,7 +154,7 @@ $(function() {
         if(app.currentRoomNumber == roomNum) {
             return;
         }
-        app.currentCourseNumber = null;
+        app.currentCoursePk = null;
         app.currentRoomNumber = roomNum;
         $('.custom-sidenav > li > a').removeClass('active');
         $('#room'+roomNum).addClass('active');
@@ -164,17 +165,16 @@ $(function() {
         });
     });
 
-    app_router.on('route:taQueueRoute', function(courseNum) {
+    app_router.on('route:taQueueRoute', function(coursePk) {
         app.currentRoomNumber = null;
-        app.currentCourseNumber = courseNum;
+        app.currentCoursePk = coursePk;
         $('.custom-sidenav > li > a').removeClass('active');
-        var queueItem = $('#queue'+courseNum);
+        var queueItem = $('#queue' + coursePk);
         queueItem.addClass('active');
         $('#content').fadeOut(100, function() {
             $('#content').empty();      
-            app.currentView = new app.queueItemsView([], {
-                'courseNum': courseNum, 
-                'coursePk': queueItem.data('pk')
+            app.currentView = new app.CourseView({
+                'coursePk': coursePk
             });
             $('#content').fadeIn(100);
         });
@@ -197,7 +197,6 @@ $(function() {
         app.currentRoomNumber = null;
         $('.custom-sidenav > li > a').removeClass('active');
         $('#home').addClass('active');
-        //Backbone.history.navigate('#room/116')
         app_router.navigate('room/116', {trigger: true});
     });
 
