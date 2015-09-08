@@ -5,19 +5,19 @@ app.queueItemView = Backbone.View.extend({
     className: 'queueItemView',
     template: _.template( $('#queueTemplate').html() ),
     editTemplate: _.template( $('#queueEditTemplate').html() ),
-    events: {},
+    events: {
+        'click .cancel-button': 'cancel',
+        'click .resolve-button': 'resolve',
+        'click .checkout-button': 'checkout',
+        'click .edit-button': 'renderEdit',
+        'click .undo-button': 'render',
+        'click .save-button': 'update',
+        'keyup #whereLocated': 'enterKeyUpdate',
+        'keyup #question': 'enterKeyUpdate',
+    },
     initialize: function() {
-        this.model.on('change', this.render, this);
-        this.model.on('remove', this.removeFromPage, this);
-        this.events['click .cancel-button'] = this.cancel;
-        this.events['click .resolve-button'] = this.resolve;
-        this.events['click .checkout-button'] = this.checkout;
-        this.events['click .edit-button'] = this.renderEdit;
-        this.events['click .undo-button'] = this.render;
-        this.events['click .save-button'] = this.update;
-        this.events['keyup #whereLocated'] = this.enterKeyUpdate;
-        this.events['keyup #question'] = this.enterKeyUpdate;
-        this.delegateEvents(this.events);
+        this.listenTo(this.model, 'change', this.render);
+        this.listenTo(this.model, 'remove', this.removeFromPage);
     },
     removeFromPage: function() {
         var _this = this;
@@ -44,13 +44,8 @@ app.queueItemView = Backbone.View.extend({
         
         this.model.save(updates, {patch: true,
             success: function() {
-                console.log('SAVED');
                 _this.model.collection.remove(_this.model);
                 app.currentView.hideEmptyDivIfNecessary();
-            },
-            error: function(model, response, options) {
-                console.log("UPDATE FAILED");
-                console.log(model, response, options);
             }
         });
 

@@ -206,13 +206,13 @@ BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
 BOWER_INSTALLED_APPS = ('foundation#5.5.2',
                         'jquery-placeholder#2.0.8',
                         'modernizr#2.8.3',
-                        'jquery#2.1.1',
-                        'fastclick#1.0.3',
+                        'jquery#2.1.4',
+                        'fastclick#1.0.6',
                         'jquery.cookie#1.4.1',
-                        'pickadate#3.5.3',
-                        'underscore#1.6.0',
-                        'backbone#1.1.2',
-                        'moment#2.7.0',
+                        'pickadate#3.5.6',
+                        'underscore#1.8.3',
+                        'backbone#1.2.3',
+                        'moment#2.10.6',
                         'livestamp#1.1.2',
                         'socket.io-client#0.9.10',
                         )
@@ -278,12 +278,13 @@ PIPELINE_JS = {
             'HalliganAvailability/backbone/models/Lab.js',
             'HalliganAvailability/backbone/models/Computer.js',
             'HalliganAvailability/backbone/models/OfficeHour.js',
-            'HalliganAvailability/backbone/models/QueueItem.js',
+            'HalliganAvailability/backbone/models/Request.js',
             'HalliganAvailability/backbone/models/Room.js',
+            'HalliganAvailability/backbone/models/Course.js',
             'HalliganAvailability/backbone/collections/Labs.js',
             'HalliganAvailability/backbone/collections/Computers.js',
             'HalliganAvailability/backbone/collections/OfficeHours.js',
-            'HalliganAvailability/backbone/collections/QueueItems.js',
+            'HalliganAvailability/backbone/collections/Requests.js',
             'HalliganAvailability/backbone/collections/Rooms.js',
             'HalliganAvailability/backbone/views/ComputerView.js',
             'HalliganAvailability/backbone/views/ComputersView.js',
@@ -295,6 +296,7 @@ PIPELINE_JS = {
             'HalliganAvailability/backbone/views/QueueItemsView.js',
             'HalliganAvailability/backbone/views/RoomView.js',
             'HalliganAvailability/backbone/views/RoomsView.js',
+            'HalliganAvailability/backbone/views/CourseView.js',
         ),
         'output_filename': 'js/backbone.js',
     },
@@ -307,6 +309,7 @@ PIPELINE_JS = {
             os.path.join('livestamp', 'livestamp.min.js'),
             os.path.join('socket.io-client', 'dist', 'socket.io.min.js'),
             os.path.join('pickadate', 'lib', 'compressed', 'picker.js'),
+            os.path.join('pickadate', 'lib', 'compressed', 'picker.time.js'),
         ),
         'output_filename': 'js/packages.js'
     },
@@ -322,8 +325,6 @@ PIPELINE_JS = {
         'output_filename': 'js/dependencies.js',
     }
 }
-
-print(PIPELINE_JS['packages'])
 
 # Opbeat stuff
 

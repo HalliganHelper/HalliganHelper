@@ -1,33 +1,32 @@
 app = typeof app !== "undefined" ? app : {};
 
 app.OfficeHoursView = Backbone.View.extend({
-    events: {},
-    initialize: function(prevModels, options) {
-        this.$el = options.el;
-        this.courseNum = options.courseNum;
-        this.coursePk = options.coursePk;
-        this.collection = new app.OfficeHours([], this.courseNum);
+    events: {
+        'click #clockInBtn': 'clockIn',
+        'keyup #TAHQ': 'enterToSubmit',
+        'keyup #dtPick': 'enterToSubmit',
+    },
+    initListeners: function() {
         this.listenTo(this.collection, 'fetch', this.showWaiting);
         this.listenTo(this.collection, 'add', this.renderOfficeHour);
         this.listenTo(this.collection, 'reset', this.render);
         this.listenTo(this.collection, 'remove', this.render);
-        this.events['click #clockInBtn'] = this.clockIn;
-        this.events['keyup #TAHQ'] = this.enterToSubmit;
-        this.events['keyup #dtPick'] = this.enterToSubmit;
-        this.delegateEvents(this.events);
-        app.fetchXhr = this.collection.fetch({
-            reset: true,
-        });
+    },
+    initialize: function( options ) {
+        this.course = options.course;
+        console.log('OfficeHoursView ', this.course);
+        this.collection = new app.OfficeHours( [], { 'course': this.course } );
+        this.initListeners();
+        app.fetchXhr = this.collection.fetch( { reset: true } );
     },
     hideEmptyDivIfNecessary: function() {
         if (this.collection.length !== 0) {
-            this.$el.find('#emptyList').addClass('hide');
+            this.$('#emptyList').addClass('hide');
         }
     },
     computeNow: function() {
         var now = moment().startOf('minute'),
             minute = now.minute();
-
         if (minute < 15) {
             now.minute(15);
         } else if (minute < 30) {
@@ -61,14 +60,11 @@ app.OfficeHoursView = Backbone.View.extend({
             timeLabel = $("label[for='dtPick']"),
             hqLabel = $("label[for='TAHQ']"),
             date_obj = $('#dtPick').pickatime('picker').get('select');
-        var newHour = new app.OfficeHour({
+        var newHour = new app.OfficeHour( {
             location: hq.val(),
             end_time: moment().startOf('day').minute(date_obj.mins).hour(date_obj.hour).toISOString(),
-            course: '/api/v2/course/' + this.coursePk + '/'
-        });
-
-
-
+            course: this.course.get('resource_uri')
+        } );
 
         newHour.save({}, 
             {

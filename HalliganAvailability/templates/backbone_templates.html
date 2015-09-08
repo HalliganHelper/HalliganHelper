@@ -7,6 +7,24 @@
     </div>
 </script>
 
+<script id="courseLayoutTemplate" type="text/template">
+    <div class="row queue-course-header text-center">
+        <div class="small-12 columns">
+            <h3> <%= name %> Queue </h3>
+        </div>
+    </div>    
+    <div id="queueContent">
+        <div class="row queue-header hide-for-small">
+            <div class="medium-2 small-3 columns queue-name-header"><h4>Name</h4></div>
+            <div class="medium-2 small-3 columns queue-location-header"><h4>Location</h4></div>
+            <div class="medium-4 small-3 columns queue-problem-header"><h4>Problem</h4></div>
+            <div class="medium-2 small-3 columns end queue-when-asked-header"><h4>Asked At</h4></div>
+        </div>
+    </div>
+    <div id="officeHourContent"></div>
+
+</script>
+
 <script id="computerTemplate" type="text/template">
     <% if (status === 'INUSE') { %>
         <div class="row computer computer-status-in-use">
@@ -64,19 +82,6 @@
 
 </script>
 
-<script id="queueItemHeaderTemplate" type="text/template">
-    <div class="row queue-course-header text-center">
-        <div class="small-12">
-            <h3>Comp <%= courseNum %> Queue</h3>
-        </div>
-    </div>
-    <div class="row queue-header hide-for-small">
-        <div class="medium-2 small-3 columns queue-name-header"><h4>Name</h4></div>
-        <div class="medium-2 small-3 columns queue-location-header"><h4>Location</h4></div>
-        <div class="medium-4 small-3 columns queue-problem-header"><h4>Problem</h4></div>
-        <div class="medium-2 small-3 columns end queue-when-asked-header"><h4>Asked At</h4></div>
-    </div>
-</script>
 
 <script id="queueTemplate" type="text/template">
     <% if ( checked_out ) { %>
