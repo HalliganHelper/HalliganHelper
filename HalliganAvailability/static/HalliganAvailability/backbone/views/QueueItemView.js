@@ -83,7 +83,6 @@ app.queueItemView = Backbone.View.extend({
                 _this.render(); 
             },
             error: function(model, response, options) {
-                console.log(model);
                 var responseJSON = response.responseJSON;
                 if ( Boolean( responseJSON.request.question ) ) {
                     $(question).parent().addClass('error');
