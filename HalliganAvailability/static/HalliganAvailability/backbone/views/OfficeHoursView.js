@@ -14,7 +14,6 @@ app.OfficeHoursView = Backbone.View.extend({
     },
     initialize: function( options ) {
         this.course = options.course;
-        console.log('OfficeHoursView ', this.course);
         this.collection = new app.OfficeHours( [], { 'course': this.course } );
         this.initListeners();
         app.fetchXhr = this.collection.fetch( { reset: true } );

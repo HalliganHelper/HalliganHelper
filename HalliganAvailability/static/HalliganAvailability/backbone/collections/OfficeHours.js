@@ -4,7 +4,6 @@ app.OfficeHours = Backbone.TastypieCollection.extend({
     model: app.OfficeHour,
     initialize: function(initialModels, options) {
         this.course = options.course; 
-        console.log(this.course);
     },
     url: function() {
         return '/api/v2/officehour/?course=' + this.course.get('id');

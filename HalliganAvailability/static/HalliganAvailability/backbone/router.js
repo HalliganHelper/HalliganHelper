@@ -93,7 +93,6 @@ $(function() {
         var rq_course;
         var item;
         var request_count;
-        console.log(rq_data);
         switch (rq_data.type) {
             case 'office_hour_update':
                 if ( Boolean ( app.ohView ) && rq_data.course == app.currentCoursePk ) {
@@ -132,7 +131,6 @@ $(function() {
                     var newRequest = new app.QueueItem({id: rq_data.id});
                     newRequest.fetch({
                         success: function(model, response, options) {
-                            console.log(model);
                             app.currentView.collection.add(model);
                         }    
                     });
