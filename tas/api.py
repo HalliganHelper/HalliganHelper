@@ -177,7 +177,7 @@ class RequestResource(ModelResource):
 
         return_val = super(RequestResource, self).obj_update(bundle, **kwargs)
         QueueNamespace.notify_request(bundle.obj.pk,
-                                      bundle.obj.course.number,
+                                      bundle.obj.course.pk,
                                       'request_update')
         return return_val
 
@@ -188,7 +188,7 @@ class RequestResource(ModelResource):
 
         return_val = super(RequestResource, self).obj_create(bundle, **kwargs)
         QueueNamespace.notify_request(bundle.obj.pk,
-                                      bundle.obj.course.number,
+                                      bundle.obj.course.pk,
                                       'request_create')
         AnnouncementNamespace.notify_ta(bundle.request.user.get_full_name(),
                                         bundle.obj.course.number)

@@ -54,9 +54,9 @@ $(function() {
 
     ajaxSetup();
     var app_router = new AppRouter();
-    app.currentRoomNumber = null;
     app.currentCoursePk = null;
     app.currentView = null;
+    app.currentCourse = null;
     app.ohView = null;
     app.announcementSocket = io.connect('/announcements');
     app.announcementSocket.on("message", function(data) {
@@ -90,6 +90,8 @@ $(function() {
 
     app.currentTASocket = io.connect('/taqueue');
     app.currentTASocket.on("message", function(rq_data) {
+        app.currentCourse.handleUpdate( rq_data );
+        /*
         var rq_course;
         var item;
         var request_count;
@@ -115,28 +117,11 @@ $(function() {
                 break;
 
             case 'request_update':
-                if ( Boolean( app.currentView ) && rq_data.course == app.currentCoursePk ) {
-                    item = app.currentView.collection.get(rq_data.id);
-                    if ( Boolean(item) && rq_data.remove ) {
-                        item.collection.remove(item);
-                        //app.currentView.collection.remove(item);
-                    } else if ( Boolean( item ) ) {
-                        item.fetch();
-                    }
-                }
-                break;
-
             case 'request_create':
-                if ( Boolean( app.currentView ) && rq_data.course == app.currentCoursePk ) {
-                    var newRequest = new app.QueueItem({id: rq_data.id});
-                    newRequest.fetch({
-                        success: function(model, response, options) {
-                            app.currentView.collection.add(model);
-                        }    
-                    });
-                }
+                app.currentCourse.handleRequest(rq_data);
                 break;
         }
+        */
     });
 
     app_router.on('route', function() {
@@ -149,11 +134,7 @@ $(function() {
 
     app_router.on('route:roomRoute', function(roomNum) {
         app.ohView = null;
-        if(app.currentRoomNumber == roomNum) {
-            return;
-        }
         app.currentCoursePk = null;
-        app.currentRoomNumber = roomNum;
         $('.custom-sidenav > li > a').removeClass('active');
         $('#room'+roomNum).addClass('active');
         $('#content').fadeOut(100, function() {
@@ -164,7 +145,6 @@ $(function() {
     });
 
     app_router.on('route:taQueueRoute', function(coursePk) {
-        app.currentRoomNumber = null;
         app.currentCoursePk = coursePk;
         $('.custom-sidenav > li > a').removeClass('active');
         var queueItem = $('#queue' + coursePk);
@@ -174,13 +154,13 @@ $(function() {
             app.currentView = new app.CourseView({
                 'coursePk': coursePk
             });
+            app.currentCourse = app.currentView;
             $('#content').fadeIn(100);
         });
     });
 
     app_router.on('route:labRoute', function(actions) {
         app.ohView = null;
-        app.currentRoomNumber = null;
         $('.custom-sidenav > li > a').removeClass('active');
         $('#labs').addClass('active');
         $('#content').fadeOut(100, function() {
@@ -192,7 +172,6 @@ $(function() {
 
     app_router.on('route:defaultRoute', function(actions) {
         app.ohView = null;
-        app.currentRoomNumber = null;
         $('.custom-sidenav > li > a').removeClass('active');
         $('#home').addClass('active');
         app_router.navigate('room/116', {trigger: true});

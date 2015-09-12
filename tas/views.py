@@ -214,11 +214,11 @@ class QueueNamespace(BaseNamespace):
         super(QueueNamespace, self).disconnect(*args, **kwargs)
 
     @staticmethod
-    def notify_request(request_id, course_number, change_type):
+    def notify_request(request_id, course_pk, change_type):
         obj = Request.objects.get(pk=request_id)
         message = {
             'type': change_type,
-            'course': course_number,
+            'course': course_pk,
             'id': request_id,
             'remove': obj.cancelled or obj.solved
         }
@@ -227,14 +227,14 @@ class QueueNamespace(BaseNamespace):
             connection['socket'].send(message, True)
 
     @staticmethod
-    def notify_office_hour(office_hour_id, course_number, change_type):
+    def notify_office_hour(office_hour_id, course_pk, change_type):
         from .api import OfficeHourResource
 
         resource = OfficeHourResource()
 
         message = {
             'type': change_type,
-            'course': course_number
+            'course': course_pk
         }
 
         office_hour = OfficeHour.objects.get(pk=office_hour_id)
