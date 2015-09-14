@@ -6,13 +6,13 @@
 4. run ```vagrant up```
 5. run ```vagrant ssh```
 6. In the ssh session
-  *. Change the HalliganAvailability/secret_template.py to HalliganAvailability/secret.py
-  *. Modify the variables within to contain the correct information
+  1. Change the HalliganAvailability/secret_template.py to HalliganAvailability/secret.py
+  2. Modify the variables within to contain the correct information
 
 6. In the ssh session, run:
-  *. ```workon HalliganHelper```
-  *. ```cd HalliganHelper ```
-  *. ```./manage.py migrate```
-  *. ```./manage.py createsuperuser```
-  *. ```./manage.py runserver 0.0.0.0:8000```
+  1. ```workon HalliganHelper```
+  2. ```cd HalliganHelper ```
+  3. ```./manage.py migrate```
+  4. ```./manage.py createsuperuser```
+  5. ```./manage.py runserver 0.0.0.0:8000```
 
