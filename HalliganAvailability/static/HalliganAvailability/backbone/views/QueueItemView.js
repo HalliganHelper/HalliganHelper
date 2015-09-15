@@ -92,11 +92,15 @@ app.queueItemView = Backbone.View.extend({
                 var responseJSON = response.responseJSON;
                 if ( Boolean( responseJSON.request.question ) ) {
                     $(question).parent().addClass('error');
-                    console.log( responseJSON.request.question );
+                    var questionError = $(question).parent().next();
+                    $(questionError).html(responseJSON.request.question);
+                    $(questionError).removeClass('hide');
                 }
                 if ( Boolean( responseJSON.request.where_located ) ) {
                     $(whereLocated).parent().addClass('error');
-                    console.log( responseJSON.request.where_located );
+                    var locationError = $(whereLocated).parent().next();
+                    $(locationError).html(responseJSON.request.question);
+                    $(locationError).removeClass('hide');
                 }
             },
             silent: true,

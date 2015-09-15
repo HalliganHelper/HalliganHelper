@@ -36,9 +36,12 @@ $available-color: rgba(0, 116, 0, 0.6);
     }
 }
 
-
 body {
     background: #FAFAFA;
+}
+
+small.error.hide {
+    display: none;
 }
 
 .custom-sidenav {
