@@ -2,6 +2,7 @@ from django.utils.timezone import now
 from tastypie.validation import Validation
 from datetime import timedelta
 import dateutil
+from .models import Request
 
 
 class RequestValidation(Validation):
@@ -9,14 +10,25 @@ class RequestValidation(Validation):
         if not bundle.data:
             return {'__all__': 'Something is wrong'}
 
+
         errors = {}
         question = bundle.data.get('question', None)
-        if question is not None and len(question) == 0:
-            errors['question'] = 'Please provide a question'
+        question_max_length = Request._meta.get_field('question').max_length
+        if question is not None:
+            if len(question) == 0:
+                errors['question'] = 'Please provide a question'
+            elif len(question) > question_max_length:
+                msg = 'Your question must be less than {} characters'.format(question_max_length)
+                errors['question'] = msg
 
         location = bundle.data.get('where_located', None)
-        if location is not None and len(location) == 0:
-            errors['where_located'] = 'Please provide a location'
+        location_max_length = Request._meta.get_field('where_located').max_length
+        if location is not None:
+            if len(location) == 0:
+                errors['where_located'] = 'Please provide a location'
+            elif len(location) > location_max_length:
+                msg = 'Your location must be less than {} characters'.format(location_max_length)
+                errors['where_located'] = msg
 
         return errors
 

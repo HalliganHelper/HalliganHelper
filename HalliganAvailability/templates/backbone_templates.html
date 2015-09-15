@@ -161,12 +161,14 @@
             <label> Where are you? 
                 <input type="text" id="whereLocated" value="<%= where_located %>" maxlength=50/> 
             </label>
+            <small class="error hide"></small>
         </div>
 
         <div class="large-4 medium-4 small-12 columns queue-problem">
             <label> What's your problem?
                 <input type="text" id="question" value="<%= question %>" maxlength=50>
             </label>
+            <small class="error hide"></small>
         </div>
 
         <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(when_asked).format("MM/DD h:mm a") %></div>
@@ -194,12 +196,14 @@
                     Where are you?
                     <input type="text" maxlength=50 id="location"/>
                 </label>
+                <small class="error hide"></small>
             </div>
             <div class="medium-9 small-12 columns queue-problem" id="questionField">
                 <label>
                     What's your problem?
                     <input type="text" maxlength=50 id="problem"/>
                 </label>
+                <small class="error hide"></small>
             </div>
         </div>
         <div class="row make-request">

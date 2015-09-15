@@ -84,6 +84,8 @@ app.queueItemsView = Backbone.View.extend({
         $requestButton.prop('disabled', true);
         $questionField.removeClass('error');
         $locationField.removeClass('error');
+        $questionField.find('small').addClass('hide');
+        $locationField.find('small').addClass('hide');
 
         console.log('MAKING REQUEST');
 
@@ -97,17 +99,25 @@ app.queueItemsView = Backbone.View.extend({
             success: function requestSuccess(){
                 locationField.val(''); 
                 problemField.val('');
+                $questionField.find('small').addClass('hide');
+                $locationField.find('small').addClass('hide');
                 $requestButton.prop('disabled', false);
                 _this.collection.add(newRequest);
             },
             error: function requestFail(model, response, options){
                 console.log('ERROR');
-                errors = response.responseJSON.request;
-                if ('question' in errors) {
-                    $questionField.addClass('error');
+                if ( ! Boolean( response.responseJSON ) || ! Boolean ( response.responseJSON.request )) {
+                    return;
                 }
-                if ('where_located' in errors) {
+                if ( Boolean( response.responseJSON.request.question ) ) {
+                    $questionField.addClass('error');
+                    $questionField.find('small').removeClass('hide');
+                    $questionField.find('small').html( response.responseJSON.request.question );
+                }
+                if ( Boolean( response.responseJSON.request.where_located ) ) {
                     $locationField.addClass('error');
+                    $locationField.find('small').removeClass('hide');
+                    $locationField.find('small').html( response.responseJSON.request.where_located );
                 }
                 $requestButton.prop('disabled', false);
             }
