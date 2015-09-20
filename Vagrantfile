@@ -4,6 +4,7 @@
 Vagrant.configure(2) do |config|
 
   config.vm.box = "ubuntu/trusty64"
+  config.vm.hostname = "HH"
 
   #Load the HalliganHelper source code
   config.vm.synced_folder ".", "/home/vagrant/HalliganHelper"
@@ -14,6 +15,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", path: "vagrant/scripts/install-ruby.sh", args: "2.1 compass", privileged: false
   config.vm.provision "shell", path: "vagrant/scripts/node-setup.sh", privileged: false
   config.vm.provision "shell", path: "vagrant/scripts/python-setup.sh", privileged: false
+  config.vm.provision "shell", path: "vagrant/scripts/redis-setup.sh", privileged: true
 
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
     sudo apt-get install -y vim \

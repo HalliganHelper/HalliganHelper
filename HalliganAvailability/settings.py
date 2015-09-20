@@ -44,6 +44,8 @@ TEMPLATE_LOADERS = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.static',
+    'ws4redis.context_processors.default',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -302,6 +304,7 @@ PIPELINE_JS = {
     },
     'packages': {
         'source_filenames': (
+            'js/ws4redis.js',
             os.path.join('jquery.cookie', 'jquery.cookie.js'),
             os.path.join('underscore', 'underscore.js'),
             os.path.join('backbone', 'backbone.js'),
@@ -337,3 +340,17 @@ if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ALLOWED_REGISTRATION_DOMAINS = ('tufts.edu', 'cs.tufts.edu')
+
+
+# Websocket-for-Redis stuff
+
+INSTALLED_APPS += (
+    'ws4redis',
+)
+
+WEBSOCKET_URL = '/ws/'
+WS4REDIS_PREFIX = 'hh'
+TEMPLATE_CONTEXT_PROCESSORS += (
+    'ws4redis.context_processors.default',
+)
+WSGI_APPLICATION = 'ws4redis.django_runserver.application'
