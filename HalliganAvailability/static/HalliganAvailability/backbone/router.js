@@ -6,7 +6,6 @@ function show_notification(msg) {
     var notification = new Notification("Halligan Helper", options);
 }
 
-
 var AppRouter = Backbone.Router.extend({
     routes: {
         "room/:roomNum": "roomRoute",
@@ -15,7 +14,6 @@ var AppRouter = Backbone.Router.extend({
         "*actions": "defaultRoute",
     }
 });
-
 
 _.each(["Model", "Collection"], function(name) {
     var ctor = Backbone[name];
@@ -58,70 +56,40 @@ $(function() {
     app.currentView = null;
     app.currentCourse = null;
     app.ohView = null;
-    app.announcementSocket = io.connect('/announcements');
-    app.announcementSocket.on("message", function(data) {
-        switch (data.type) {
-            case 'request_update':
-                var lbl = $('#' + data.course_number + '-count');
-                $(lbl).text(data.num_requests);
-                if (data.num_requests <= 20) {
-                    lbl.removeClass('alert');
-                    lbl.addClass('success');
-                } else {
-                    lbl.removeClass('success');
-                    lbl.addClass('alert');
+    
+    var websocketProtocol = location.protocol === "http:" ? "ws:" : "wss:"; 
+    var websocketURI = websocketProtocol + "//" + location.host + "/ws/ta?subscribe-broadcast";
+
+    var ws4redis = WS4Redis({
+        uri: websocketURI,
+        heartbeat_msg: '--heartbeat--',
+        receive_message: function(msg) {
+            console.log(msg);
+            try {
+                var data = JSON.parse(msg);
+                app.currentCourse.handleUpdate( data );
+                switch( data.type ) {
+                    case 'request_update': 
+                        console.log(data);
+                        break;
+                    case 'request_create':
+                        console.log(data);
+                        break;
+                    case 'office_hour_update':
+                        console.log(data);
+                        break;
+                    case 'office_hour_create':
+                        console.log(data);
+                        break;
+                    case 'notifyta':
+                    case 'notifystudent':
+                        console.log(data);
+                        break;
                 }
-                break;
-            case 'cancel_hours':
-                if (Boolean(app.ohView) && app.currentCoursePk == data.course_number) {
-                    app.ohView.collection.remove(data.office_hour_id);
-                }
-                break;
-            case 'notifyta':
-                var msg = data.name + " added themself to the queue";
-                show_notification(msg);
-                break;
-            case 'notifystudent':
-                show_notification(data.name + " is on their way!");
-                break;
+            } catch( err ) {
+                return;
+            }
         }
-    });
-
-
-    app.currentTASocket = io.connect('/taqueue');
-    app.currentTASocket.on("message", function(rq_data) {
-        app.currentCourse.handleUpdate( rq_data );
-        /*
-        var rq_course;
-        var item;
-        var request_count;
-        switch (rq_data.type) {
-            case 'office_hour_update':
-                if ( Boolean ( app.ohView ) && rq_data.course == app.currentCoursePk ) {
-                    item = app.ohView.collection.get(rq_data.data.id);
-                    if ( Boolean( item ) ) {
-                        var same_end_time = rq_data.end_time == item.get('end_time');
-                        if ( ! same_end_time ) {
-                            app.ohView.collection.remove(item);
-                        } else {
-                            item.set(rq_data.data);
-                        }
-                    }
-                }
-                break;
-
-            case 'office_hour_create':
-                if ( Boolean ( app.ohView ) && rq_data.course == app.currentCoursePk ) {
-                    app.ohView.collection.add ( new app.OfficeHour ( rq_data.data ) );
-                }
-                break;
-
-            case 'request_update':
-            case 'request_create':
-                app.currentCourse.handleRequest(rq_data);
-                break;
-        }
-        */
     });
 
     app_router.on('route', function() {

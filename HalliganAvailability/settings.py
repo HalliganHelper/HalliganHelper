@@ -354,3 +354,4 @@ TEMPLATE_CONTEXT_PROCESSORS += (
     'ws4redis.context_processors.default',
 )
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
+WS4REDIS_HEARTBEAT = '--heartbeat--'
