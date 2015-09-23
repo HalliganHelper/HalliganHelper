@@ -120,7 +120,8 @@ class OfficeHourResource(ModelResource):
         websocket_data = {
             'type': 'office_hour_update',
             'id': bundle.obj.pk,
-            'course_id': bundle.obj.course.pk
+            'course_id': bundle.obj.course.pk,
+            'remove': bundle.obj.end_time < now()
         }
         publish_ta_message(websocket_data)
 

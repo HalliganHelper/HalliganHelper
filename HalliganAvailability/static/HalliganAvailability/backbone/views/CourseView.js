@@ -24,7 +24,7 @@ app.CourseView = Backbone.View.extend({
         switch( update.type ) {
             case 'office_hour_update':
             case 'office_hour_create':
-                console.log('Dealing with Office Hours') ;
+                this.course.handleOfficeHour( update );
                 break;
             case 'request_update':
             case 'request_create':

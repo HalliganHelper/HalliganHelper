@@ -9,11 +9,26 @@ app.Course = Backbone.TastypieModel.extend({
     url: function() {
         return '/api/v2/course/' + this.coursePk;
     },
-    handleOfficeHour: function( officeHour , action ) {
-        if ( action === 'update' ) {
+    handleOfficeHour: function( requestData ) {
+        var course = this;
+        if ( requestData.course_id != course.coursePk ) {
+            return;
+        }
+        if ( requestData.type === 'office_hour_create' ) {
+            var newOfficeHour = new app.OfficeHour({id: requestData.id});
+            newOfficeHour.fetch({
+                success: function(model, response, options) {
+                    course.officeHours.add( model );
+                }
+            });
+        } else if ( requestData.type === 'office_hour_update' ) {
+            var oldOfficeHour = course.officeHours.get( requestData.id );
 
-        } else if ( action === 'create' ) {
-
+            if ( Boolean( oldOfficeHour ) && requestData.remove ) {
+                course.officeHours.remove( oldOfficeHour );
+            } else if ( Boolean( oldOfficeHour ) ) {
+                oldOfficeHour.fetch();
+            }
         }
     },
     handleRequest: function( requestData ) {

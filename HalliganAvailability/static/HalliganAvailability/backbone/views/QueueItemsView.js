@@ -78,7 +78,6 @@ app.queueItemsView = Backbone.View.extend({
                 _this.collection.add(newRequest);
             },
             error: function requestFail(model, response, options){
-                console.log('ERROR');
                 if ( ! Boolean( response.responseJSON ) || ! Boolean ( response.responseJSON.request )) {
                     return;
                 }

@@ -64,28 +64,9 @@ $(function() {
         uri: websocketURI,
         heartbeat_msg: '--heartbeat--',
         receive_message: function(msg) {
-            console.log(msg);
             try {
                 var data = JSON.parse(msg);
                 app.currentCourse.handleUpdate( data );
-                switch( data.type ) {
-                    case 'request_update': 
-                        console.log(data);
-                        break;
-                    case 'request_create':
-                        console.log(data);
-                        break;
-                    case 'office_hour_update':
-                        console.log(data);
-                        break;
-                    case 'office_hour_create':
-                        console.log(data);
-                        break;
-                    case 'notifyta':
-                    case 'notifystudent':
-                        console.log(data);
-                        break;
-                }
             } catch( err ) {
                 return;
             }
