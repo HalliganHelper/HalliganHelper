@@ -12,10 +12,24 @@ app.CourseView = Backbone.View.extend({
     render: function() {
         this.$el.html( this.template( this.course.toJSON() ) );
         new app.queueItemsView( { el: this.$( '#queueContent' ),
-                                  course: this.course 
-                                } );
-        new app.OfficeHoursView( { el: this.$( '#officeHourContent' ),
+                                  collection: this.course.requests,
                                   course: this.course
                                 } );
+        new app.OfficeHoursView( { el: this.$( '#officeHourContent' ),
+                                  collection: this.course.officeHours,
+                                  course: this.course
+                                } );
+    },
+    handleUpdate: function( update ) {
+        switch( update.type ) {
+            case 'office_hour_update':
+            case 'office_hour_create':
+                this.course.handleOfficeHour( update );
+                break;
+            case 'request_update':
+            case 'request_create':
+                this.course.handleRequest( update );
+                break;
+        } 
     }
 });

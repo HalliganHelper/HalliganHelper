@@ -10,7 +10,6 @@ urlpatterns = patterns('tas.views',
     url(r'^accounts/sent_username/$', 'sent_username', name='sent_username'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^taSystem$', RedirectView.as_view(url=reverse_lazy('ModularHomePage')), name='taSystem'),
-    url(r'^socket\.io', 'socketio', name='socketio'),
     url(r'^login_or_register', 'login_or_register', name='login_or_register'),
     url(r'^ta/updatephoto', 'update_photo', name='update_photo'),
 )

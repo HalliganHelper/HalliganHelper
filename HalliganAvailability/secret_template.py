@@ -49,3 +49,8 @@ DATABASES = {
         'HOST': 'localhost'
     }
 }
+
+
+WS4REDIS_CONNECTION = {
+    'password': 'some_complicated_password'
+}

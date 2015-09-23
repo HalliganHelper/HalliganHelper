@@ -1,5 +1,6 @@
 Django==1.7.7
 Pillow==2.5.3
+South==1.0.2
 Werkzeug==0.9.6
 amqp==1.4.6
 anyjson==0.3.3
@@ -14,18 +15,22 @@ dj-static==0.0.5
 django-allauth==0.13.0
 django-appconf==0.6
 django-bower==5.0.1
+django-braces==1.4.0
 django-compressor==1.4
+django-debug-toolbar==1.3.2
 django-extensions==1.2.5
 django-htmlmin==0.7.0
 django-imagekit==3.2.4
 -e git+https://github.com/TylerLubeck/django-oauth2-provider.git@aac9f4532c4b1c9d38a69e5624a42c447ecfdbcb#egg=django_oauth2_provider-master
-django-pipeline==1.5.0
+django-pipeline==1.5.4
 django-pylibmc-sasl==0.2.4
--e git+https://github.com/macropin/django-registration.git@5c0a4b04784720c1e2a4fc7f6c9e8286c28e8d11#egg=django_registration_redux-master
+django-registration==1.0
+-e git+https://github.com/macropin/django-registration.git@5c0a4b04784720c1e2a4fc7f6c9e8286c28e8d11#egg=django_registration_redux-dev
 django-tastypie==0.12.1
 django-toolbelt==0.0.1
+django-websocket-redis==0.4.4
 django-widget-tweaks==1.4.1
-futures==3.0.2
+futures==3.0.3
 gevent==1.0
 gevent-socketio==0.3.6
 gevent-websocket==0.9.3
@@ -33,11 +38,11 @@ greenlet==0.4.2
 gunicorn==19.3.0
 html5lib==0.999
 kombu==3.0.23
-lxml==3.3.5
 manifesto==0.5
 meld3==1.0.0
 mercurial==3.1.1
 mimeparse==0.1.3
+mock==1.0.1
 newrelic==2.6.0.5
 oauthlib==0.6.0
 opbeat==2.1
@@ -59,6 +64,7 @@ ropevim==0.4
 shortuuid==0.4.0
 six==1.9.0
 sphinx-me==0.2.1
+sqlparse==0.1.16
 static==0.4
 supervisor==3.0
 ujson==1.33

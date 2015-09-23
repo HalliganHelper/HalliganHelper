@@ -13,9 +13,6 @@ app.queueItemsView = Backbone.View.extend({
     },
     initialize: function(options) {
         this.course = options.course;
-        this.collection = new app.Requests([], {
-            'coursePk': this.course.get('id')
-        });
         this.initListeners();
         app.fetchXhr = this.collection.fetch({reset: true});
     },
@@ -81,7 +78,6 @@ app.queueItemsView = Backbone.View.extend({
                 _this.collection.add(newRequest);
             },
             error: function requestFail(model, response, options){
-                console.log('ERROR');
                 if ( ! Boolean( response.responseJSON ) || ! Boolean ( response.responseJSON.request )) {
                     return;
                 }

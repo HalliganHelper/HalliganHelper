@@ -1,3 +1,4 @@
+import json
 from django.utils.timezone import now
 from django.utils.html import conditional_escape
 from tastypie import fields
@@ -11,10 +12,17 @@ import datetime
 from .authorizations import RequestAuthorization, OfficeHourAuthorization
 from .validations import RequestValidation, OfficeHourValidation
 from .models import Course, TA, OfficeHour, Request, Student
-from .views import QueueNamespace, AnnouncementNamespace
 from HalliganAvailability.authentication import OAuth20Authentication
+from ws4redis.publisher import RedisPublisher
+from ws4redis.redis_store import RedisMessage
 logger = logging.getLogger('api')
 
+redis_publisher = RedisPublisher(facility='ta', broadcast=True)
+
+
+def publish_ta_message(message_data):
+    message = RedisMessage(json.dumps(message_data))
+    redis_publisher.publish_message(message)
 
 class CommonMeta(object):
     authorization = DjangoAuthorization()
@@ -97,16 +105,26 @@ class OfficeHourResource(ModelResource):
         kwargs['end_time'] = bundle.data['end_time'].replace('T', ' ')
 
         return_val = super(OfficeHourResource, self).obj_create(bundle, **kwargs)
-        QueueNamespace.notify_office_hour(bundle.obj.pk,
-                                          bundle.obj.course.number,
-                                          'office_hour_create')
+        websocket_data = {
+            'type': 'office_hour_create',
+            'id': bundle.obj.pk,
+            'course_id': bundle.obj.course.pk
+        }
+
+        publish_ta_message(websocket_data)
         return return_val
 
     def obj_update(self, bundle, **kwargs):
-        return_val = super(OfficeHourResource, self).obj_create(bundle, **kwargs)
-        QueueNamespace.notify_office_hour(bundle.obj.pk,
-                                          bundle.obj.course.number,
-                                          'office_hour_update')
+        return_val = super(OfficeHourResource, self).obj_create(bundle,
+                                                                **kwargs)
+        websocket_data = {
+            'type': 'office_hour_update',
+            'id': bundle.obj.pk,
+            'course_id': bundle.obj.course.pk,
+            'remove': bundle.obj.end_time < now()
+        }
+        publish_ta_message(websocket_data)
+
         return return_val
 
 
@@ -176,9 +194,14 @@ class RequestResource(ModelResource):
             bundle.obj.who_solved = request.user.ta
 
         return_val = super(RequestResource, self).obj_update(bundle, **kwargs)
-        QueueNamespace.notify_request(bundle.obj.pk,
-                                      bundle.obj.course.number,
-                                      'request_update')
+
+        websocket_data = {
+            'type': 'request_update',
+            'id': bundle.obj.pk,
+            'course_id': bundle.obj.course.pk
+        }
+        publish_ta_message(websocket_data)
+
         return return_val
 
     def obj_create(self, bundle, **kwargs):
@@ -187,11 +210,13 @@ class RequestResource(ModelResource):
         kwargs['when_asked'] = now()
 
         return_val = super(RequestResource, self).obj_create(bundle, **kwargs)
-        QueueNamespace.notify_request(bundle.obj.pk,
-                                      bundle.obj.course.number,
-                                      'request_create')
-        AnnouncementNamespace.notify_ta(bundle.request.user.get_full_name(),
-                                        bundle.obj.course.number)
+
+        websocket_data = {
+            'type': 'request_create',
+            'id': bundle.obj.pk,
+            'course_id': bundle.obj.course.pk
+        }
+        publish_ta_message(websocket_data)
 
         return return_val
 
