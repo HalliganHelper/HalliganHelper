@@ -18,7 +18,7 @@ app.Course = Backbone.TastypieModel.extend({
     },
     handleRequest: function( requestData ) {
         var course = this;
-        if ( requestData.course != course.coursePk ) {
+        if ( requestData.course_id != course.coursePk ) {
             return;
         }
         if ( requestData.type === 'request_update' ) {

@@ -12,9 +12,11 @@ app.CourseView = Backbone.View.extend({
     render: function() {
         this.$el.html( this.template( this.course.toJSON() ) );
         new app.queueItemsView( { el: this.$( '#queueContent' ),
-                                  course: this.course 
+                                  collection: this.course.requests,
+                                  course: this.course
                                 } );
         new app.OfficeHoursView( { el: this.$( '#officeHourContent' ),
+                                  collection: this.course.officeHours,
                                   course: this.course
                                 } );
     },

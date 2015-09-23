@@ -13,9 +13,6 @@ app.queueItemsView = Backbone.View.extend({
     },
     initialize: function(options) {
         this.course = options.course;
-        this.collection = new app.Requests([], {
-            'coursePk': this.course.get('id')
-        });
         this.initListeners();
         app.fetchXhr = this.collection.fetch({reset: true});
     },
