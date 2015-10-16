@@ -198,7 +198,8 @@ class RequestResource(ModelResource):
         websocket_data = {
             'type': 'request_update',
             'id': bundle.obj.pk,
-            'course_id': bundle.obj.course.pk
+            'course_id': bundle.obj.course.pk,
+            'remove': bundle.obj.cancelled or bundle.obj.solved
         }
         publish_ta_message(websocket_data)
 
