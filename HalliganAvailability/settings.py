@@ -176,6 +176,10 @@ LOGGING = {
         }
     },
     'loggers': {
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False
+        },
         'tas.views': {
             'handlers': ['console'],
             'level': 'DEBUG'
