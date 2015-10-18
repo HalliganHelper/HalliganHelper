@@ -220,7 +220,6 @@ BOWER_INSTALLED_APPS = ('foundation#5.5.2',
                         'backbone#1.2.3',
                         'moment#2.10.6',
                         'livestamp#1.1.2',
-                        'socket.io-client#0.9.10',
                         )
 
 TASTYPIE_DEFAULT_FORMATS = ['json']
