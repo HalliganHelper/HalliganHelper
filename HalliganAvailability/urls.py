@@ -13,7 +13,7 @@ from computers.api import RoomInfoResource
 
 # TA Availability api
 from tas.api import CourseResource, OfficeHourResource
-from tas.api import TAResource, RequestResource
+from tas.api import TAResource, RequestResource, UserResource
 
 v1_api = Api(api_name='v2')
 
@@ -28,6 +28,7 @@ v1_api.register(CourseResource())
 v1_api.register(OfficeHourResource())
 v1_api.register(TAResource())
 v1_api.register(RequestResource())
+v1_api.register(UserResource())
 
 
 # Uncomment the next two lines to enable the admin:
