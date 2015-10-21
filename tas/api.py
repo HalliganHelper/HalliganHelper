@@ -1,6 +1,7 @@
 import json
 from django.utils.timezone import now
 from django.utils.html import conditional_escape
+from django.conf.urls import url
 from tastypie import fields
 from tastypie.http import HttpUnauthorized
 from tastypie.authentication import MultiAuthentication, SessionAuthentication
@@ -9,9 +10,13 @@ from tastypie.resources import ModelResource
 from tastypie.constants import ALL_WITH_RELATIONS
 import logging
 import datetime
-from .authorizations import RequestAuthorization, OfficeHourAuthorization
+from .authorizations import (RequestAuthorization,
+                             OfficeHourAuthorization,
+                             UserAuthorization)
+
 from .validations import RequestValidation, OfficeHourValidation
 from .models import Course, TA, OfficeHour, Request, Student
+from .custom_user import CustomUser
 from HalliganAvailability.authentication import OAuth20Authentication
 from ws4redis.publisher import RedisPublisher
 from ws4redis.redis_store import RedisMessage
@@ -24,14 +29,40 @@ def publish_ta_message(message_data):
     message = RedisMessage(json.dumps(message_data))
     redis_publisher.publish_message(message)
 
+
 class CommonMeta(object):
     authorization = DjangoAuthorization()
-#     authentication = MultiAuthentication(OAuth20Authentication(),
-#                                          SessionAuthentication())
     authentication = MultiAuthentication(SessionAuthentication(),
                                          OAuth20Authentication())
     limit = 0
     always_return_data = True
+
+
+class UserResource(ModelResource):
+    class Meta(CommonMeta):
+        authorization = UserAuthorization()
+        queryset = CustomUser.objects.all()
+        include_resource_uri = False
+        allowed_methods = ['get']
+        fields = ['first_name', 'last_name']
+
+    def get_object_list(self, request):
+        return CustomUser.objects.filter(pk=request.user.pk).select_related('ta')
+
+    def dehydrate(self, bundle):
+        ta_for = []
+        is_ta = TA.objects.filter(active=True, user=bundle.request.user).exists()
+        if is_ta:
+            ta_for = TA.objects.get(user=bundle.request.user).course.values_list('number', flat=True)
+            ta_for = list(ta_for)
+        bundle.data['is_ta'] = is_ta
+        bundle.data['ta_for'] = ta_for
+        return bundle
+
+    def override_urls(self):
+        return [
+            url(r"^(?P<resource_name>%s)/$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
+        ]
 
 
 class CourseResource(ModelResource):

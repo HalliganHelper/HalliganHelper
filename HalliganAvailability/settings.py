@@ -1,6 +1,5 @@
 # Django settings for HalliganAvailability project.
 import os
-from secret import *
 
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), '..')
 
@@ -71,7 +70,7 @@ ROOT_URLCONF = 'HalliganAvailability.urls'
 WSGI_APPLICATION = 'HalliganAvailability.wsgi.application'
 
 TEMPLATE_DIRS = (
-    os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),
+    os.path.join(os.path.dirname(__file__), 'templates').replace('\\', '/'),
 )
 
 INSTALLED_APPS = (
@@ -105,39 +104,22 @@ AUTH_USER_MODEL = 'tas.CustomUser'
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-
-def get_cache():
-    import os
-    try:
-        os.environ['MEMCACHE_SERVERS'] = os.environ['MEMCACHIER_SERVERS'].replace(',', ';')
-        os.environ['MEMCACHE_USERNAME'] = os.environ['MEMCACHIER_USERNAME']
-        os.environ['MEMCACHE_PASSWORD'] = os.environ['MEMCACHIER_PASSWORD']
-        return {
-            'default': {
-                'BACKEND': 'django_pylibmc.memcached.PyLibMCCache',
-                'TIMEOUT': 500,
-                'BINARY': True,
-                'OPTIONS': {'tcp_nodelay': True}
-            }
-        }
-    except:
-        return {
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
-            }
-        }
-
-CACHES = get_cache()
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+    }
+}
 
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = True
 
+LOG_FORMAT = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'formatters': {
         'verbose': {
-            'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+            'format': LOG_FORMAT,
             'datefmt': '%d/%b/%Y %H:%M:%S'
         },
         'deprecation': {
@@ -243,30 +225,34 @@ STATICFILES_FINDERS = (
     'pipeline.finders.PipelineFinder',
 )
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
-
-
-# STATICFILES_FINDERS = (
-#     'pipeline.finders.FileSystemFinder',
-#     'pipeline.finders.AppDirectoriesFinder',
-#     'pipeline.finders.CachedFileFinder',
-#     'pipeline.finders.PipelineFinder',
-# )
-
 PIPELINE_COMPILERS = (
     'pipeline.compilers.sass.SASSCompiler',
 )
 
-PIPELINE_SASS_ARGUMENTS = '--scss --compass -E "UTF-8" -I "{}"'.format(FOUNDATION_PATH)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+BOWER_COMPONENTS = os.path.join(BASE_DIR, '..', 'components',
+                                'bower_components')
+
+FOUNDATION_PATH = os.path.join(BOWER_COMPONENTS, 'foundation', 'scss')
+
+PIPELINE_SASS_ARGUMENTS = '--scss --compass -E "UTF-8" -I "{}"' \
+    .format(FOUNDATION_PATH)
 
 PIPELINE_CSS = {
     'all_styles': {
         'source_filenames': (
             'HalliganAvailability/scss/extend_foundation.scss',
-            os.path.join('pickadate', 'lib', 'compressed', 'themes', 'default.css'),
-            os.path.join('pickadate', 'lib', 'compressed', 'themes', 'default.time.css'),
+            os.path.join('pickadate',
+                         'lib',
+                         'compressed',
+                         'themes',
+                         'default.css'),
+            os.path.join('pickadate',
+                         'lib',
+                         'compressed',
+                         'themes',
+                         'default.time.css'),
         ),
         'output_filename': 'css/styles.css',
     }
@@ -339,9 +325,6 @@ INSTALLED_APPS += (
 )
 
 
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
 ALLOWED_REGISTRATION_DOMAINS = ('tufts.edu', 'cs.tufts.edu')
 
 
@@ -358,3 +341,49 @@ TEMPLATE_CONTEXT_PROCESSORS += (
 )
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 WS4REDIS_HEARTBEAT = '--heartbeat--'
+
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'staticfiles')
+STATIC_URL = '/static/'
+MEDIA_ROOT = 'mediafiles/'
+MEDIA_URL = '/media/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, '..', 'components', 'bower_components'),
+
+)
+
+
+# This is a dummy database setup. You'll need to insert your own
+# database name and passwords
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'halliganhelper',
+        'USER': 'postgres',
+        'PASSWORD': '',
+        'HOST': 'localhost'
+    }
+}
+
+EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+try:
+    from secret import *
+except ImportError:
+    WS4REDIS_CONNECTION = {
+        'password': ''
+    }
+    DEBUG = False
+    TEMPLATE_DEBUG = DEBUG
+    EMAIL_HOST_PASSWORD = ''
+    SECRET_KEY = 'secret_key'
+    ALLOWED_HOSTS = ['*']
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
