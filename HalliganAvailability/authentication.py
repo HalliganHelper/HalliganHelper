@@ -22,6 +22,8 @@ Example:
  - http://ianalexandr.com
 """
 
+logger = logging.getLogger(__name__)
+
 # stolen from piston
 class OAuthError(RuntimeError):
     """Generic exception class."""
@@ -45,7 +47,7 @@ class OAuth20Authentication(Authentication):
         values in "Authorization" header, or as a GET request
         or in a POST body.
         """
-        logging.info("OAuth20Authentication")
+        logger.info("OAuth20Authentication")
 
         try:
             key = request.GET.get('oauth_consumer_key')
@@ -56,7 +58,7 @@ class OAuth20Authentication(Authentication):
                 if auth_header_value:
                     key = auth_header_value.split(' ')[1]
             if not key:
-                # logging.error('OAuth20Authentication. No consumer_key found.')
+                logger.error('OAuth20Authentication. No consumer_key found.')
                 return None
             """
             If verify_access_token() does not pass, it will raise an error
@@ -69,12 +71,14 @@ class OAuth20Authentication(Authentication):
             # If OAuth authentication is successful, set oauth_consumer_key on request in case we need it later
             request.META['oauth_consumer_key'] = key
             return True
-        except KeyError, e:
-            logging.exception("Error in OAuth20Authentication.")
+        except KeyError:
+            logger.exception("Error in OAuth20Authentication. path=%s",
+                             request.path)
             request.user = AnonymousUser()
             return False
-        except Exception, e:
-            logging.exception("Error in OAuth20Authentication.")
+        except Exception:
+            logger.exception("Error in OAuth20Authentication. path=%s",
+                             request.path)
             return False
         return True
 
@@ -89,5 +93,5 @@ def verify_access_token(key):
     except AccessToken.DoesNotExist, e:
         raise OAuthError("AccessToken not found at all.")
 
-    logging.info('Valid access')
+    logger.info('Valid access')
     return token

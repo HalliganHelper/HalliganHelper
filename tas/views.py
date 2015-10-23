@@ -21,7 +21,6 @@ from .custom_user_forms import EmailUserCreationForm, EmailAuthenticationForm
 
 
 logger = logging.getLogger(__name__)
-socket_logger = logging.getLogger('sockets')
 
 
 def notify(user, courses, adding_ta=True):
@@ -48,14 +47,17 @@ def notify(user, courses, adding_ta=True):
 def check_ta(user):
     # Because apparently having an '@' in the email gives a 403 back from Tufts
     email = user.email.replace('@', ':')
+    logger.info('Checking if TA: user_id=%s email=%s', user.pk, email)
     url = "http://www.cs.tufts.edu/~molay/compta/isata.cgi/{0}"
     r = requests.get(url.format(email))
+    logger.info('Checking if TA: user_id=%s status=%s courses=%s',
+                user.pk, r.status_code, r.text)
     is_ta = r.text.strip() != 'NONE'
     if is_ta:
         course_nums = r.text.strip().split(' ')
         courses = Course.objects.filter(number__in=course_nums)
 
-        logger.debug("{0} has been added as a ta".format(user))
+        logger.debug('Added TA user_id', user.pk)
         ta, created = TA.objects.get_or_create(user=user)
         ta.active = True
         ta.course = courses
@@ -72,7 +74,7 @@ def check_ta(user):
 
 def user_confirmed(sender, user, request, **kwargs):
     check_ta(user)
-    logger.debug("User {0} confirmed".format(user))
+    logger.info('Confirmed user: user_id=%s', user.pk)
 
 
 def user_created(sender, user, request, **kwargs):
@@ -82,7 +84,7 @@ def user_created(sender, user, request, **kwargs):
     user.first_name = form.data['first_name']
     user.last_name = form.data['last_name']
     user.save()
-    logger.debug("User {0} created".format(user))
+    logger.info('Created a user: user_id=%s', user.pk)
 
 user_registered.connect(user_created)
 user_activated.connect(user_confirmed)
@@ -103,6 +105,7 @@ class TuftsRegistrationView(RegistrationView):
 
 
 def send_forgotten_username_email(user):
+    logger.info('Sending forgotten username email. user_id=%s', user.pk)
     subject = 'Forgotten HalliganHelper Username'
     from_email = 'halliganhelper@tylerlubeck.com'
     to_email = user.email
@@ -120,6 +123,8 @@ def send_forgotten_username_email(user):
 
 
 def forgot_username(request):
+    logger.info('Starting forgotten username view. user_id=%s',
+                request.user.pk)
     if request.method == 'POST':
         form = ForgotUsernameForm(request.POST)
         if form.is_valid():
@@ -171,6 +176,7 @@ def login_or_register(request):
 @login_required()
 @user_passes_test(is_ta)
 def update_photo(request):
+    logger.info('Update a photo for user. user_id=%s', request.user.pk)
     if request.method == 'POST':
         image_form = TAPhotoChangeForm(request.POST, request.FILES)
         if image_form.is_valid():

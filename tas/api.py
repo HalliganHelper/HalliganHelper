@@ -20,12 +20,13 @@ from .custom_user import CustomUser
 from HalliganAvailability.authentication import OAuth20Authentication
 from ws4redis.publisher import RedisPublisher
 from ws4redis.redis_store import RedisMessage
-logger = logging.getLogger('api')
+logger = logging.getLogger(__name__)
 
 redis_publisher = RedisPublisher(facility='ta', broadcast=True)
 
 
 def publish_ta_message(message_data):
+    logger.info('Publishing redis message: %s', message_data)
     message = RedisMessage(json.dumps(message_data))
     redis_publisher.publish_message(message)
 
@@ -57,6 +58,8 @@ class UserResource(ModelResource):
             ta_for = list(ta_for)
         bundle.data['is_ta'] = is_ta
         bundle.data['ta_for'] = ta_for
+        logger.info('Getting user info. user_id=%s is_ta=%s',
+                    bundle.obj.pk, is_ta)
         return bundle
 
     def override_urls(self):
@@ -87,8 +90,10 @@ class TAResource(ModelResource):
 
     def get_object_list(self, request):
         if 'get_all' in request.GET:
+            logger.info('Getting TAs. type=all')
             return TA.objects.all()
         else:
+            logger.info('Getting TAs. type=active')
             return TA.objects.active()
 
     def dehydrate(self, bundle):
@@ -143,6 +148,9 @@ class OfficeHourResource(ModelResource):
         }
 
         publish_ta_message(websocket_data)
+        logger.info('Creating an office hour. ta_id=%s office_hour_id=%s '
+                    'course_id=%s', bundle.request.user.ta.pk, bundle.obj.pk,
+                    bundle.obj.course.pk)
         return return_val
 
     def obj_update(self, bundle, **kwargs):
@@ -155,6 +163,10 @@ class OfficeHourResource(ModelResource):
             'remove': bundle.obj.end_time < now()
         }
         publish_ta_message(websocket_data)
+        logger.info('Updating an office hour. ta_id=%s office_hour_id=%s '
+                    'course_id=%s remove=%s', bundle.request.user.ta.pk,
+                    bundle.obj.pk, bundle.obj.course.pk,
+                    bundle.obj.end_time < now())
 
         return return_val
 
@@ -194,7 +206,11 @@ class RequestResource(ModelResource):
         changes_allowed = new_keys.issubset(student_allowed_updates)
 
         if (not is_owner) or (is_owner and not changes_allowed):
+            logger.info('Student not allowed to update request. '
+                        'user_id=%s new_keys=%s', user.pk, new_keys)
             return False
+        logger.info('Student is allowed to update request. '
+                    'user_id=%s new_keys=%s', user.pk, new_keys)
 
         return True
 
@@ -208,7 +224,11 @@ class RequestResource(ModelResource):
 
         changes_allowed = new_keys.issubset(ta_allowed_updates)
         if (not is_ta) or (is_ta and not changes_allowed):
+            logger.info('TA not allowed to update request. '
+                        'user_id=%s new_keys=%s', user.pk, new_keys)
             return False
+        logger.info('TA is allowed to update request. '
+                    'user_id=%s new_keys=%s', user.pk, new_keys)
         return True
 
     def obj_update(self, bundle, **kwargs):
@@ -221,6 +241,7 @@ class RequestResource(ModelResource):
         ta_update = self._can_ta_update(request.user, new_keys)
 
         if ta_update and 'solved' in new_keys and bundle.obj.when_solved is None:
+            logger.info('Marking request solved. request_id=%s', bundle.obj.pk)
             bundle.obj.when_solved = now()
             bundle.obj.who_solved = request.user.ta
 
@@ -262,6 +283,8 @@ class RequestResource(ModelResource):
         student_update = self._can_student_update(request.user, new_keys,
                                                   kwargs['pk'])
         ta_update = self._can_ta_update(request.user, new_keys)
+        logger.info('Updating request. user_id=%s new_data=%s',
+                    request.user.pk, kwargs)
 
         if (not student_update) and (not ta_update):
             return HttpUnauthorized("You are not authorized")
