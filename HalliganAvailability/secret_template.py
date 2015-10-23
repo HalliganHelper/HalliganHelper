@@ -1,5 +1,5 @@
 # This is merely a template for the secret.py file that should contain all of
-# your secret or device specific settings. 
+# your secret or device specific settings.
 
 
 DEBUG = False
@@ -9,7 +9,6 @@ EMAIL_HOST_PASSWORD = 'INSERT_EMAIL_PASSWORD_HERE'
 EMAIL_HOST = 'INSERT_EMAIL_HOST_HERE'
 EMAIL_PORT = 666
 EMAIL_USE_TLS = True
-EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SECRET_KEY = 'INSERT_SECRET_KEY_HERE'
 
@@ -38,7 +37,7 @@ FOUNDATION_PATH = os.path.join(BOWER_COMPONENTS, 'foundation',
                                'scss')
 
 
-# This is a dummy database setup. You'll need to insert your own 
+# This is a dummy database setup. You'll need to insert your own
 # database name and passwords
 DATABASES = {
     'default': {
