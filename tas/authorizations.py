@@ -2,7 +2,7 @@ from tastypie.exceptions import Unauthorized
 from tastypie.authorization import ReadOnlyAuthorization
 from .models import TA
 import logging
-logger = logging.getLogger('api')
+logger = logging.getLogger(__name__)
 
 
 class RequestAuthorization(ReadOnlyAuthorization):

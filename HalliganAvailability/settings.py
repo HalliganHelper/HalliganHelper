@@ -116,19 +116,12 @@ REGISTRATION_OPEN = True
 LOG_FORMAT = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s'
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
             'format': LOG_FORMAT,
             'datefmt': '%d/%b/%Y %H:%M:%S'
-        },
-        'deprecation': {
-            'format': 'DEPRECATION - [%(asctime)s] %(message)s',
-            'datefmt': '%d/%b/%Y %H:%M:%S'
-        },
-        'simple': {
-            'format': '[%(levelname)s] %(message)s'
-        },
+        }
     },
     'handlers': {
         'null': {
@@ -140,20 +133,16 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
-        'deprecation': {
-            'level': 'ERROR',
-            'class': 'logging.StreamHandler',
-            'formatter': 'deprecation'
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/webapps/logs/halliganhelper/halliganhelper.log',
+            'formatter': 'verbose'
         },
-        # 'deprecation': {
-        #     'level': 'ERROR',
-        #     'class': 'logging.FileHandler',
-        #     'filename': '../logs/view_deprecation.log',
-        #     'formatter': 'deprecation'
-        # },
-        'exception': {
-            'level': 'ERROR',
-            'class': 'logging.StreamHandler',
+        'authentication_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/webapps/logs/halliganhelper/halliganhelper-auth.log',
             'formatter': 'verbose'
         }
     },
@@ -162,29 +151,22 @@ LOGGING = {
             'handlers': ['null'],
             'propagate': False
         },
-        'tas.views': {
-            'handlers': ['console'],
+        'HalliganAvailability': {
+            'handlers': ['console', 'file'],
             'level': 'DEBUG'
         },
-        'sockets': {
-            'handlers': ['console'],
+        'tas': {
+            'handlers': ['console', 'file'],
             'level': 'DEBUG'
         },
-        'computers.views': {
-            'handlers': ['console'],
+        'computers': {
+            'handlers': ['console', 'file'],
             'level': 'DEBUG'
         },
-        'api': {
-            'handlers': ['console'],
-            'level': 'DEBUG'
-        },
-        'task': {
-            'handlers': ['console', 'exception'],
-            'level': 'DEBUG'
-        },
-        'deprecated_views': {
-            'handlers': ['console', 'deprecation'],
-            'level': 'DEBUG'
+        'HalliganAvailability.authentication': {
+            'handlers': ['console', 'authentication_file'],
+            'level': 'DEBUG',
+            'propagate': False
         }
     }
 }

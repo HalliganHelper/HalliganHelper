@@ -6,6 +6,6 @@ from celery import shared_task
 import logging
 import redis
 
-logger = logging.getLogger("task")
+logger = logging.getLogger(__name__)
 
 POOL = redis.ConnectionPool(host='localhost', db=0)
