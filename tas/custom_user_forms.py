@@ -40,11 +40,8 @@ class EmailAuthenticationForm(AuthenticationForm):
         self.fields['username'].widget = forms.TextInput(attrs={'type': 'email'})
 
 
-class CustomUserChangeForm(UserChangeForm):
-
-    def __init__(self, *args, **kwargs):
-        super(CustomUserChangeForm, self).__init__(*args, **kwargs)
-        del self.fields['username']
+class CustomUserChangeForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
+        fields = ('email', 'first_name', 'last_name')

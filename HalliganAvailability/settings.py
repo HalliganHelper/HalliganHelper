@@ -52,7 +52,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
     'htmlmin.middleware.HtmlMinifyMiddleware',
     'htmlmin.middleware.MarkRequestMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -85,14 +84,9 @@ INSTALLED_APPS = (
     'computers',
     'tas',
     'registration',
-    'widget_tweaks',
     'django_extensions',
-    'tastypie',
-    'provider',
-    'provider.oauth2',
     'djangobower',
     'imagekit',
-    'manifesto',
 )
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
@@ -126,7 +120,7 @@ LOGGING = {
     'handlers': {
         'null': {
             'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler',
+            'class': 'logging.NullHandler',
         },
         'console': {
             'level': 'DEBUG',
@@ -136,13 +130,13 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/webapps/logs/halliganhelper/halliganhelper.log',
+            'filename': 'halliganhelper.log',
             'formatter': 'verbose'
         },
         'authentication_file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/webapps/logs/halliganhelper/halliganhelper-auth.log',
+            'filename': 'halliganhelper-auth.log',
             'formatter': 'verbose'
         }
     },
@@ -299,12 +293,6 @@ PIPELINE_JS = {
         'output_filename': 'js/dependencies.js',
     }
 }
-
-# Opbeat stuff
-
-INSTALLED_APPS += (
-    'opbeat.contrib.django',
-)
 
 
 ALLOWED_REGISTRATION_DOMAINS = ('tufts.edu', 'cs.tufts.edu')

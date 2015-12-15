@@ -1,3 +1,4 @@
+.cache/
 htmlcov/
 node_modules/
 .vagrant/
