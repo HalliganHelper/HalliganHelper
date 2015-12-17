@@ -29,7 +29,9 @@ Vagrant.configure(2) do |config|
                             python-dev \
                             memcached \
                             libmemcached-dev \
-                            lib32z1-dev
+                            lib32z1-dev \
+			    libjpeg8-dev
+			
   SHELL
 
   config.vm.provision "shell", path: "vagrant/scripts/setup-halliganhelper.sh", privileged: false

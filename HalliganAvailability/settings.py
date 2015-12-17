@@ -309,7 +309,7 @@ WS4REDIS_PREFIX = 'hh'
 TEMPLATE_CONTEXT_PROCESSORS += (
     'ws4redis.context_processors.default',
 )
-WSGI_APPLICATION = 'ws4redis.django_runserver.application'
+# WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 WS4REDIS_HEARTBEAT = '--heartbeat--'
 
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'staticfiles')
