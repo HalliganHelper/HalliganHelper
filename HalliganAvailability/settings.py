@@ -356,3 +356,8 @@ except ImportError:
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+if DEBUG:
+    INSTALLED_APPS += (
+        'debug_toolbar',
+    )

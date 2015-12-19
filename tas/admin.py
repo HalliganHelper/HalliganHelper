@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .custom_user_admin import CustomUserAdmin
+from django.contrib.auth.admin import UserAdmin
+
+from registration.models import RegistrationProfile
+
+from .custom_user_forms import CustomUserChangeForm, CustomUserCreationForm
 from .custom_user import CustomUser
 from .models import (Student, OfficeHour, Course, Request,
                      School, SchoolEmailDomain)
@@ -38,6 +42,10 @@ class CourseAdmin(MySchoolsOnlyModelAdminMixin, admin.ModelAdmin):
     list_filter = (
         ('school', admin.RelatedOnlyFieldListFilter),
     )
+
+    def get_queryset(self, request):
+        return super(CourseAdmin, self)\
+            .get_queryset(request).prefetch_related('school')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
 
@@ -78,7 +86,6 @@ class StudentAdmin(MySchoolsOnlyModelAdminMixin, admin.ModelAdmin):
             .formfield_for_manytomany(db_field, request, **kwargs)
 
 
-
 class OfficeHourAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(OfficeHourAdmin, self).get_queryset(request)
@@ -101,6 +108,7 @@ class OfficeHourAdmin(admin.ModelAdmin):
 
         return super(OfficeHourAdmin, self)\
             .formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 class RequestAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
@@ -131,9 +139,56 @@ class RequestAdmin(admin.ModelAdmin):
             .formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+class StudentInline(admin.StackedInline):
+    model = Student
+    max_num = 1
+    can_delete = False
+
+
+class RegistrationProfileInline(admin.StackedInline):
+    model = RegistrationProfile
+    max_num = 1
+    can_delete = False
+
+
+class CustomUserAdmin(UserAdmin):
+    form = CustomUserChangeForm
+    add_form = CustomUserCreationForm
+
+    inlines = [StudentInline, RegistrationProfileInline]
+
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal Info', {'fields': ('first_name', 'last_name')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff',
+                                    'is_superuser', 'groups',
+                                    'user_permissions')}),
+        ('Important Dates', {'fields': ('last_login', )})
+    )
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2')}
+         ),
+    )
+
+    list_display = ('email', 'first_name', 'last_name', 'is_staff')
+    search_fields = ('email', 'first_name', 'last_name')
+    ordering = ('email',)
+
+    def get_queryset(self, request):
+        qs = super(CustomUserAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        groups = request.user.groups.values_list('name', flat=True)
+        school_names = [g.rstrip(' Admins') for g in groups]
+        return qs.filter(student__school__name__in=school_names)
+
+
 admin.site.register(Request, RequestAdmin)
 admin.site.register(OfficeHour, OfficeHourAdmin)
-admin.site.register(Student, StudentAdmin)
+# admin.site.register(Student, StudentAdmin)
 admin.site.register(School, SchoolAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)

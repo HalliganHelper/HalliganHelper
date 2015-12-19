@@ -7,6 +7,7 @@ celery==3.1.19
 django-appconf==1.0.1
 django-bower==5.0.4
 django-celery==3.1.17
+django-debug-toolbar==1.4
 django-extensions==1.6.1
 django-imagekit==3.3
 django-pipeline==1.5.4
