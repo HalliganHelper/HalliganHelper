@@ -4,7 +4,8 @@ from django.utils import timezone
 from django.contrib.auth.models import (AbstractBaseUser,
                                         PermissionsMixin,
                                         BaseUserManager)
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 class CustomUserManager(BaseUserManager):
     def _create_user(self, email, password, is_staff, is_superuser, **kwargs):
         now = timezone.now()
@@ -27,6 +28,7 @@ class CustomUserManager(BaseUserManager):
 
     def create_superuser(self, email, password=None, **kwargs):
         return self._create_user(email, password, True, True, **kwargs)
+
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField('Email Address',
@@ -65,5 +67,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def email_user(self, subject, message, from_email=None):
         send_mail(subject, message, from_email, [self.email])
+
+    def __str__(self):
+        return '{} ({})'.format(self.get_full_name(), self.email)
+
 
 

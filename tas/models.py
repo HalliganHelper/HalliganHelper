@@ -1,18 +1,68 @@
+import logging
+
 from django.db import models
-from django.contrib import admin
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.utils.timezone import now
 from django.core.exceptions import ValidationError
-import datetime
-from imagekit.admin import AdminThumbnail
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.models import Group
 
 from .custom_user import CustomUser
 
+logger = logging.getLogger(__name__)
 
 def not_empty_string(value):
     if len(value) == 0:
         raise ValidationError("No value for field")
+
+
+class School(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    administrator_email = models.EmailField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    max_course_count = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+@receiver(post_save, sender=School)
+def create_school_admin_group(instance, created, **kwargs):
+    if created:
+        school_name = instance.name
+        Group.objects.get_or_create(name='{} Admins'.format(school_name))
+
+
+
+class SchoolEmailDomain(models.Model):
+    domain = models.CharField(max_length=255, unique=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    school = models.ForeignKey(School)
+
+    def __str__(self):
+        return '{} - {}'.format(self.school.name, self.domain)
+
+
+class Course(models.Model):
+    """ A Course is the representation of an academic course.
+        Requests and TAs are associated with courses.
+    """
+    class Meta:
+        ordering = ['department', 'number']
+
+    school = models.ForeignKey(School)
+    name = models.CharField(max_length=100,
+                            help_text='The name of the course')
+    department = models.CharField(max_length=50,
+                                  help_text='The department the course belongs to')
+    number = models.IntegerField(help_text='The identifying course number')
+
+    postfix = models.CharField(max_length=20,
+                               default='',
+                               help_text='The CP of COMP 150CP')
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '{}: {}'.format(self.school.name, self.name)
 
 
 class Student(models.Model):
@@ -20,67 +70,45 @@ class Student(models.Model):
         Every User object has a Student associated with it, and these Students
         are created when the user is registered.
     """
+    default_image = 'headshots/None/ming.jpg'
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    school = models.ForeignKey(School)
+
+    # TODO: Make sure these are process properly. Size, naming, etc
+    headshot = models.ImageField(upload_to='headshots',
+                                 default=default_image,
+                                 help_text='A headshot of the user')
+
+    # Both of these will have to be limited to only allow Courses within the
+    # same school
+    courses = models.ManyToManyField(Course,
+                                     related_name='students',
+                                     help_text='The courses a student is registered for.')
+
+    ta_jobs = models.ManyToManyField(Course,
+                                     through='TA',
+                                     related_name='tas',
+                                     help_text='The courses a student TAs for.')
 
     def __str__(self):
-        return self.user.first_name + ' ' + self.user.last_name
+        return self.user.get_full_name()
+
+    def __repr__(self):
+        return '<Student ({}) at {}>'.format(self.user.get_full_name(),
+                                             id(self))
 
 
-admin.site.register(Student)
-
-
-class Course(models.Model):
-    """ A Course is the representation of an academic course.
-        Requests and TAs are associated with courses.
-    """
-    name = models.CharField(max_length=100,
-                            help_text='The name of the course')
-    department = models.CharField(max_length=50,
-                                  help_text='The department the course belongs to')
-    number = models.IntegerField(help_text='The identifying course number')
-
-    # NOTE: This is not currently used
-    students = models.ForeignKey(Student,
-                                 blank=True,
-                                 null=True,
-                                 help_text='A list of students enrolled in the course')
-
-    def __str__(self):
-        return '{} {} -- {}'.format(self.department,
-                              self.number,
-                              self.name)
-
-
-    class Meta:
-        ordering = ['department', 'number']
-
-admin.site.register(Course)
-
-
-class TAAdmin(admin.ModelAdmin):
-    """ An enhancement to the admin interface for TAs.
-        Lists the courses they TA for as well as a thumbnail of their headshot
-    """
-
-    def list_courses(ta):
-        """ Create a CSV of the courses that a TA is registered for """
-        courses = map(str, ta.course.all().values_list('number', flat=True))
-        return ', '.join(courses)
-
-    list_courses.short_description = 'Courses'
-
-    list_display = ['__str__', 'active', list_courses, 'headshot']
-    headshot = AdminThumbnail(image_field='headshot')
-
-
-class TAManager(models.Manager):
-    """ Enhances the default objects manager for a TA.
-        Provides an 'active' query that only returns active TAs
-    """
-    def active(self):
-        """ Returns a queryset of active TAs """
-        qs = super(TAManager, self).get_query_set()
-        return qs.filter(active=True)
+@receiver(post_save, sender=CustomUser)
+def create_student_profile_for_user(instance, created, **kwargs):
+    if created:
+        domain = instance.email.split('@')[-1]
+        try:
+            sed = SchoolEmailDomain.objects.get(domain=domain)
+            Student.objects.get_or_create(user=instance,
+                                          school=sed.school)
+        except SchoolEmailDomain.DoesNotExist:
+                logger.exception('Tried to create a student for a '
+                                 'non existing email domain')
 
 
 class TA(models.Model):
@@ -92,134 +120,68 @@ class TA(models.Model):
         verbose_name = "Teacher's Assistant"
         verbose_name_plural = "Teacher's Assistants"
 
-    default_image = 'headshots/None/ming.jpg'
-
-    user = models.OneToOneField(settings.AUTH_USER_MODEL,
-                                help_text='The user the TA is associated with.')
-    course = models.ManyToManyField(Course,
-                                    help_text='The courses a TA is registered to TA for')
+    student = models.ForeignKey(Student)
+    course = models.ForeignKey(Course)
     active = models.BooleanField(default=True,
                                  help_text='Whether or not the TA is currently active')
-    headshot = models.ImageField(upload_to='headshots',
-                                 default=default_image,
-                                 help_text='A headshot to help students identify TAs')
-    has_updated_headshot = models.BooleanField(default=False,
-                                               help_text='Whether or not the TA has updated their headshot')
-
-    objects = TAManager()
 
     def __str__(self):
-        return self.user.get_full_name()
+        return 'TA: {}'.format(self.user.get_full_name())
 
     def __repr__(self):
-        return self.__str__()
-
-admin.site.register(TA, TAAdmin)
-
-
-class RequestDisplayManager(models.Manager):
-    """Helpful additional queries about Requests."""
-    def not_resolved(self):
-        """Retrieve a queryset of all queries that have not been resolved
-            Does not matter when they were opened
-        """
-        qs = super(RequestDisplayManager, self).get_query_set()
-        return qs.filter(cancelled=False, solved=False)
-
-    def still_open(self, since_when=5):
-        """ Retrieve a queryset of all open requests within the last 'since_when' hours.
-            since_when defaults to 5
-        """
-        timeout = datetime.timedelta(hours=since_when)
-        return self.get_query_set().filter(when_asked__gte=now() - timeout,
-                                           cancelled=False,
-                                           solved=False)
+        return '<TA ({}) at 0x{}>'.format(self.user.get_full_name(),
+                                          id(self))
 
 
 class Request(models.Model):
     """ Requests are the corner stone of this whole shebang.
         They keep track of when a Student requests a TA for a course
     """
+    # Required Relations
     course = models.ForeignKey(Course,
                                help_text='The course the request is for')
+    requestor = models.ForeignKey(Student,
+                                  related_name='requests',
+                                  help_text='The student who made the request')
 
-    student = models.ForeignKey(Student,
-                                help_text='The student who made the request')
-
+    # Request Information
+    when_asked = models.DateTimeField(auto_now_add=True,
+                                      help_text='When the request was made')
     question = models.CharField(max_length=51,
                                 validators=[not_empty_string],
                                 help_text='The question associated with the request')
-
     where_located = models.CharField(max_length=50,
                                      validators=[not_empty_string],
                                      help_text='Where the user is located')
 
-    when_asked = models.DateTimeField(help_text='When the request was made')
-
-    cancelled = models.BooleanField(default=False, blank=True,
+    # Information about being solved
+    cancelled = models.BooleanField(default=False,
                                     help_text='Did the student cancel the request?')
-
+    checked_out = models.BooleanField(default=False,
+                                      help_text='Has a TA started working on the request?')
     solved = models.BooleanField(default=False,
                                  help_text='Has the request been resolved?')
     when_solved = models.DateTimeField(blank=True, null=True,
-                                      help_text='When the request was resolved')
-    who_solved = models.ForeignKey(TA, null=True, blank=True,
+                                       help_text='When the request was resolved')
+    who_solved = models.ForeignKey(Student,
+                                   related_name='requests_solved',
+                                   null=True,
+                                   blank=True,
                                    help_text='The TA who resolved the request')
-    checked_out = models.BooleanField(default=False,
-                                      help_text='Has a TA started working on the request?')
-
-    objects = RequestDisplayManager()
-
-    def save(self, *args, **kwargs):
-        """ Note that when_asked is set to the current time if
-            this is a new request
-        """
-        if self.pk is None:
-            self.when_asked = now()
-        return super(Request, self).save(*args, **kwargs)
-
-    def timeOut(self):
-        self.timedOut = True
-        self.save()
-
-    def resolutionTime(self):
-        if not self.when_solved:
-            return None
-        return self.when_solved - self.when_asked
 
     def __str__(self):
         return '{0} - Comp {1}'.format(self.student.user.first_name,
                                        self.course.number)
 
-admin.site.register(Request)
-
-
-class OfficeHourManager(models.Manager):
-    """Creates helper queries for OfficeHours. Namely, allows for easy querying
-        about who is on duty
-    """
-    def on_duty(self):
-        """Returns currently active office hours"""
-        qs = self.get_query_set()
-        return qs.filter(start_time__lte=now()).filter(end_time__gte=now())
-
-    def on_duty_for_course(self, course_number):
-        """Returns active office hours for the specified course"""
-        qs = self.on_duty()
-        return qs.filter(course__number=course_number)
-
 
 class OfficeHour(models.Model):
     """The representation of an office hour. It's associated with a course and a TA"""
-    start_time = models.DateTimeField(help_text='When the TA went on duty')
+    start_time = models.DateTimeField(auto_now_add=True,
+                                      help_text='When the TA went on duty')
     end_time = models.DateTimeField(help_text='When the TA goes off duty')
     course = models.ForeignKey(Course,
                                help_text='The course this OfficeHour is associated with')
-    ta = models.ForeignKey(TA,
+    ta = models.ForeignKey(Student,
                            help_text='The TA on duty')
     location = models.CharField(max_length=255,
                                 help_text='The home base of the TA')
-    objects = OfficeHourManager()
-
-
-admin.site.register(OfficeHour)

@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import (UserCreationForm,
                                        UserChangeForm,
-                                       AuthenticationForm)
+                                       AuthenticationForm,
+                                       ReadOnlyPasswordHashField)
 from django import forms
 from .custom_user import CustomUser
 from django.conf import settings
@@ -41,7 +42,11 @@ class EmailAuthenticationForm(AuthenticationForm):
 
 
 class CustomUserChangeForm(forms.ModelForm):
+    password = ReadOnlyPasswordHashField()
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'first_name', 'last_name')
+        fields = ('email', 'first_name', 'last_name', 'password')
+
+    def clean_password(self):
+        return self.initial['password']
