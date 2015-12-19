@@ -60,3 +60,4 @@ nosetests.xml
 
 
 staticfiles/
+datadump.json
