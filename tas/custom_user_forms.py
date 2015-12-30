@@ -1,5 +1,4 @@
 from django.contrib.auth.forms import (UserCreationForm,
-                                       UserChangeForm,
                                        AuthenticationForm,
                                        ReadOnlyPasswordHashField)
 from django import forms
@@ -38,7 +37,9 @@ class EmailAuthenticationForm(AuthenticationForm):
 
     def __init__(self, *args, **kwargs):
         super(EmailAuthenticationForm, self).__init__(*args, **kwargs)
-        self.fields['username'].widget = forms.TextInput(attrs={'type': 'email'})
+        self.fields['username'].widget = forms.TextInput(
+            attrs={'type': 'email'}
+        )
 
 
 class CustomUserChangeForm(forms.ModelForm):

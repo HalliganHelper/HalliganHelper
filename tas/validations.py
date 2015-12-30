@@ -10,7 +10,6 @@ class RequestValidation(Validation):
         if not bundle.data:
             return {'__all__': 'Something is wrong'}
 
-
         errors = {}
         question = bundle.data.get('question', None)
         question_max_length = Request._meta.get_field('question').max_length
@@ -18,17 +17,17 @@ class RequestValidation(Validation):
             if len(question) == 0:
                 errors['question'] = 'Please provide a question'
             elif len(question) > question_max_length:
-                msg = 'Your question must be less than {} characters'.format(question_max_length)
-                errors['question'] = msg
+                msg = 'Your question must be less than {} characters'
+                errors['question'] = msg.format(question_max_length)
 
         location = bundle.data.get('where_located', None)
-        location_max_length = Request._meta.get_field('where_located').max_length
+        location_max_length = \
+            Request._meta.get_field('where_located').max_length
         if location is not None:
             if len(location) == 0:
                 errors['where_located'] = 'Please provide a location'
             elif len(location) > location_max_length:
-                msg = 'Your location must be less than {} characters'.format(location_max_length)
-                errors['where_located'] = msg
+                errors['where_located'] = msg.format(location_max_length)
 
         return errors
 

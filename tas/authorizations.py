@@ -56,6 +56,7 @@ class OfficeHourAuthorization(ReadOnlyAuthorization):
 
         raise Unauthorized("You are not authorized!")
 
+
 class UserAuthorization(ReadOnlyAuthorization):
     """Determines if you're allowed to see a user object"""
     def read_detail(self, object_list, bundle):

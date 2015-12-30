@@ -167,7 +167,7 @@ LOGGING = {
 
 BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
 
-BOWER_INSTALLED_APPS = ('foundation#5.5.2',
+BOWER_INSTALLED_APPS = ('foundation-sites#6.1.1',
                         'jquery-placeholder#2.0.8',
                         'modernizr#2.8.3',
                         'jquery#2.1.4',
@@ -210,7 +210,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BOWER_COMPONENTS = os.path.join(BASE_DIR, '..', 'components',
                                 'bower_components')
 
-FOUNDATION_PATH = os.path.join(BOWER_COMPONENTS, 'foundation', 'scss')
+FOUNDATION_PATH = os.path.join(BOWER_COMPONENTS, 'foundation-sites', 'scss')
 
 PIPELINE_SASS_ARGUMENTS = '--scss --compass -E "UTF-8" -I "{}"' \
     .format(FOUNDATION_PATH)
@@ -286,8 +286,8 @@ PIPELINE_JS = {
             os.path.join('jquery', 'dist', 'jquery.min.js'),
             'modernizr/modernizr.js',
             'fastclick/lib/fastclick.js',
-            'foundation/js/foundation.min.js',
-            'foundation/js/foundation/foundation.dropdown.js',
+            'foundation-sites/js/foundation.min.js',
+            'foundation-sites/js/foundation/foundation.dropdown.js',
             'js/jquery.titlealert.js',
         ),
         'output_filename': 'js/dependencies.js',
@@ -296,6 +296,7 @@ PIPELINE_JS = {
 
 
 ALLOWED_REGISTRATION_DOMAINS = ('tufts.edu', 'cs.tufts.edu')
+
 
 
 # Websocket-for-Redis stuff
@@ -361,3 +362,21 @@ if DEBUG:
     INSTALLED_APPS += (
         'debug_toolbar',
     )
+
+# Django Rest Framework
+INSTALLED_APPS += (
+    'rest_framework',
+)
+
+DEFAULT_RENDERER_CLASSES = (
+    'rest_framework.renderers.JSONRenderer',
+)
+
+if DEBUG:
+    DEFAULT_RENDERER_CLASSES += (
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+}

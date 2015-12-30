@@ -33,6 +33,7 @@ from django.conf.urls.static import static
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+from tas import api as tas_api
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -41,9 +42,10 @@ urlpatterns = patterns('',
                        url(r'^admin/', include(admin.site.urls)),
                        # url(r'^api/', include(v1_api.urls)),
                        # url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
-                       url(r'^api/', include('computers.urls')),
-                       url(r'^', include('tas.urls')),
+                       # url(r'^api/', include('computers.urls')),
+                       # url(r'^', include('tas.urls')),
                        url(r'^$', 'computers.views.ModularHomePage', name='ModularHomePage'),
+                       url('^api/', include(tas_api.urls)),
 #                        url(r'^manifest\.appcache$', ManifestView.as_view(), name='cache_manifest'),
                        )
 

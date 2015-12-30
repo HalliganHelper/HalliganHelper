@@ -27,7 +27,6 @@ def remove_old_model_instances(apps, schema_editor):
 
     Course.objects.all().delete()
     TA.objects.all().delete()
-    Request.objects.all().delete()
     OfficeHour.objects.all().delete()
 
 class Migration(migrations.Migration):

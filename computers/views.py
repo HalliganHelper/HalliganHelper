@@ -25,7 +25,7 @@ def ModularHomePage(request):
         cache.set(ROOMS_CACHE_KEY, room_nums)
 
     courses = Course.objects.all()
-    open_requests = Request.objects.still_open()
+    open_requests = Request.objects.all()
 
     for course in courses:
         course.count = open_requests.filter(course=course).count()

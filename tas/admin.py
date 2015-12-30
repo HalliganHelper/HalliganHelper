@@ -8,6 +8,7 @@ from .custom_user import CustomUser
 from .models import (Student, OfficeHour, Course, Request,
                      School, SchoolEmailDomain)
 
+
 class MySchoolsOnlyModelAdminMixin(object):
     def get_queryset(self, request):
         qs = super(MySchoolsOnlyModelAdminMixin, self).get_queryset(request)
@@ -68,7 +69,8 @@ class StudentAdmin(MySchoolsOnlyModelAdminMixin, admin.ModelAdmin):
             if db_field.name == 'school':
                 kwargs['queryset'] = schools
             if db_field.name == 'user':
-                kwargs['queryset'] = CustomUser.objects.filter(student__school__in=schools)
+                users = CustomUser.objects.filter(student__school__in=schools)
+                kwargs['queryset'] = users
 
         return super(StudentAdmin, self)\
             .formfield_for_foreignkey(db_field, request, **kwargs)
@@ -133,7 +135,8 @@ class RequestAdmin(admin.ModelAdmin):
             if db_field.name == 'requestor':
                 kwargs['queryset'] = Student.objects.filter(school__in=schools)
             if db_field.name == 'who_solved':
-                kwargs['queryset'] = kwargs['queryset'].filter(school__in=schools)
+                kwargs['queryset'] = \
+                    kwargs['queryset'].filter(school__in=schools)
 
         return super(RequestAdmin, self)\
             .formfield_for_foreignkey(db_field, request, **kwargs)

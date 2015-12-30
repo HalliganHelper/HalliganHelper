@@ -4,8 +4,8 @@ from django.utils import timezone
 from django.contrib.auth.models import (AbstractBaseUser,
                                         PermissionsMixin,
                                         BaseUserManager)
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+
+
 class CustomUserManager(BaseUserManager):
     def _create_user(self, email, password, is_staff, is_superuser, **kwargs):
         now = timezone.now()
@@ -36,12 +36,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
                               unique=True,
                               help_text='User Identifier')
 
-
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     is_staff = models.BooleanField('Staff Status',
                                    default=False,
-                                   help_text='Whether or not the user can login to the admin site')
+                                   help_text='Whether or not the user '
+                                             'can login to the admin site')
     is_active = models.BooleanField('Active',
                                     default=True,
                                     help_text='If the user is active or not')
@@ -58,18 +58,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'Users'
 
     def get_full_name(self):
-        return '{} {}'.format(self.first_name,
-                            self.last_name)
+        return '{} {}'.format(self.first_name, self.last_name)
 
     def get_short_name(self):
-        return '{} {}.'.format(self.first_name,
-                             self.last_name[0])
+        return '{} {}.'.format(self.first_name, self.last_name[0])
 
     def email_user(self, subject, message, from_email=None):
         send_mail(subject, message, from_email, [self.email])
 
     def __str__(self):
         return '{} ({})'.format(self.get_full_name(), self.email)
-
-
-
