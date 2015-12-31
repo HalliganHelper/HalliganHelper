@@ -4,121 +4,85 @@
 
 {% block endscripts %}
     {% include "backbone_templates.html" %}
-    {% comment %}
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.7.0/moment.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/livestamp/1.1.2/livestamp.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.3/compressed/picker.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/pickadate.js/3.5.3/compressed/picker.time.js"></script>
-    {% endcomment %}
-    {% javascript 'dependencies' %}
     {% javascript 'packages' %}
     {% javascript 'backbone' %}
+    {% javascript 'dependencies' %}
 {% endblock %}
 
 {% block content %}
-    {# Nav bar for phones #}
-    <nav class="top-bar show-for-small" data-topbar role="navigation">
-        <ul class="title-area">
-            <li class="name">
-                <h1><a href="/">Halligan Helper</a></h1>
-            </li>
-            <li class="toggle-topbar menu-icon"><a href><span></span></a></li>
-        </ul>
-        <section class="top-bar-section">
-        <!-- Right Nav Section -->
-        <ul>
-          <li class="has-dropdown">
-            <a href="#">Rooms</a>
-            <ul class="dropdown">
-                {% for room_num in rooms %}
-                    <li> <a href="#room/{{ room_num }}" id="room{{room_num}}">Lab {{ room_num }}</a></li>
-                {%  endfor %}
-            </ul>
-          </li>
-            <li class="has-dropdown">
-                <a href="#">TA Queues</a>
-                <ul class="dropdown">
-                    {% for course in courses %}
-                    <li>
-                        <a href="#/ta/queue/{{ course.pk }}" id="queue{{ course.pk }}" data-pk="{{course.pk}}">
-                            {{course.department}} {{ course.number }}
-                        </a>
-                    </li>
-                    {% endfor %}
+    <div class="row expanded">
+        <div class="small-2 columns left">
+            <div class="side-nav">
+                <div class="side-nav-header">
+                    <img id="side-nav-logo" src="https://placekitten.com/g/151/151" height=151 width=151 alt="logo"></img>
+                    <h4>Halligan Helper</h4>
+                    <h6>Tufts University</h6>
+                </div>
+                <ul class="menu vertical">
+                    <ul class="room-menu menu-heading"><a href="#">Rooms</a>
+                        <li><a href="#15">Room 1</a></li>
+                        <li><a href="#15">Room 1</a></li>
+                        <li><a href="#15">Room 1</a></li>
+                    </ul>
+                    <ul class="course-menu menu-heading"><a href="#">Courses</a>
+                        <li><a href="#15">Course 1</a></li>
+                        <li><a href="#15">Course 1</a></li>
+                        <li><a href="#15">Course 1</a></li>
+                        <li><a href="#15">Course 1</a></li>
+                    </ul>
+                    <ul class="more-menu menu-heading"><a href="#">More</a>
+                        <li><a href="#15">More 1</a></li>
+                        <li><a href="#15">More 1</a></li>
+                        <li><a href="#15">Logout</a></li>
+                    </ul>
                 </ul>
-            </li>
-            <li class="has-dropdown">
-                <a href="#">More</a>
-                <ul class="dropdown">
-                    <li><a href="#/labs" id="labs">Lab Schedule</a></li>
-                    <li><a href="/accounts/logout?next=/">Logout</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
-    <section role="main" class="scroll-container">
-        <div class="row fullWidth">
-            {# Nav Bar for normal screens #}
-            <div class="large-2 medium-3 small-1 columns hide-for-small"> 
-                <div class="hide-for-small">
-                    <div class="sidebar">
-                        <nav>
-                            <ul class="custom-sidenav">
-                                <li class="heading text-center">
-                                    <a href="#" id="home">
-                                        <img src="{% static 'tas/imgs/HH_Logo.jpg' %}" width=100 height=100 alt=logo/>
-                                        <h6>Halligan Helper</h6>
-                                    </a>
-                                </li>
-                                <li class="heading">Rooms</li>
-                                {% for room_num in rooms %}
-                                <li> <a href="#room/{{ room_num }}" id="room{{room_num}}">Lab {{ room_num }}</a></li>
-
-                                {% endfor %}
-                                <li class="heading">TA Queues</li>
-                                {% for course in courses %}
-                                <li><a href="#/ta/queue/{{ course.pk }}" id="queue{{ course.pk }}" data-pk="{{course.pk}}">
-                                    {{ course.department }} {{ course.number }}
-                                    {% if course.count <= 20 %}
-                                        <span class="round success label float-right" id="{{course.number}}-count">{{ course.count}}</span>
-                                    {% else %}
-                                        <span class="round alert label float-right" id="{{course.number}}-count">{{ course.count}}</span>
-                                    {% endif %}
-                                </a>
-                                </li>
-                                {% endfor %}
-                                <li class="heading">More</li>
-                                <li><a href="#/labs" id="labs">Lab Schedule</a></li>
-                                {%  if user.ta.active %}
-                                    <li><a href="{% url 'update_photo' %}">Update Photo</a></li>
-                                {% endif %}
-                                <li><a href="/accounts/logout?next=/">Logout</a></li>
-                            </ul>
-                        </nav>
-                    </div>
+            </div>
+        </div>
+        <div class="columns main-content">
+            <div class="row expanded">
+                <div class="columns">
+                    <div class="course-title">
+                        <h3>Machine Structure &amp; Assembly Language<span><i class="fi-torsos"></i></span></h3>
+                    </div> 
                 </div>
             </div>
-            <div class="large-10 medium-9 small-12 columns content" id="content">
-                {% block inner_content %}
-                {% endblock %}
-            </div>
-            <div class="large-10 medium-9 small-12 columns content" id="footer-content">
+            <div class="row expanded">
+                <div class="columns">
+                    <div class="requests-container">
+                        {# Start of Request Listing #}
+                        <div class="request-listing">
+                            <div class="row">
+                                <div class="columns shrink">
+                                    <img src="https://placekitten.com/g/75/75"></img>
+                                </div> 
+                                <div class="columns">
+                                    <div class="row request-name">
+                                        <div class="columns">
+                                            Tyler L.
+                                        </div>
+                                        <div class="columns shrink request-location">
+                                            Lab 116 at 4:30pm
+                                        </div>
+                                    </div>
+                                    <div class="row request-bottom-row">
+                                        <div class="columns">
+                                            This is my question
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {# End of Request Listing #}
+                </div>
             </div>
         </div>
-    </section>
-{% endblock %}
+        <div class="row expanded">
+            <div class="columns">
 
-{% block footer_bar %}
-    <div class="row fullWidth">
-        <div class="card text-center">
-            Created by <a href="mailto:tyler@tylerlubeck.com">Tyler Lubeck</a><br/>
-            <a href="mailto:halliganhelper@tylerlubeck.com">Questions?</a>
-            <a href="mailto:halliganhelper@tylerlubeck.com">Comments?</a> 
-            <a href="mailto:devnull@tylerlubeck.com">Obscenities?</a>
+            </div>
         </div>
     </div>
+
+    
 {% endblock %}

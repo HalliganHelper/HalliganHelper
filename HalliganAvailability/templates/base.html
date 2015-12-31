@@ -18,19 +18,9 @@
     {% block content %}
     {% endblock %}
 
-    {% block footer_bar %}
-    <div class="row">
-        <div class="card text-center">
-            Created by <a href="mailto:tyler@tylerlubeck.com">Tyler Lubeck</a>
-        </div>
-    </div>
-    {% endblock %}
-
-
-    {% javascript 'dependencies' %}
-    <script>
-        $(document).foundation();
-    </script>
-    {% block endscripts %}
-    {% endblock %}
 </body>
+<footer>
+    {% block footer_bar %}{% endblock footer_bar %}
+    {% javascript 'dependencies' %}
+    {% block endscripts %}{% endblock %}
+</footer>
