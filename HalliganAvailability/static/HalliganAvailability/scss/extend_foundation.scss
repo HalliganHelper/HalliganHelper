@@ -1,6 +1,8 @@
 @import "foundation";
 @import "compass";
 
+//@include foundation-everything(true);
+
 @include foundation-global-styles;
 @include foundation-flex-grid;
 @include foundation-typography;
@@ -39,6 +41,7 @@ $font-path: "static/HalliganAvailability/scss/fonts/foundation-icons";
 
 body {
     background-color: #FAFAFA;
+    margin-top: 10px;
 }
 
 .main-content {

@@ -11,7 +11,8 @@
 
 {% block content %}
     <div class="row expanded">
-        <div class="small-2 columns left">
+        <div class="columns shrink show-for-medium">
+            {# Start side nav bar #}
             <div class="side-nav">
                 <div class="side-nav-header">
                     <img id="side-nav-logo" src="https://placekitten.com/g/151/151" height=151 width=151 alt="logo"></img>
@@ -37,6 +38,7 @@
                     </ul>
                 </ul>
             </div>
+            {# End side nav bar #}
         </div>
         <div class="columns main-content">
             <div class="row expanded">
@@ -51,12 +53,12 @@
                     <div class="requests-container">
                         {# Start of Request Listing #}
                         <div class="request-listing">
-                            <div class="row">
+                            <div class="row expanded request-information">
                                 <div class="columns shrink">
                                     <img src="https://placekitten.com/g/75/75"></img>
                                 </div> 
                                 <div class="columns">
-                                    <div class="row request-name">
+                                    <div class="row expanded request-name">
                                         <div class="columns">
                                             Tyler L.
                                         </div>
@@ -64,22 +66,111 @@
                                             Lab 116 at 4:30pm
                                         </div>
                                     </div>
-                                    <div class="row request-bottom-row">
+                                    <div class="row expanded request-bottom-row">
                                         <div class="columns">
-                                            This is my question
+                                            Yet another normal boring request
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row expanded align-right request-action-bar">
+                                <div class="columns shrink">
+                                    <button type="button" class="secondary button">Edit</button>
+                                    <button type="button" class="primary button">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                        {# End of Request Listing #}
+                        {# Start of Request Listing #}
+                        <div class="request-listing">
+                            <div class="row expanded request-information">
+                                <div class="columns shrink">
+                                    <img src="https://placekitten.com/g/75/75"></img>
+                                </div> 
+                                <div class="columns">
+                                    <div class="row expanded request-name">
+                                        <div class="columns">
+                                            Tyler L.
+                                        </div>
+                                        <div class="columns shrink request-location">
+                                            Lab 116 at 4:30pm
+                                        </div>
+                                    </div>
+                                    <div class="row expanded request-bottom-row">
+                                        <div class="columns">
+                                            Another typical request
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        {# End of Request Listing #}
+                        {# Start of Request Listing #}
+                        <div class="request-listing">
+                            <div class="row expanded request-information">
+                                <div class="columns shrink">
+                                    <img src="https://placekitten.com/g/75/75"></img>
+                                </div> 
+                                <div class="columns">
+                                    <div class="row expanded request-name">
+                                        <div class="columns">
+                                            Tyler L.
+                                        </div>
+                                        <div class="columns shrink request-location">
+                                            Lab 116 at 4:30pm
+                                        </div>
+                                    </div>
+                                    <div class="row expanded request-bottom-row">
+                                        <div class="columns">
+                                            Typical request
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {# End of Request Listing #}
                     </div>
-                    {# End of Request Listing #}
                 </div>
             </div>
-        </div>
-        <div class="row expanded">
-            <div class="columns">
-
+            <div class="row expanded">
+                <div class="columns">
+                    {# Start of Make-Request container #}
+                    <div class="make-request-container"> 
+                        <div class="row expanded align-center">
+                            <div class="columns">
+                                <div class="row expanded problem-input-row">
+                                    <div class="columns">
+                                        <label>
+                                            What problem are you having?
+                                                <input type="text" class="problem-input">
+                                                <span class="make-request-error-message input-footer problem-error">Oh shit</span>
+                                                <span class="character-count input-footer"><span class="problem-char-count">0</span>/51 characters</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row expanded location-input-row">
+                                    <div class="columns">
+                                        <label>
+                                            Where are you?
+                                                <input type="text" class="location-input">
+                                                <span class="make-request-error-message location-error input-footer">Oh shit</span>
+                                                <span class="character-count input-footer"><span class="location-char-count">0</span>/51 characters</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="columns shrink align-middle show-for-medium">
+                                <button type="button" class="button get-help-button">Get Help</button>
+                            </div>
+                        </div>
+                        <div class="row expanded align-center hide-for-medium">
+                            <div class="columns shrink">
+                                <button type="button" class="button get-help-button">Get Help</button>
+                            </div>
+                        </div>
+                    </div>
+                    {# End of Make-Request container #}
+                </div>
             </div>
         </div>
     </div>
