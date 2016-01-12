@@ -1,0 +1,1 @@
+{"status":"error","error":"Error","message":"The `libsass` binding was not found in /home/vagrant/HalliganHelper/node_modules/node-sass/vendor/linux-x64-47/binding.node\nThis usually happens because your node version has changed.\nRun `npm rebuild node-sass` to build the binding for your current node version."}

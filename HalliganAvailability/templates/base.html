@@ -1,3 +1,4 @@
+{% load render_bundle from webpack_loader %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,11 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="content-language" content="en-US">
 
-    {% load pipeline %}
     {% load static %}
     {% block styles %}
     {% endblock %}
-    {% stylesheet 'all_styles' %}
     {% block header %}{% endblock %}
 </head>
 <body>
@@ -21,6 +20,6 @@
 </body>
 <footer>
     {% block footer_bar %}{% endblock footer_bar %}
-    {% javascript 'dependencies' %}
     {% block endscripts %}{% endblock %}
+    {% render_bundle 'main' %}
 </footer>

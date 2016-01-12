@@ -11,9 +11,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
 
   config.vm.provision "shell", path: "vagrant/scripts/postgres.sh", name: "Postgres"
-  config.vm.provision "shell", path: "vagrant/scripts/install-rvm.sh", args: "stable", privileged: false  
-  config.vm.provision "shell", path: "vagrant/scripts/install-ruby.sh", args: "2.1 compass", privileged: false
-  config.vm.provision "shell", path: "vagrant/scripts/node-setup.sh", privileged: false
+  config.vm.provision "shell", path: "vagrant/scripts/node-setup.sh", privileged: true
   config.vm.provision "shell", path: "vagrant/scripts/python-setup.sh", privileged: false
   config.vm.provision "shell", path: "vagrant/scripts/redis-setup.sh", privileged: true
 

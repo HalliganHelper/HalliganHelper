@@ -52,8 +52,9 @@ class RequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Request
-        fields = ('id', 'question', 'where_located', 'cancelled',
-                  'checked_out', 'solved', 'requestor', 'expired')
+        fields = ('id', 'question', 'where_located', 'when_asked',
+                  'cancelled', 'checked_out', 'solved', 'requestor',
+                  'expired')
 
 
 class SchoolAdminSerializer(serializers.ModelSerializer):

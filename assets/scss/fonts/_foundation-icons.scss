@@ -4,6 +4,7 @@
  * MIT License
  */
 
+
 @font-face {
   font-family: "foundation-icons";
   src: url("foundation-icons.eot");
@@ -14,6 +15,16 @@
   font-weight: normal;
   font-style: normal;
 }
+
+/*
+@font-face {
+  font-family: "foundation-icons";
+  src: url("foundation-icons.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+*/
+
 
 .fi-address-book:before,
 .fi-alert:before,

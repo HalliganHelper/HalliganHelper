@@ -5,13 +5,13 @@ anyjson==0.3.3
 billiard==3.3.0.22
 celery==3.1.19
 django-appconf==1.0.1
-django-bower==5.0.4
 django-celery==3.1.17
 django-debug-toolbar==1.4
 django-extensions==1.6.1
 django-imagekit==3.3
 django-pipeline==1.5.4
-django-registration-redux==1.3a0
+-e git://github.com/macropin/django-registration.git@7869e8472208d65c18a9959af9a61319a9802d6d#egg=django_registration_redux-master
+django-webpack-loader==0.2.4
 django-websocket-redis==0.4.4
 futures==3.0.3
 gevent==1.0.2

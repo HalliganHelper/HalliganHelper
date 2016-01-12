@@ -1,0 +1,35 @@
+{
+  "name": "halliganhelper",
+  "version": "3.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "dependencies": {
+    "css-loader": "^0.23.1",
+    "foundation-sites": "^6.1.1",
+    "backbone": "^1.2.3",
+    "file-loader": "^0.8.5",
+    "jquery": "^2.2.0",
+    "node-sass": "^3.4.2",
+    "resolve-url-loader": "^1.4.3",
+    "url-loader": "^0.5.7",
+    "sass-loader": "^3.1.2",
+    "style-loader": "^0.13.0",
+    "underscore": "^1.8.3",
+    "webpack-bundle-tracker": "^0.0.9",
+    "webpack": "^1.12.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+      "webpack": "webpack",
+      "webpack-watch": "webpack -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TylerLubeck/HalliganHelper.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/TylerLubeck/HalliganHelper/issues"
+  },
+  "homepage": "https://github.com/TylerLubeck/HalliganHelper#readme"
+}

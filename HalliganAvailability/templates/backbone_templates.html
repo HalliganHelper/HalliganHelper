@@ -1,265 +1,150 @@
 {% load staticfiles %}
-<script id="computerHeaderTemplate" type="text/template">
-    <div class="row computer-header">
-        <div class="small-4 columns computer-number-header"><h4>Number</h4></div>
-        <div class="small-4 columns computer-status-header"><h4>Status</h4></div>
-        <div class="small-4 columns computer-last-update-header"><h4>Last Updated</h4></div>
+<script id="school-template" type="text/template">
+    {# Start header bar for mobile #}
+    <div class="top-bar hide-for-medium">
+        <div class="top-bar-left">
+            <ul class="dropdown menu" data-dropdown-menu>
+                <li class="menu-text">Halligan Helper</li>
+                <li class="has-submenu">
+                    <a href="#">Rooms</a>
+                    <ul class="submenu menu vertical room-menu" data-submenu>
+                        <li><a href="#15">Room 1</a></li>
+                        <% _.each(courses, function(course) { %>
+                            <li>
+                                <a href="#course/<%= course.id %>"><%- course.identifier %></a>
+                            </li>
+                        <% }); %>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="#">Courses</a>
+                    <ul class="submenu menu vertical course-menu" data-submenu>
+                        <li><a href="#15">Course 1</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     </div>
-</script>
-
-<script id="courseLayoutTemplate" type="text/template">
-    <div class="row queue-course-header text-center">
-        <div class="small-12 columns">
-            <h3> <%= name %> Queue </h3>
-        </div>
-    </div>    
-    <div id="queueContent">
-        <div class="row queue-header hide-for-small">
-            <div class="medium-2 small-3 columns queue-name-header"><h4>Name</h4></div>
-            <div class="medium-2 small-3 columns queue-location-header"><h4>Location</h4></div>
-            <div class="medium-4 small-3 columns queue-problem-header"><h4>Problem</h4></div>
-            <div class="medium-2 small-3 columns end queue-when-asked-header"><h4>Asked At</h4></div>
-        </div>
-    </div>
-    <div id="officeHourContent"></div>
-
-</script>
-
-<script id="computerTemplate" type="text/template">
-    <% if (status === 'INUSE') { %>
-        <div class="row computer computer-status-in-use">
-    <% } else if (status === 'AVAILABLE') { %>
-        <div class="row computer computer-status-available">
-    <% } else if (status === 'ERROR')  { %>
-        <div class="row computer computer-status-error">
-    <% } else if (status === 'OFF')  { %>
-        <div class="row computer computer-status-available">
-    <% } %>
-        <div class="small-4 columns computer-number"><%= number %></div>
-        <% if (status === 'INUSE') { %>
-            <div class="small-4 columns">In Use</div>
-        <% } else if (status === 'AVAILABLE') { %>
-            <div class="small-4 columns">Available</div>
-        <% } else if (status === 'ERROR')  { %>
-            <div class="small-4 columns">Error</div>
-        <% } else if (status === 'OFF')  { %>
-            <div class="small-4 columns">Off</div>
-        <% } %>
-        <div data-livestamp="<%= last_update %>" class="small-4 columns computer-last-update"><%= moment(last_update).format("h:mm a D/MM/YY") %></div>
-    </div>
-</script>
-
-<script id="labHeaderTemplate" type="text/template">
-    <div class="row lab-header">
-        <div class="small-12 text-center"><h3>Lab Schedule</h3></div>
-    </div>
-    <div class="row lab-header hide-for-small">
-        <div class="large-2 medium-2 small-2 columns lab-week-day-header"><h4>Day</h4></div>
-        <div class="large-2 medium-2 small-2 columns lab-start-time-header"><h4>Start Time</h4></div>
-        <div class="large-2 medium-2 small-2 columns lab-end-time-header"><h4>End Time</h4></div>
-        <div class="large-2 medium-2 small-3 columns lab-room-num-header"><h4>Room Number</h4></div>
-        <div class="large-3 medium-3 small-2 columns end lab-course-name-header"><h4>Course</h4></div>
-    </div>
-</script>
-
-<script id="labTemplate" type="text/template">
-    <% if (coming_up) { %>
-        <div class="row lab lab-coming-up">
-    <% } else if (in_session) { %>
-        <div class="row lab lab-in-session">
-    <% } else { %>
-        <div class="row lab">
-    <% } %>
-            <div class="large-2 medium-2 small-12 columns lab-week-day"><span class="show-for-small-only">Day: </span><%= day_of_week_str %></div>
-            <div class="large-2 medium-2 small-12 columns lab-start-time"><span class="show-for-small-only">Start Time: </span><%= moment(start_time, "HH:mm:ss").format("h:mm a") %></div>
-            <div class="large-2 medium-2 small-12 columns lab-end-time"><span class="show-for-small-only">End Time: </span><%= moment(end_time, "HH:mm:ss").format("h:mm a") %></div>
-            <div class="large-2 medium-2 small-12 columns lab-room-num"><span class="show-for-small-only">Room Number: </span><%= room_number %></div>
-            <div class="large-3 medium-3 small-12 columns end lab-course-name"><span class="show-for-small-only">Course: </span><%= course_name %></div>
-        </div>
-</script>
-
-<script id="roomTemplate" type="text/template">
-
-</script>
-
-
-<script id="queueTemplate" type="text/template">
-    <% if ( checked_out ) { %>
-        <div class="row request checked_out">
-    <% } else { %>
-        <div class="row request">
-    <% } %>
-        <div class="large-2 medium-2 small-12 columns queue-name">
-            <span class="show-for-small-only">
-                Name: 
-            </span>
-            <%= first_name %> <%= last_name[0] %>.
-        </div>
-
-        <div class="large-2 medium-2 small-12 columns queue-location">
-            <span class="show-for-small-only">
-                Location: 
-            </span>
-            <%= where_located %>
-        </div>
-
-        <div class="large-4 medium-4 small-12 columns queue-problem">
-            <span class="show-for-small-only">
-                Question: 
-            </span>
-            <%= question %>
-        </div>
-
-        <% if (allow_edit) { %>
-            <div class="large-2 medium-2 small-12 columns queue-when-asked">
-                <span class="show-for-small-only">
-                    Asked at: 
-                </span>
-                <%= moment(when_asked).format("MM/DD h:mm a") %>
-            </div>
-
-            <div class="large-2 medium-2 small-12 columns end queue-resolve text-center">
-                <div class="tiny secondary button edit-button">
-                    Edit
+    {# End header bar for mobile #}
+    <div class="row expanded">
+        <div class="columns shrink show-for-medium">
+            {# Start side nav bar #}
+            <div class="side-nav">
+                <div class="side-nav-header">
+                    <img id="side-nav-logo" src="https://placekitten.com/g/151/151" height=151 width=151 alt="logo"></img>
+                    <h4>Halligan Helper</h4>
+                    <h6><%- name %></h6>
                 </div>
-                <div class="tiny primary button cancel-button">
-                    Cancel
-                </div>
+                <ul class="menu vertical">
+                    <ul class="room-menu menu-heading"><a href="#">Rooms</a>
+                        <li><a href="#15">Room 1</a></li>
+                    </ul>
+                    <ul class="course-menu menu-heading"><a href="#">Courses</a>
+                        <% _.each(courses, function(course) { %>
+                            <li>
+                                <a href="#course/<%= course.id %>"><%- course.identifier %></a>
+                                {% comment %}
+                                <span data-tooltip aria-haspopup="true" class="has-tip right" tabindex=1 title="<%- course.name %>">
+                                    <a href="#course/<%= course.id %>"><%- course.identifier %></a>
+                                </span>
+                                {% endcomment %}
+                            </li>
+                        <% }); %>
+                    <ul class="more-menu menu-heading"><a href="#">More</a>
+                        <li><a href="#15">More 1</a></li>
+                        <li><a href="#15">Logout</a></li>
+                    </ul>
+                </ul>
             </div>
-
-        <% } else if (allow_resolve) { %>
-            <div class="large-2 medium-2 small-12 columns queue-when-asked">
-                <span class="show-for-small-only">
-                    Asked at: 
-                </span>
-                <%= moment(when_asked).format("MM/DD h:mm a") %>
-            </div>
-
-            <div class="large-2 medium-2 small-12 columns end text-center queue-resolve">
-                <div class="tiny secondary button checkout-button">
-                    Checkout
+            {# End side nav bar #}
+        </div>
+        <div class="columns main-content">
+        </div>
+    </div>
+</script>
+<script id="course-template" type="text/template">
+        <div class="row expanded">
+            <div class="columns">
+                <div class="course-title">
+                    <h3><%- name %><span><i class="fi-torsos"></i></span></h3>
                 </div> 
-                <div class="tiny primary button resolve-button">
-                    Resolve
+            </div>
+        </div>
+        <div class="row expanded">
+            <div class="columns">
+                <div class="requests-container"></div>
+            </div>
+        </div>
+        <div class="row expanded">
+            <div class="columns">
+                <div class="make-request-container"></div>
                 </div>
             </div>
-        <% } else { %> 
-            <div class="large-2 medium-2 small-12 columns end queue-when-asked">
-                <span class="show-for-small-only">
-                    Asked at: 
-                </span>
-                <%= moment(when_asked).format("MM/DD h:mm a") %>
-            </div>
-        <% } %>
-    </div>
+        </div>
 </script>
 
-<script id="queueEditTemplate" type="text/template">
-    <% if ( checked_out ) { %>
-        <div class="row request checked_out">
-    <% } else { %>
-        <div class="row request">
-    <% } %>
-        <div class="large-2 medium-2 small-12 columns queue-name"><span class="show-for-small-only">Name: </span><%= first_name %> <%= last_name[0] %>.</div>
-
-        <div class="large-2 medium-2 small-12 columns queue-location">
-            <label> Where are you? 
-                <input type="text" id="whereLocated" value="<%= where_located %>" maxlength=50/> 
-            </label>
-            <small class="error hide"></small>
-        </div>
-
-        <div class="large-4 medium-4 small-12 columns queue-problem">
-            <label> What's your problem?
-                <input type="text" id="question" value="<%= question %>" maxlength=50>
-            </label>
-            <small class="error hide"></small>
-        </div>
-
-        <div class="large-2 medium-2 small-12 columns queue-when-asked"><span class="show-for-small-only">Asked at: </span><%= moment(when_asked).format("MM/DD h:mm a") %></div>
-        <div class="large-2 medium-2 small-12 columns end text-center queue-resolve">
-            <div class="tiny secondary button undo-button">
-               Undo 
-            </div> 
-            <div class="tiny primary button save-button">
-               Save 
+<script id="request-listing-template" type="text/template">
+    <div class="row expanded request-information <% if ( editable ) { %> editable <% } %>">
+        <div class="columns shrink">
+            <img src="<%= requestor.headshot_url %>" width="101" height="101"></img>
+        </div> 
+        <div class="columns">
+            <div class="row expanded request-name">
+                <div class="columns">
+                    <%- requestor.first_name %>
+                </div>
+                <div class="columns shrink request-location">
+                    <%- where_located %> at <%- cancelled %>
+                </div>
+            </div>
+            <div class="row expanded request-bottom-row">
+                <div class="columns">
+                <%- question %>
+                </div>
             </div>
         </div>
     </div>
-</script>
-
-<script id="makeRequestTemplate" type="text/template">
-    <div class="get-help" id="get-help">
-        <div class="row make-request">
-            <div class="small-12 small-centered columns text-center">
-                <h5>Get Help</h5>
-            </div>
-        </div>
-        <div class="row make-request">
-            <div class="medium-3 small-12 columns queue-location" id="locationField">
-                <label>
-                    Where are you?
-                    <input type="text" maxlength=50 id="location"/>
-                </label>
-                <small class="error hide"></small>
-            </div>
-            <div class="medium-9 small-12 columns queue-problem" id="questionField">
-                <label>
-                    What's your problem?
-                    <input type="text" maxlength=50 id="problem"/>
-                </label>
-                <small class="error hide"></small>
-            </div>
-        </div>
-        <div class="row make-request">
-            <div class="small-12 small-centered columns text-center">
-                <input id="makeRequestButton" type="button" class="small button extend" value="Submit"/>
-            </div>
-        </div>
-    </div>
-</script>
-
-<script id="emptyListTemplate" type="text/template">
-    <div class="small-12 text-center" id="emptyList">
-        <div class="card">
-            There's nothing here!
-        </div>
-    </div>
-</script>
-
-<script id="officeHourTemplate" type="text/template">
-    <div class="row text-center"><img width="100" height="100" alt="<%= ta.full_name %>'s headshot" src="<%= ta.headshot %>"/></div>
-    <div class="row text-center"><%= ta.full_name %></div>
-    <div class="row text-center"><%= location %></div>
-    <div class="row text-center">Off Duty <span class="moment" data-time='<%= end_time %>'><%= moment(end_time).fromNow() %></span></div>
-    <% if (is_me) { %>
-        <div class="row text-center">
-            <div class="small-12 small-centered columns text-center">
-                <input id="cancelOfficeHours" type="button" class="tiny button extend" value="Cancel"/> 
+    <% if ( editable ) { %>
+        <div class="row expanded align-right request-action-bar">
+            <div class="columns shrink">
+                <button type="button" class="secondary button">Edit</button>
+                <button type="button" class="primary button">Cancel</button>
             </div>
         </div>
     <% } %>
 </script>
 
-<script id="goOnDutyTemplate" type="text/template">
-    {% if user.ta %}
-        <div class="get-help">
-            
+<script id="make-request-remplate" type="text/template">
+    <div class="row expanded align-center">
+        <div class="columns">
+            <div class="row expanded problem-input-row">
+                <div class="columns">
+                    <label>
+                        What problem are you having?
+                            <input type="text" class="problem-input">
+                            <span class="make-request-error-message input-footer problem-error">Oh shit</span>
+                            <span class="character-count input-footer"><span class="problem-char-count">0</span>/51 characters</span>
+                    </label>
+                </div>
+            </div>
+            <div class="row expanded location-input-row">
+                <div class="columns">
+                    <label>
+                        Where are you?
+                            <input type="text" class="location-input">
+                            <span class="make-request-error-message location-error input-footer">Oh shit</span>
+                            <span class="character-count input-footer"><span class="location-char-count">0</span>/51 characters</span>
+                    </label>
+                </div>
+            </div>
         </div>
-    {% endif %}
-</script>
-
-<script id="addOfficeHourTemplate" type="text/template">
-    <li id="addHours" class="taCard"> 
-        <h5 class="text-center">Go On Duty</h5>
-        <div class="row">
-            <label for="TAHQ" class="white_bckgd_lbl"> Where are you camped?</label>
-            <input id="TAHQ" type="text"/> 
+        <div class="columns shrink align-middle show-for-medium">
+            <button type="button" class="button get-help-button">Get Help</button>
         </div>
-        <div class="row">
-            <label for="dtPick" class="white_bckgd_lbl"> When are you done?</label>
-            <input id="dtPick" type="text" />
+    </div>
+    <div class="row expanded align-center hide-for-medium">
+        <div class="columns shrink">
+            <button type="button" class="button get-help-button">Get Help</button>
         </div>
-        <div class="row text-center"><div class="tiny button extend" id="clockInBtn">Clock In</div></div>
-    </li>
+    </div>
 </script>

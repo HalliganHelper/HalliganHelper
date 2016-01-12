@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-sudo apt-get install build-essential libssl-dev -y
-curl -s https://raw.githubusercontent.com/creationix/nvm/v0.26.1/install.sh | bash
-source ~/.nvm/nvm.sh
+curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
+sudo apt-get install build-essential libssl-dev nodejs npm -y
+sudo apt-get install -y nodejs
+# sudo ln -s "$(which nodejs)" /usr/bin/node
 
-nvm install v4
-nvm use v4
-nvm alias default v4
-npm install -g yuglify
+sudo npm install -g yuglify

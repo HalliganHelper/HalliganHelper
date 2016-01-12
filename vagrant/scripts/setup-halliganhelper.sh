@@ -4,3 +4,4 @@ mkvirtualenv HalliganHelper
 workon HalliganHelper
 cd $HOME/HalliganHelper
 pip install -r requirements.txt
+npm install

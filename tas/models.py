@@ -68,7 +68,9 @@ class Course(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def get_identifier(self):
-        return '{} {}{}'.format(self.department, self.number, self.postfix)
+        return '{} {}{}'.format(self.department.title(),
+                                self.number,
+                                self.postfix)
 
     def __str__(self):
         return '{}: {}'.format(self.school.name, self.name)
