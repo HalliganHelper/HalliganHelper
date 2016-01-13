@@ -205,6 +205,28 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+
+# Static Assets
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = 'mediafiles/'
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'staticfiles')
+
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'assets'),
+)
+
+# Django Webpack Loader
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(PROJECT_ROOT, 'webpack-stats.json'),
+    },
+}
+
+INSTALLED_APPS += (
+    'webpack_loader',
+)
 try:
     from secret import *
 except ImportError:
@@ -243,25 +265,3 @@ if DEBUG:
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
 }
-
-# Static Assets
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'staticfiles')
-STATIC_URL = '/static/'
-MEDIA_ROOT = 'mediafiles/'
-MEDIA_URL = '/media/'
-
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'assets'),
-)
-
-# Django Webpack Loader
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(PROJECT_ROOT, 'webpack-stats.json'),
-    },
-}
-
-INSTALLED_APPS += (
-    'webpack_loader',
-)
