@@ -6,6 +6,7 @@ from django.db import migrations
 
 
 def make_tufts_school(apps, schema_editor):
+    Group = apps.get_model('auth', 'Group')
     School = apps.get_model('tas', 'School')
     SchoolEmailDomain = apps.get_model('tas', 'SchoolEmailDomain')
 
@@ -16,6 +17,8 @@ def make_tufts_school(apps, schema_editor):
                                             school=tufts)
     SchoolEmailDomain.objects.get_or_create(domain='cs.tufts.edu',
                                             school=tufts)
+
+    Group.objects.create(name='Tufts University Admins')
 
 
 
@@ -33,6 +36,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('tas', '0003_make_tufts_models'),
+        ('auth', '0001_initial'),
     ]
 
     operations = [
