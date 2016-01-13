@@ -10,7 +10,7 @@ django-debug-toolbar==1.4
 django-extensions==1.6.1
 django-imagekit==3.3
 django-pipeline==1.5.4
--e git://github.com/macropin/django-registration.git@7869e8472208d65c18a9959af9a61319a9802d6d#egg=django_registration_redux-master
+django-registration-redux==1.3
 django-webpack-loader==0.2.4
 django-websocket-redis==0.4.4
 futures==3.0.3
