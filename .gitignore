@@ -2,10 +2,11 @@
 htmlcov/
 node_modules/
 .vagrant/
+components/
+!assets/scss/components/
 
 .idea/
 .DS_Store
-components/
 .sass-cache/
 *.bak
 gunicorn.py

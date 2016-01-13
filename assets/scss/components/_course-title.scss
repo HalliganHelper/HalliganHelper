@@ -1,0 +1,22 @@
+@import "mixins/card";
+
+.course-title {
+    @include card;
+    text-align: center;
+    padding: 2px 0px;
+    color: white;
+    background-color: $primary-color;
+
+    span {
+        position: relative;
+        margin-left: 15px;
+        top: 2px;
+        transition-property: color;
+        transition-duration: .2s;
+
+        &:hover {
+            color: #C1D2DE;
+            cursor: pointer;
+        }
+    }
+}

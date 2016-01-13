@@ -1,0 +1,36 @@
+@import "mixins/card";
+
+.side-nav {
+    @include card;
+    overflow-y: scroll;
+    margin-left: 0px;
+    margin-top: 1vh;
+    padding: 10px 15px 5px 15px;
+
+    .side-nav-header {
+        text-align:center;
+
+        #side-nav-logo {
+            text-align: center;
+            margin-bottom: 1vh;
+        }
+
+    }
+    .menu .menu-heading {
+        font-weight: bold; 
+        > a {
+            color: red;
+        }
+    }
+    
+    .menu ul {
+        margin-left: 0px;
+
+        > li {
+            font-weight: normal;
+            list-style-type: none;
+            margin-left: 1vw;
+            margin-bottom: 1vw;
+        }
+    }
+}

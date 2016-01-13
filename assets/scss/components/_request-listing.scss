@@ -1,0 +1,132 @@
+@import "mixins/card";
+
+.requests-container {
+    margin-top: 5px;
+}
+
+.request-listing {
+    margin-top: 5px;
+
+
+    &.cancelled {
+        transition: all .75s ease;
+        margin-left: 200px;
+        margin-right: -200px;
+        opacity: 0;
+    }
+
+    .row {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .request-information {
+        @include card;
+        padding-top: 5px;
+        padding-right: 0px;
+        padding-bottom: 10px;
+        padding-left: 0px;
+
+        &.editable {
+            padding-bottom: 30px;
+        }
+
+        .columns:nth-of-type(2) {
+            padding-left: 0px;
+        }
+
+    }
+    .request-action-bar {
+        margin-right: 1vw;
+        position: relative;
+        top: -25px;
+        margin-bottom: -25px;
+
+        .columns {
+            @include card;
+            padding-right: 0px;
+            padding-left: 0px;
+        }
+
+        button {
+            padding: .2em 1em .4em 1em;
+            margin-bottom: 0px;
+            font-size: larger;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        .primary.button {
+            float: right;
+        }
+    }
+
+    &:first-of-type {
+        margin-top: 0px;
+    }
+
+    img {
+        border-radius: 50%;
+        position: relative;
+        top: 3px;
+    }
+    .request-name {
+        font-weight: bold;  
+    }
+    .request-location {
+        color: grey;
+        font-size: small;
+    }
+
+    .request-bottom-row {
+        margin-top: 2px;
+        word-break: break-word;
+    }
+}
+
+.make-request-container {
+    @include card;
+    margin-top: 5px;
+    background-color: #C0C0C0;
+    padding: 10px;
+
+    input {
+        margin-bottom: 0px;
+    }
+
+    button {
+        margin-bottom: 0px;
+        margin-right: 10px;
+        font-size: medium;
+    }
+
+    .input-footer {
+        position: relative;
+        top: -2px;
+        font-size: smaller;
+    }
+    .character-count {
+        float: right;
+        margin-right: 4px;
+    }
+
+    .make-request-error-message {
+        float: left;
+        margin-left: 4px;
+        display: none;
+    }
+
+    .row.error {
+        label {
+            color: darkred;
+        }
+        input {
+            border-color: darkred;
+        }
+        .make-request-error-message {
+            display: inherit;
+        }
+    }
+}
