@@ -86,7 +86,6 @@ INSTALLED_APPS = (
     'tas',
     'registration',
     'django_extensions',
-    'djangobower',
     'imagekit',
 )
 
@@ -165,23 +164,6 @@ LOGGING = {
         }
     }
 }
-
-BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
-
-BOWER_INSTALLED_APPS = ('foundation-sites#6.1.1',
-                        'jquery-placeholder#2.0.8',
-                        'modernizr#2.8.3',
-                        'jquery#2.1.4',
-                        'fastclick#1.0.6',
-                        'jquery.cookie#1.4.1',
-                        'pickadate#3.5.6',
-                        'underscore#1.8.3',
-                        'backbone#1.2.3',
-                        'moment#2.10.6',
-                        'livestamp#1.1.2',
-                        )
-
-TASTYPIE_DEFAULT_FORMATS = ['json']
 
 LOGIN_URL = 'login_or_register'
 LOGIN_REDIRECT_URL = '/'
