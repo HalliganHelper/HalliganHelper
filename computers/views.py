@@ -14,7 +14,6 @@ ROOMS_CACHE_KEY = "ROOMS_CACHE_KEY"
 LABS_CACHE_KEY = "LABS_CACHE_KEY"
 
 
-@login_required
 def ModularHomePage(request):
     template_params = {}
 

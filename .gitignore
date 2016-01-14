@@ -4,6 +4,8 @@ node_modules/
 .vagrant/
 components/
 !assets/scss/components/
+assets/bundles/
+webpack-stats.json
 
 .idea/
 .DS_Store

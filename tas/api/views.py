@@ -1,16 +1,20 @@
 import logging
 
+from django.contrib.auth import authenticate, logout, login
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from rest_framework import views, viewsets, mixins, status
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, NotAuthenticated, ParseError
 from rest_framework.response import Response
+from rest_framework.decorators import list_route
 
-from ..models import School, Course, Request, Student, OfficeHour
+from ..models import (School, Course, Request,
+                      Student, OfficeHour, CustomUser)
+
 from .serializers import (SchoolSerializer, CourseSerializer,
                           RequestSerializer, RequestorSerializer,
-                          OfficeHourSerializer)
+                          OfficeHourSerializer, UserSerializer)
 
 logger = logging.getLogger(__name__)
 
@@ -168,3 +172,43 @@ class TAViewSet(viewsets.ReadOnlyModelViewSet):
 
         serializer = RequestorSerializer(ta)
         return Response(serializer.data)
+
+
+class UserViewSet(viewsets.ViewSet):
+    serializer_class = UserSerializer
+    queryset = CustomUser.objects.none()
+
+    def list(self, request):
+        user = request.user
+        if not user.is_authenticated() or not user.is_active:
+            raise NotAuthenticated
+        return Response(UserSerializer(user).data)
+
+    def get_queryset(self):
+        return CustomUser.objects.none()
+
+    @list_route(methods=['post'])
+    def login(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        if email is None or password is None:
+            raise ParseError
+
+        user = authenticate(email=email, password=password)
+        if user is None or not user.is_active:
+            raise NotAuthenticated
+
+        login(request, user)
+        return Response(UserSerializer(user).data)
+
+    @list_route(methods=['post'])
+    def logout(self, request):
+        user = request.user
+        if not user.is_authenticated():
+            raise ParseError
+
+        logout(request)
+
+        return Response({}, status=200)
+

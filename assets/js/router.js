@@ -2,7 +2,8 @@ var Backbone = require('backbone');
 
 var AppRouter = Backbone.Router.extend({
     routes: {
-        "course/:id": "course",
+        'course/:id': 'course',
+        'logout': 'logout',
     },
 });
 

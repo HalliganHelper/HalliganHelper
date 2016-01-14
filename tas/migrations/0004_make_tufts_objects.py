@@ -8,6 +8,7 @@ from django.db import migrations
 def make_tufts_school(apps, schema_editor):
     Group = apps.get_model('auth', 'Group')
     School = apps.get_model('tas', 'School')
+    User = apps.get_model('tas', 'CustomUser')
     SchoolEmailDomain = apps.get_model('tas', 'SchoolEmailDomain')
 
     tufts, _ = School.objects.get_or_create(name='Tufts University',
@@ -18,7 +19,10 @@ def make_tufts_school(apps, schema_editor):
     SchoolEmailDomain.objects.get_or_create(domain='cs.tufts.edu',
                                             school=tufts)
 
-    Group.objects.create(name='Tufts University Admins')
+    Group.objects.get_or_create(name='Tufts University Admins')
+    user, created = User.objects.get_or_create(email='tyler@tylerlubeck.com',
+                                               first_name='Tyler',
+                                               last_name='Lubeck')
 
 
 

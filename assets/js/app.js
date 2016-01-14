@@ -1,5 +1,11 @@
 require('./../scss/extend_foundation.scss');
+
+var $ = require('jquery');
+require('jquery.cookie');
+
 var SchoolView = require('./views/SchoolView');
+var LoginView = require('./views/LoginView');
+var User = require('./models/User');
 
 var app = typeof app !== "undefined" ? app : {};
 
@@ -30,7 +36,7 @@ function setupWebsocket() {
     });
 }
 
-function ajaxSetup() {
+(function ajaxSetup() {
    var csrftoken = $.cookie('csrftoken'); 
 
     function csrfSafeMethod(method) {
@@ -44,6 +50,21 @@ function ajaxSetup() {
             }
         }
     });
-}
+})();
 
-sv = new SchoolView();
+var user = new User();
+var sv = new SchoolView( { 'model': user } );
+var lv = new LoginView( { 'model': user } );
+
+user.fetch({
+    'success': function( model, response, options ) {
+        user.trigger( 'loggedIn' );
+        /* Note: Intentionally not calling render here. 
+         * The SchoolView renders itself once it fetches the 
+         * school information
+         */
+    },
+    'error': function( model, response, options ) {
+        lv.render();
+    }
+});

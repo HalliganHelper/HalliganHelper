@@ -43,16 +43,11 @@
                         <% _.each(courses, function(course) { %>
                             <li>
                                 <a href="#course/<%= course.id %>"><%- course.identifier %></a>
-                                {% comment %}
-                                <span data-tooltip aria-haspopup="true" class="has-tip right" tabindex=1 title="<%- course.name %>">
-                                    <a href="#course/<%= course.id %>"><%- course.identifier %></a>
-                                </span>
-                                {% endcomment %}
                             </li>
                         <% }); %>
                     <ul class="more-menu menu-heading"><a href="#">More</a>
                         <li><a href="#15">More 1</a></li>
-                        <li><a href="#15">Logout</a></li>
+                        <li><a href="#logout">Logout</a></li>
                     </ul>
                 </ul>
             </div>
@@ -145,6 +140,24 @@
     <div class="row expanded align-center hide-for-medium">
         <div class="columns shrink">
             <button type="button" class="button get-help-button">Get Help</button>
+        </div>
+    </div>
+</script>
+
+<script id="login-template" type="text/template">
+    <div class="row expanded align-center">
+        <div class="columns">
+            <input type="email" class="login-email-address" placeholder="Email Address"/>
+        </div>
+    </div>
+    <div class="row expanded align-center">
+        <div class="columns">
+            <input type="password" class="login-password" placeholder="Password"/>
+        </div>
+    </div>
+    <div class="row expanded align-center">
+        <div class="columns">
+            <button class="button login-button" type="button">Login</button>
         </div>
     </div>
 </script>

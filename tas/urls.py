@@ -14,7 +14,7 @@ urlpatterns = patterns(
         RedirectView.as_view(url=reverse_lazy('ModularHomePage')),
         name='taSystem'),
     url(r'^login_or_register',
-        'login_or_register',
+        RedirectView.as_view(url=reverse_lazy('ModularHomePage')),
         name='login_or_register'),
     url(r'^ta/updatephoto',
         'update_photo',

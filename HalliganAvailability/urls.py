@@ -40,13 +40,8 @@ urlpatterns = patterns('',
                        # Uncomment the admin/doc line below to enable admin documentation:
                        # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
                        url(r'^admin/', include(admin.site.urls)),
-                       # url(r'^api/', include(v1_api.urls)),
-                       # url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
-                       # url(r'^api/', include('computers.urls')),
-                       # url(r'^', include('tas.urls')),
                        url(r'^$', 'computers.views.ModularHomePage', name='ModularHomePage'),
                        url('^api/', include(tas_api.urls)),
-#                        url(r'^manifest\.appcache$', ManifestView.as_view(), name='cache_manifest'),
                        )
 
 if settings.DEBUG:

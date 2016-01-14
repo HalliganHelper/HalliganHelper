@@ -4,24 +4,25 @@
   "description": "",
   "main": "webpack.config.js",
   "dependencies": {
-    "css-loader": "^0.23.1",
-    "foundation-sites": "^6.1.1",
     "backbone": "^1.2.3",
+    "css-loader": "^0.23.1",
     "file-loader": "^0.8.5",
+    "foundation-sites": "^6.1.1",
     "jquery": "^2.2.0",
+    "jquery.cookie": "^1.4.1",
     "node-sass": "^3.4.2",
     "resolve-url-loader": "^1.4.3",
-    "url-loader": "^0.5.7",
     "sass-loader": "^3.1.2",
     "style-loader": "^0.13.0",
     "underscore": "^1.8.3",
-    "webpack-bundle-tracker": "^0.0.9",
-    "webpack": "^1.12.11"
+    "url-loader": "^0.5.7",
+    "webpack": "^1.12.11",
+    "webpack-bundle-tracker": "^0.0.9"
   },
   "devDependencies": {},
   "scripts": {
-      "webpack": "webpack",
-      "webpack-watch": "webpack -w"
+    "webpack": "webpack",
+    "webpack-watch": "webpack -w"
   },
   "repository": {
     "type": "git",

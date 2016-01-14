@@ -12,6 +12,13 @@ from ..utils import get_administrators_for_school
 logger = logging.getLogger(__name__)
 
 
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUser
+        fields = ('first_name', 'last_name',)
+
+
 class SimpleCourseSerializer(serializers.ModelSerializer):
     identifier = serializers.CharField(source='get_identifier')
 
