@@ -28,7 +28,7 @@ Vagrant.configure(2) do |config|
                             memcached \
                             libmemcached-dev \
                             lib32z1-dev \
-			    libjpeg8-dev
+                            libjpeg-dev
 			
   SHELL
 
