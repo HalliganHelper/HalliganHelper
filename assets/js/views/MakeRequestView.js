@@ -3,7 +3,7 @@ var _ = require('underscore');
 var $ = require('jquery');
 
 var MakeRequestView = Backbone.View.extend({
-    template: _.template( $( '#make-request-remplate' ).html() ),
+    template: _.template( require( './../templates/make-request-template') ),
     events: {
         'keyup .problem-input': 'problemChanged',
         'keyup .location-input': 'locationChanged',

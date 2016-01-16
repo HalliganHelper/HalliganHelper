@@ -1,10 +1,11 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
 var $ = require('jquery');
+// var moment = require('moment')();
 
 var RequestView = Backbone.View.extend({
     className: 'request-listing',
-    template: _.template( $( '#request-listing-template' ).html() ),
+    template: _.template( require( './../templates/request-template' ) ),
     events: {
         'click .primary.button': 'cancel'
     },

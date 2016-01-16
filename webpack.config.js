@@ -14,6 +14,10 @@ module.exports = {
 
     plugins: [
         new BundleTracker({filename: './webpack-stats.json'}),
+        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
+        new webpack.ProvidePlugin({
+           moment: "moment"
+        }),
     ],
 
     module: {
@@ -38,11 +42,15 @@ module.exports = {
               exclude: /node_modules/,
               loader: 'file'
             },
+            { test: /\.html$/,
+              exclude: /node_modules/,
+              loader: 'raw'
+            }
         ],
     },
 
     resolve: {
         modulesDirectories: ['node_modules', 'components/bower_components'],
-        extensions: ['', '.js', '.jsx']
+        extensions: ['', '.js', '.jsx', '.html']
     },
 };

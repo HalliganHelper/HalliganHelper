@@ -8,7 +8,7 @@ var AppRouter = require('./../router');
 
 var SchoolView = Backbone.View.extend({
     el: 'body', /** The School is the main view of the app, so it is the root */
-    template: _.template( $( '#school-template' ).html() ),
+    template: _.template( require( './../templates/school-template' ) ),
 
     initialize: function( options ) {
         this.school = new School();
@@ -27,10 +27,21 @@ var SchoolView = Backbone.View.extend({
     },
     initRouter: function() {
         this.router = new AppRouter();
+        var router = this.router;
+
         this.router.on( 'route:course', _.bind(function( id ) {
             this.courseView.trigger( 'newCourse', Number( id ) );
         }, this ) );
-        this.router.on( 'route:logout', _.bind( this.model.logout, this.model ) );
+
+        this.router.on( 'route:logout', _.bind( function() {
+            this.model.logout( {
+                'success': function() {
+                    console.log('Navigating to slash');
+                    router.navigate('/'); 
+                } 
+            } ); 
+        }, this) );
+
         Backbone.history.start();
     },
     render: function() {

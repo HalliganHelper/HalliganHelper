@@ -200,15 +200,10 @@ class UserViewSet(viewsets.ViewSet):
             raise NotAuthenticated
 
         login(request, user)
+
         return Response(UserSerializer(user).data)
 
     @list_route(methods=['post'])
     def logout(self, request):
-        user = request.user
-        if not user.is_authenticated():
-            raise ParseError
-
         logout(request)
-
         return Response({}, status=200)
-

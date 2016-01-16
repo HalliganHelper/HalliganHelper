@@ -1,0 +1,28 @@
+<div class="row expanded request-information <% if ( editable ) { %> editable <% } %>">
+    <div class="columns shrink">
+        <img src="<%= requestor.headshot_url %>" width="101" height="101"></img>
+    </div> 
+    <div class="columns">
+        <div class="row expanded request-name">
+            <div class="columns">
+                <%- requestor.first_name %>
+            </div>
+            <div class="columns shrink request-location">
+                <%- where_located %> at <%- when_asked %>
+            </div>
+        </div>
+        <div class="row expanded request-bottom-row">
+            <div class="columns">
+            <%- question %>
+            </div>
+        </div>
+    </div>
+</div>
+<% if ( editable ) { %>
+    <div class="row expanded align-right request-action-bar">
+        <div class="columns shrink">
+            <button type="button" class="secondary button">Edit</button>
+            <button type="button" class="primary button">Cancel</button>
+        </div>
+    </div>
+<% } %>

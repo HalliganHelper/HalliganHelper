@@ -22,15 +22,16 @@ var User = Backbone.Model.extend( {
                    { 'url': saveUrl, 'success': successFunc, 'error': errorFunc }
                  );
     },
-    logout: function( success, error ) {
+    logout: function( options ) {
+        console.log("logging out user");
         var logoutUrl = this.url + 'logout/';
 
-        var errorFunc = _.isFunction( error ) ? error : this.noop;
+        var errorFunc = _.isFunction( options.error ) ? options.error : this.noop;
         function successFunc( model, response, options ) {
             model.trigger( 'loggedOut' );
 
-            if ( _.isFunction( success ) ) {
-                return success( model, response, options );
+            if ( _.isFunction( options.success ) ) {
+                return options.success( model, response, options );
             }
         }
 

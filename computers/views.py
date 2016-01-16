@@ -1,6 +1,6 @@
 # Create your views here.
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import Computer
 from tas.models import Course, Request
 from django.core.cache import cache
@@ -14,6 +14,8 @@ ROOMS_CACHE_KEY = "ROOMS_CACHE_KEY"
 LABS_CACHE_KEY = "LABS_CACHE_KEY"
 
 
+# Necessary so that the csrf token can be loaded for the ajax calls on the page.
+@ensure_csrf_cookie
 def ModularHomePage(request):
     template_params = {}
 

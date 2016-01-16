@@ -8,7 +8,7 @@ var RequestView = require('./RequestView');
 var MakeRequestView = require('./MakeRequestView');
 
 var CourseView = Backbone.View.extend({
-    template: _.template( $( '#course-template' ).html() ),
+    template: _.template( require( './../templates/course-template' ) ),
     initialize: function( options ) {
         this.course = new Course();
         this.requests = new Requests();

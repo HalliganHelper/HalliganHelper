@@ -4,7 +4,7 @@ var $ = require('jquery');
 
 var LoginView = Backbone.View.extend({
     el: 'body',
-    template: _.template( $( '#login-template' ).html() ),
+    template: _.template( require( './../templates/login-template' ) ),
 
     events: {
         'click .login-button': 'login',

@@ -45,6 +45,7 @@ function setupWebsocket() {
 
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
+            console.log('Pre send for ', settings.type);
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }

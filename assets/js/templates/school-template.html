@@ -1,0 +1,52 @@
+<div class="top-bar hide-for-medium">
+    <div class="top-bar-left">
+        <ul class="dropdown menu" data-dropdown-menu>
+            <li class="menu-text">Halligan Helper</li>
+            <li class="has-submenu">
+                <a href="#">Rooms</a>
+                <ul class="submenu menu vertical room-menu" data-submenu>
+                    <li><a href="#15">Room 1</a></li>
+                    <% _.each(courses, function(course) { %>
+                        <li>
+                            <a href="#course/<%= course.id %>"><%- course.identifier %></a>
+                        </li>
+                    <% }); %>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#">Courses</a>
+                <ul class="submenu menu vertical course-menu" data-submenu>
+                    <li><a href="#15">Course 1</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="row expanded">
+    <div class="columns shrink show-for-medium">
+        <div class="side-nav">
+            <div class="side-nav-header">
+                <img id="side-nav-logo" src="https://placekitten.com/g/151/151" height=151 width=151 alt="logo"></img>
+                <h4>Halligan Helper</h4>
+                <h6><%- name %></h6>
+            </div>
+            <ul class="menu vertical">
+                <ul class="room-menu menu-heading"><a href="#">Rooms</a>
+                    <li><a href="#15">Room 1</a></li>
+                </ul>
+                <ul class="course-menu menu-heading"><a href="#">Courses</a>
+                    <% _.each(courses, function(course) { %>
+                        <li>
+                            <a href="#course/<%= course.id %>"><%- course.identifier %></a>
+                        </li>
+                    <% }); %>
+                <ul class="more-menu menu-heading"><a href="#">More</a>
+                    <li><a href="#15">More 1</a></li>
+                    <li><a href="#logout">Logout</a></li>
+                </ul>
+            </ul>
+        </div>
+    </div>
+    <div class="columns main-content">
+    </div>
+</div>
