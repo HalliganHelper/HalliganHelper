@@ -92,7 +92,7 @@ CREATE DATABASE $APP_DB_NAME WITH OWNER=$APP_DB_USER
                                   ENCODING='UTF8'
                                   TEMPLATE=template0;
 
-GRANT ALL PRIVILEGED ON DATABASE $APP_DB_NAME TO $APP_DB_USER;
+GRANT ALL PRIVILEGES ON DATABASE $APP_DB_NAME TO $APP_DB_USER;
 EOF
 
 # Tag the provision time:
