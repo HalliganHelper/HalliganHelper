@@ -12,12 +12,13 @@ var CourseView = Backbone.View.extend({
     initialize: function( options ) {
         this.course = new Course();
         this.requests = new Requests();
-        this.makeRequestView = new MakeRequestView();
+        this.makeRequestView = new MakeRequestView( { 'course': this.course } );
 
         this.listenTo( this.course, 'change:id', this.fetchCourse );
         this.listenTo( this.course, 'change:name', this.render );
         this.listenTo( this.requests, 'reset', this.renderAllRequests );
         this.listenTo( this.requests, 'add', this.renderRequest );
+        this.listenTo( this.makeRequestView, 'newRequest', this.newRequest );
 
         this.listenTo( this, 'newCourse', this.newCourse );
     },
@@ -30,6 +31,9 @@ var CourseView = Backbone.View.extend({
     },
     newCourse: function( courseID ) {
         this.course.set( { 'id': courseID } );
+    },
+    newRequest: function( request ) {
+        this.requests.add( request );
     },
     renderRequest: function( request ) {
         var requestElement = new RequestView( { model: request } );
