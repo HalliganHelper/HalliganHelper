@@ -36,7 +36,6 @@ var SchoolView = Backbone.View.extend({
         this.router.on( 'route:logout', _.bind( function() {
             this.model.logout( {
                 'success': function() {
-                    console.log('Navigating to slash');
                     router.navigate('/'); 
                 } 
             } ); 

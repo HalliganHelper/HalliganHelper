@@ -1,7 +1,6 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
 var $ = require('jquery');
-// var moment = require('moment')();
 
 var RequestView = Backbone.View.extend({
     className: 'request-listing',
@@ -38,7 +37,6 @@ var RequestView = Backbone.View.extend({
         var problem = this.$el.find( '.problem-input' ).val();
         var loc = this.$el.find( '.location-input' ).val();
         var primaryButton = this.$el.find( '.primary.button' );
-        console.log( 'Edited request! ');
         
         if ( problem != this.model.get( 'question' ) ||
              loc != this.model.get( 'where_located' ) ) {
@@ -53,11 +51,9 @@ var RequestView = Backbone.View.extend({
         if( $( e.currentTarget ).data( 'save-edit' ) ) {
             var question = this.$el.find( '.problem-input' ).val();
             var loc = this.$el.find( '.location-input' ).val();
-            console.log('savig edit', question, loc);
             this.model.save( { 'question': question, 'where_located': loc } );
         }
         else if ( this.model.get( 'owned_by_me' ) ) {
-            console.log('Cancelling ', this.model.get( 'id' ) );
             this.model.save( { 'cancelled': true },
                              {
                                 'silent': true,
@@ -66,7 +62,6 @@ var RequestView = Backbone.View.extend({
                            );
             
         } else if ( this.model.get( 'can_ta_for' ) ) {
-            console.log('Resolving ', this.model.get( 'id' ) );
             this.model.save( { 'solved': true },
                              {
                                 'silent': true,
@@ -77,7 +72,6 @@ var RequestView = Backbone.View.extend({
 
     },
     secondaryClick: function( e ) {
-        console.log('clicking');
         if ( $( e.currentTarget ).data( 'cancel-edit' )) {
             this.render();
         }
@@ -88,7 +82,6 @@ var RequestView = Backbone.View.extend({
         }
     },
     renderEdit: function() {
-        // this.delegateEvents();
         this.$el.html( this.editTemplate( this.model.attributes ) );
         return this;
     },
