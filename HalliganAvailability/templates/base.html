@@ -1,6 +1,7 @@
 {% load render_bundle from webpack_loader %}
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html manifest="{% static 'bundles/manifest.appcache' %}">
 <head>
     <title>{% block title %}Halligan Helper{% endblock %}</title>
     <meta charset="utf-8">

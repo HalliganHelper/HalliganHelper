@@ -4,6 +4,7 @@
   "description": "",
   "main": "webpack.config.js",
   "dependencies": {
+    "appcache-webpack-plugin": "^1.2.1",
     "backbone": "^1.2.3",
     "css-loader": "^0.23.1",
     "file-loader": "^0.8.5",

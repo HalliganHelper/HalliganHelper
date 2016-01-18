@@ -1,6 +1,7 @@
 var path = require("path");
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
+var AppCachePlugin = require('appcache-webpack-plugin');
 
 module.exports = {
     context: __dirname,
@@ -15,8 +16,8 @@ module.exports = {
     plugins: [
         new BundleTracker({filename: './webpack-stats.json'}),
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
-        new webpack.ProvidePlugin({
-           moment: "moment"
+        new AppCachePlugin({
+            output: 'manifest.appcache'
         }),
     ],
 
