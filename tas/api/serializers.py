@@ -5,7 +5,7 @@ from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework_nested.relations import NestedHyperlinkedRelatedField
 
 from ..models import (School, Course, CustomUser,
-                      Student, Request, OfficeHour)
+                      Student, Request, OfficeHour, TA)
 
 from ..utils import get_administrators_for_school
 
@@ -56,12 +56,33 @@ class OfficeHourSerializer(serializers.ModelSerializer):
 
 class RequestSerializer(serializers.ModelSerializer):
     requestor = RequestorSerializer(read_only=True)
+    owned_by_me = serializers.SerializerMethodField()
+    can_ta_for = serializers.SerializerMethodField()
+
+    def get_owned_by_me(self, student_request):
+        web_request = self.context.get('request', None)
+        if web_request is None:
+            return False
+
+        return web_request.user.student == student_request.requestor
+
+    def get_can_ta_for(self, student_request):
+        web_request = self.context.get('request', None)
+        if web_request is None:
+            return False
+
+        course = student_request.course
+        student = web_request.user.student
+
+        return TA.objects.filter(student=student,
+                                 course=course,
+                                 active=True).exists()
 
     class Meta:
         model = Request
         fields = ('id', 'question', 'where_located', 'when_asked',
                   'cancelled', 'checked_out', 'solved', 'requestor',
-                  'expired')
+                  'expired', 'owned_by_me', 'can_ta_for',)
 
 
 class SchoolAdminSerializer(serializers.ModelSerializer):

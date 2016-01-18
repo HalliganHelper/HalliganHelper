@@ -6,12 +6,19 @@ var $ = require('jquery');
 var RequestView = Backbone.View.extend({
     className: 'request-listing',
     template: _.template( require( './../templates/request-template' ) ),
+    editTemplate: _.template( require( './../templates/edit-request-template' ) ),
     events: {
-        'click .primary.button': 'cancel'
+        'keyup .problem-input': 'editedRequest',
+        'keyup .location-input': 'editedRequest',
+        'click .primary.button': 'primaryClick',
+        'click .secondary.button': 'secondaryClick',
     },
-    cancel: function() {
-        // this.remove();
-        // this.model.trigger( 'destroy' );
+
+    initialize: function() {
+        this.listenTo( this.model, 'change', this.render );
+    },
+
+    removeView: function() {
         var view = this;
         var transitionFinishedEvents = 'transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd';
         this.$el.addClass( 'cancelled' )
@@ -22,6 +29,68 @@ var RequestView = Backbone.View.extend({
                     view.remove();
                 } );
             } );
+    },
+
+    editedRequest: function( e ) {
+        if ( e.keyCode == 13 ) {
+            this.$el.find( '.primary.button' ).click();
+        }
+        var problem = this.$el.find( '.problem-input' ).val();
+        var loc = this.$el.find( '.location-input' ).val();
+        var primaryButton = this.$el.find( '.primary.button' );
+        console.log( 'Edited request! ');
+        
+        if ( problem != this.model.get( 'question' ) ||
+             loc != this.model.get( 'where_located' ) ) {
+            primaryButton.removeAttr( 'disabled' );
+        } else {
+            primaryButton.attr( 'disabled', 'disabled' );
+        }
+    },
+    primaryClick: function( e ) {
+        // this.remove();
+        // this.model.trigger( 'destroy' );
+        if( $( e.currentTarget ).data( 'save-edit' ) ) {
+            var question = this.$el.find( '.problem-input' ).val();
+            var loc = this.$el.find( '.location-input' ).val();
+            console.log('savig edit', question, loc);
+            this.model.save( { 'question': question, 'where_located': loc } );
+        }
+        else if ( this.model.get( 'owned_by_me' ) ) {
+            console.log('Cancelling ', this.model.get( 'id' ) );
+            this.model.save( { 'cancelled': true },
+                             {
+                                'silent': true,
+                                'success': _.bind( this.removeView, this )   
+                             } 
+                           );
+            
+        } else if ( this.model.get( 'can_ta_for' ) ) {
+            console.log('Resolving ', this.model.get( 'id' ) );
+            this.model.save( { 'solved': true },
+                             {
+                                'silent': true,
+                                'success': _.bind( this.removeView, this )   
+                             } 
+                           );
+        }
+
+    },
+    secondaryClick: function( e ) {
+        console.log('clicking');
+        if ( $( e.currentTarget ).data( 'cancel-edit' )) {
+            this.render();
+        }
+        else if ( this.model.get( 'owned_by_me' ) ) {
+            this.renderEdit();
+        } else if ( this.model.get( 'can_ta_for' ) ) {
+            this.model.save( { 'checked_out': true } );
+        }
+    },
+    renderEdit: function() {
+        // this.delegateEvents();
+        this.$el.html( this.editTemplate( this.model.attributes ) );
+        return this;
     },
     render: function() {
         this.$el.html( this.template( this.model.attributes ) ); 

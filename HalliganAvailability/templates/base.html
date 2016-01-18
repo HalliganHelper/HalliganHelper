@@ -6,20 +6,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="content-language" content="en-US">
-
-    {% load static %}
-    {% block styles %}
-    {% endblock %}
+    {% block styles %}{% endblock %}
     {% block header %}{% endblock %}
 </head>
 <body>
-
-    {% block content %}
-    {% endblock %}
-
+    {% block content %}{% endblock %}
 </body>
 <footer>
-    {% block footer_bar %}{% endblock footer_bar %}
-    {% block endscripts %}{% endblock %}
     {% render_bundle 'main' %}
+    {% block endscripts %}{% endblock %}
 </footer>

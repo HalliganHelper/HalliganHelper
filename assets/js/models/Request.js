@@ -5,7 +5,19 @@ var Request = Backbone.Model.extend( {
         this.course = options.course;
     },
 
+    url: function() {
+        var _url = Backbone.Model.prototype.url.call( this );
+        if ( _url.charAt( _url.length - 1 ) != '/' ) {
+            _url += '/';
+        }
+
+        return  _url;
+    },
     urlRoot: function() {
+        if( this.collection ) {
+            return this.collection.url();
+        }
+
         var courseID = this.course.get('id');
         return '/api/v3/school/courses/' + courseID + '/requests/';
     },

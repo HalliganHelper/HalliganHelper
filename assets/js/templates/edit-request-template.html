@@ -8,28 +8,24 @@
                 <%- requestor.first_name %> <%- requestor.last_name.charAt(0) %>.
             </div>
             <div class="columns shrink request-location">
-                <%- where_located %> at <%- when_asked %>
+                <%- when_asked %>
             </div>
         </div>
         <div class="row expanded request-bottom-row">
             <div class="columns">
-            <%- question %>
+                <input type="text" class="problem-input" value="<%- question %>" maxlength="51">
+            </div>
+        </div>
+        <div class="row expanded request-bottom-row">
+            <div class="columns">
+                <input type="text" class="location-input" value="<%- where_located %>" maxlength="51">
             </div>
         </div>
     </div>
 </div>
-<% if ( owned_by_me ) { %>
-    <div class="row expanded align-right request-action-bar">
-        <div class="columns shrink">
-            <button type="button" class="secondary button">Edit</button>
-            <button type="button" class="primary button">Cancel</button>
-        </div>
+<div class="row expanded align-right request-action-bar">
+    <div class="columns shrink">
+        <button type="button" class="secondary button" data-cancel-edit=true>Cancel</button>
+        <button type="button" class="primary button" disabled="disabled" data-save-edit=true>Save</button>
     </div>
-<% } else if ( can_ta_for ) { %>
-    <div class="row expanded align-right request-action-bar">
-        <div class="columns shrink">
-            <button type="button" class="secondary button">Checkout</button>
-            <button type="button" class="primary button">Resolve</button>
-        </div>
-    </div>
-<% } %>
+</div>

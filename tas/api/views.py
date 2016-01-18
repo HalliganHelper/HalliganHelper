@@ -71,6 +71,13 @@ class RequestViewSet(CreateModelWithRequestMixin,
     serializer_class = RequestSerializer
     queryset = Request.objects.all()
 
+    def get_serializer_context(self):
+        context = super(RequestViewSet, self).get_serializer_context()
+        context.update({
+            'request': self.request
+        })
+        return context
+
     def perform_create_with_request(self, serializer, request):
         course = request.data['course']
         requestor = self.request.user.student
@@ -88,7 +95,7 @@ class RequestViewSet(CreateModelWithRequestMixin,
 
         queryset = self.get_queryset().filter(course=course_pk)
 
-        serializer = RequestSerializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None, course_pk=None):
@@ -98,8 +105,11 @@ class RequestViewSet(CreateModelWithRequestMixin,
 
         raise_if_not_own_school(request.user.student.school, course_pk)
 
-        serializer = RequestSerializer(help_request)
+        serializer = self.get_serializer(help_request)
         return Response(serializer.data)
+
+
+
 
     def create(self, request, course_pk=None):
         raise_if_not_own_school(request.user.student.school, course_pk)

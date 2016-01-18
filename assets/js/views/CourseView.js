@@ -9,6 +9,7 @@ var MakeRequestView = require('./MakeRequestView');
 
 var CourseView = Backbone.View.extend({
     template: _.template( require( './../templates/course-template' ) ),
+
     initialize: function( options ) {
         this.course = new Course();
         this.requests = new Requests();
@@ -40,7 +41,6 @@ var CourseView = Backbone.View.extend({
         this.requestsContainer.append( requestElement.render().el );
     },
     renderAllRequests: function() {
-        console.log( 'Render all requests for course ', this.course.get( 'name' ) );
         this.requestsContainer.empty();
         this.requests.each( this.renderRequest, this );
     },
