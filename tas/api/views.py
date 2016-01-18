@@ -16,13 +16,9 @@ from .serializers import (SchoolSerializer, CourseSerializer,
                           RequestSerializer, RequestorSerializer,
                           OfficeHourSerializer, UserSerializer)
 
+from .permissions import RequestPermission, OwnSchoolPermission
+
 logger = logging.getLogger(__name__)
-
-
-def raise_if_not_own_school(school, course_pk):
-    course = get_object_or_404(Course, pk=course_pk)
-    if course.school != school:
-        raise NotFound
 
 
 class CreateModelWithRequestMixin(mixins.CreateModelMixin):
@@ -70,6 +66,7 @@ class RequestViewSet(CreateModelWithRequestMixin,
                      viewsets.ReadOnlyModelViewSet):
     serializer_class = RequestSerializer
     queryset = Request.objects.all()
+    permission_classes = (OwnSchoolPermission, RequestPermission,)
 
     def get_serializer_context(self):
         context = super(RequestViewSet, self).get_serializer_context()
@@ -91,8 +88,6 @@ class RequestViewSet(CreateModelWithRequestMixin,
         return queryset
 
     def list(self, request, course_pk=None):
-        raise_if_not_own_school(request.user.student.school, course_pk)
-
         queryset = self.get_queryset().filter(course=course_pk)
 
         serializer = self.get_serializer(queryset, many=True)
@@ -103,17 +98,10 @@ class RequestViewSet(CreateModelWithRequestMixin,
                                          pk=pk,
                                          course=course_pk)
 
-        raise_if_not_own_school(request.user.student.school, course_pk)
-
         serializer = self.get_serializer(help_request)
         return Response(serializer.data)
 
-
-
-
     def create(self, request, course_pk=None):
-        raise_if_not_own_school(request.user.student.school, course_pk)
-
         course = get_object_or_404(Course, pk=course_pk)
         request.data['course'] = course
 
@@ -125,6 +113,7 @@ class OfficeHourViewSet(CreateModelWithRequestMixin,
                         viewsets.ReadOnlyModelViewSet):
     serializer_class = OfficeHourSerializer
     queryset = OfficeHour.objects.all()
+    permission_classes = (OwnSchoolPermission,)
 
     def get_queryset(self):
         queryset = super(OfficeHourViewSet, self).get_queryset()
@@ -136,16 +125,12 @@ class OfficeHourViewSet(CreateModelWithRequestMixin,
         serializer.save(course=course, ta=ta)
 
     def list(self, request, course_pk=None):
-        raise_if_not_own_school(request.user.student.school, course_pk)
-
         queryset = self.get_queryset().filter(course=course_pk)
         serializer = OfficeHourSerializer(queryset, many=True)
 
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None, course_pk=None):
-        raise_if_not_own_school(request.user.student.school, course_pk)
-
         office_hour = get_object_or_404(self.get_queryset(),
                                         pk=pk,
                                         course=course_pk)
@@ -155,7 +140,6 @@ class OfficeHourViewSet(CreateModelWithRequestMixin,
 
     def create(self, request, course_pk=None):
         school = request.user.student.school
-        raise_if_not_own_school(school, course_pk)
 
         course = get_object_or_404(Course, pk=course_pk, school=school)
         request.data['course'] = course
@@ -164,19 +148,16 @@ class OfficeHourViewSet(CreateModelWithRequestMixin,
 
 class TAViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = RequestorSerializer
-    queryset = Student.objects.all()
+    queryset = Student.objects.none()
+    permission_classes = (OwnSchoolPermission,)
 
     def list(self, request, course_pk=None):
-        raise_if_not_own_school(request.user.student.school, course_pk)
-
         queryset = Course.objects.get(pk=course_pk).tas.filter(ta__active=True)
 
         serializer = RequestorSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None, course_pk=None):
-        raise_if_not_own_school(request.user.student.school, course_pk)
-
         queryset = Course.objects.get(pk=course_pk).tas.filter(ta__active=True)
         ta = get_object_or_404(queryset, pk=pk)
 
