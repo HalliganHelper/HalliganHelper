@@ -4,6 +4,7 @@ node_modules/
 .vagrant/
 components/
 !assets/scss/components/
+!assets/js/components/
 assets/bundles/
 webpack-stats.json
 
