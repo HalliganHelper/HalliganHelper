@@ -78,6 +78,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'super_inlines',
     'django.contrib.admin',
     # 'django.contrib.admindocs',
     'computers',
@@ -183,7 +184,7 @@ WS4REDIS_PREFIX = 'hh'
 TEMPLATE_CONTEXT_PROCESSORS += (
     'ws4redis.context_processors.default',
 )
-# WSGI_APPLICATION = 'ws4redis.django_runserver.application'
+WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 WS4REDIS_HEARTBEAT = '--heartbeat--'
 
 

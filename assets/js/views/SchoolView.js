@@ -4,15 +4,23 @@ var $ = require('jquery');
 
 var School = require('./../models/School');
 var CourseView = require('./CourseView');
+var DashboardView = require('./DashboardView');
 var AppRouter = require('./../router');
+var WebSocketHandler = require('./../components/WebSocketHandler');
+
 
 var SchoolView = Backbone.View.extend({
     el: 'body', /** The School is the main view of the app, so it is the root */
     template: _.template( require( './../templates/school-template' ) ),
 
     initialize: function( options ) {
+        this.webSocketHandler = new WebSocketHandler();
         this.school = new School();
-        this.courseView = new CourseView();
+        this.courseView = new CourseView( { 'webSocketHandler': this.webSocketHandler } );
+        this.dashboardView = new DashboardView( { 'model': this.school,
+                                                  'webSocketHandler': this.webSocketHandler
+                                                 } );
+
         this.listenTo( this.model, 'loggedIn', _.bind( this.initSchool, this ) );
     },
     initSchool: function() {
@@ -31,6 +39,11 @@ var SchoolView = Backbone.View.extend({
 
         this.router.on( 'route:course', _.bind(function( id ) {
             this.courseView.trigger( 'newCourse', Number( id ) );
+            this.mainContent.html( this.courseView.$el );
+        }, this ) );
+    
+        this.router.on( 'route:dashboard', _.bind( function() {
+            this.mainContent.html( this.dashboardView.render().$el );
         }, this ) );
 
         this.router.on( 'route:logout', _.bind( function() {
@@ -45,7 +58,7 @@ var SchoolView = Backbone.View.extend({
     },
     render: function() {
         this.$el.html( this.template( this.school.attributes ) ); 
-        this.courseView.setElement( this.$el.find( '.main-content' ) );
+        this.mainContent = this.$el.find( '.main-content' );
         return this;
     },
 });

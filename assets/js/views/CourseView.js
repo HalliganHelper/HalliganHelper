@@ -3,30 +3,55 @@ var _ = require('underscore');
 var $ = require('jquery');
 
 var Course = require('./../models/Course');
+var Request = require('./../models/Request');
 var Requests = require('./../collections/Requests');
+var TAs = require('./../collections/TAs');
 var RequestView = require('./RequestView');
 var MakeRequestView = require('./MakeRequestView');
+var TAsView = require('./TAsView');
 
 var CourseView = Backbone.View.extend({
     template: _.template( require( './../templates/course-template' ) ),
+    events: {
+        'click .show-tas': 'showTAs'
+    },
 
     initialize: function( options ) {
         this.course = new Course();
         this.requests = new Requests();
+        this.tas = new TAs();
+        this.webSocketHandler = options.webSocketHandler;
         this.makeRequestView = new MakeRequestView( { 'course': this.course } );
+        this.TAsView = new TAsView( { 'collection': this.tas } );
 
         this.listenTo( this.course, 'change:id', this.fetchCourse );
         this.listenTo( this.course, 'change:name', this.render );
+        this.listenTo( this.tas, 'reset', this.setTACount );
         this.listenTo( this.requests, 'reset', this.renderAllRequests );
         this.listenTo( this.requests, 'add', this.renderRequest );
         this.listenTo( this.makeRequestView, 'newRequest', this.newRequest );
-
+        this.listenTo( options.webSocketHandler, 
+                       'request_created request_updated', 
+                       this.newWebSocketRequest );
         this.listenTo( this, 'newCourse', this.newCourse );
+    },
+    newWebSocketRequest: function( data ) {
+        console.log( data );
+        if ( data.course != this.course.get('id' ) ) {
+           return; 
+        }
+        var request = new Request( { 'id': data.id }, { 'course': this.course } );
+        request.fetch( {
+            'success': _.bind( function( model ) {
+                this.requests.add( model, { 'merge': true } ); 
+            }, this )
+        } );
     },
     fetchCourse: function() {
         this.course.fetch( {
             success: _.bind(function( course ) {
                 this.requests.trigger( 'resetCourse', course.get( 'id' ) );
+                this.tas.trigger( 'resetCourse', course.get( 'id' ) );
             }, this )
         } );
     },
@@ -35,6 +60,14 @@ var CourseView = Backbone.View.extend({
     },
     newRequest: function( request ) {
         this.requests.add( request );
+    },
+    showTAs: function() {
+        this.taContainer.toggleClass( 'hidden' ); 
+    },
+    setTACount: function() {
+        console.log( 'setting ta count' );
+        var taCount = this.tas.where( { 'on_duty': true } ).length;
+        this.taCountContainer.text( taCount );
     },
     renderRequest: function( request ) {
         var requestElement = new RequestView( { model: request } );
@@ -46,9 +79,12 @@ var CourseView = Backbone.View.extend({
     },
     render: function() {
         this.$el.html( this.template( this.course.attributes ) );
-        this.requestsContainer = this.$el.find( $( '.requests-container' ) );
+        this.taCountContainer = this.$el.find( '.ta-count' );
+        this.taContainer = this.$el.find( '.ta-overlay-container' );
+        this.requestsContainer = this.$el.find( '.requests-container' );
         this.makeRequestView.setElement( this.$el.find( '.make-request-container' ) );
         this.makeRequestView.render();
+        this.TAsView.setElement( this.$el.find( '.ta-overlay-container' ) );
         return this;
     }
 });

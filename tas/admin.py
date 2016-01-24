@@ -1,12 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
+from super_inlines.admin import SuperInlineModelAdmin, SuperModelAdmin
+
 from registration.models import RegistrationProfile
 
 from .custom_user_forms import CustomUserChangeForm, CustomUserCreationForm
 from .custom_user import CustomUser
 from .models import (Student, OfficeHour, Course, Request,
-                     School, SchoolEmailDomain)
+                     School, SchoolEmailDomain, TA)
 
 
 class MySchoolsOnlyModelAdminMixin(object):
@@ -142,10 +144,22 @@ class RequestAdmin(admin.ModelAdmin):
             .formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-class StudentInline(admin.StackedInline):
+class TAJobInline(SuperInlineModelAdmin, admin.StackedInline):
+    model = TA
+    can_delete = False
+    verbose_name = 'TA Job'
+    verbose_name_plural = 'TA Jobs'
+    extra = 1
+
+
+class StudentInline(SuperInlineModelAdmin, admin.StackedInline):
     model = Student
+    verbose_name = 'Profile'
+    verbose_name_plural = 'Profile'
     max_num = 1
     can_delete = False
+
+    inlines = (TAJobInline,)
 
 
 class RegistrationProfileInline(admin.StackedInline):
@@ -154,11 +168,9 @@ class RegistrationProfileInline(admin.StackedInline):
     can_delete = False
 
 
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(SuperModelAdmin, UserAdmin):
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
-
-    inlines = [StudentInline, RegistrationProfileInline]
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
@@ -180,6 +192,14 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 
+    def add_view(self, *args, **kwargs):
+        self.inlines = (RegistrationProfileInline,)
+        return super(CustomUserAdmin, self).add_view(*args, **kwargs)
+
+    def change_view(self, *args, **kwargs):
+        self.inlines = (RegistrationProfileInline, StudentInline,)
+        return super(CustomUserAdmin, self).change_view(*args, **kwargs)
+
     def get_queryset(self, request):
         qs = super(CustomUserAdmin, self).get_queryset(request)
         if request.user.is_superuser:
@@ -191,7 +211,6 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.register(Request, RequestAdmin)
 admin.site.register(OfficeHour, OfficeHourAdmin)
-# admin.site.register(Student, StudentAdmin)
 admin.site.register(School, SchoolAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)

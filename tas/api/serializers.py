@@ -1,4 +1,7 @@
 import logging
+from datetime import timedelta
+
+from django.utils.timezone import now
 
 from rest_framework import serializers
 from rest_framework.relations import HyperlinkedIdentityField
@@ -19,12 +22,28 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('first_name', 'last_name',)
 
 
-class SimpleCourseSerializer(serializers.ModelSerializer):
+class CourseSerializer(serializers.ModelSerializer):
     identifier = serializers.CharField(source='get_identifier')
+    active_ta_count = serializers.SerializerMethodField()
+    current_request_count = serializers.SerializerMethodField()
+
+    def get_active_ta_count(self, course):
+        return OfficeHour.objects.filter(course=course,
+                                         end_time__gte=now()).count()
+
+    def get_current_request_count(self, course):
+        when_asked_cutoff = now() - timedelta(hours=Request.EXPIRE_IN_HOURS)
+        requests = Request.objects.filter(course=course,
+                                          solved=False,
+                                          cancelled=False,
+                                          when_asked__gte=when_asked_cutoff)
+        return requests.count()
+
 
     class Meta:
         model = Course
-        fields = ('id', 'name', 'identifier',)
+        fields = ('id', 'name', 'identifier',
+                  'active_ta_count', 'current_request_count',)
 
 
 class RequestorSerializer(serializers.ModelSerializer):
@@ -35,15 +54,7 @@ class RequestorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = ('headshot_url', 'first_name', 'last_name',)
-
-
-class CourseSerializer(serializers.ModelSerializer):
-    identifier = serializers.CharField(source='get_identifier')
-
-    class Meta:
-        model = Course
-        fields = ('id', 'name', 'identifier',)
+        fields = ('id', 'headshot_url', 'first_name', 'last_name',)
 
 
 class OfficeHourSerializer(serializers.ModelSerializer):
@@ -101,7 +112,7 @@ class SchoolAdminSerializer(serializers.ModelSerializer):
 
 
 class SchoolSerializer(serializers.ModelSerializer):
-    courses = SimpleCourseSerializer(many=True, read_only=True)
+    courses = CourseSerializer(many=True, read_only=True)
     administrators = serializers.SerializerMethodField()
 
     def get_administrators(self, school):

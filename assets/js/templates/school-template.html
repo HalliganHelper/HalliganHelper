@@ -1,17 +1,8 @@
 <div class="top-bar hide-for-medium">
     <div class="top-bar-left">
         <ul class="dropdown menu" data-dropdown-menu>
-            <li class="menu-text">Halligan Helper</li>
-            <li class="has-submenu">
-                <a href="#">Rooms</a>
-                <ul class="submenu menu vertical room-menu" data-submenu>
-                    <li><a href="#15">Room 1</a></li>
-                    <% _.each(courses, function(course) { %>
-                        <li>
-                            <a href="#course/<%= course.id %>"><%- course.identifier %></a>
-                        </li>
-                    <% }); %>
-                </ul>
+            <li class="menu-text">
+                <a href="#dashboard">Halligan Helper</a>
             </li>
             <li class="has-submenu">
                 <a href="#">Courses</a>
@@ -27,13 +18,10 @@
         <div class="side-nav">
             <div class="side-nav-header">
                 <img id="side-nav-logo" src="https://placekitten.com/g/151/151" height=151 width=151 alt="logo"></img>
-                <h4>Halligan Helper</h4>
+                <h4><a href="#dashboard">Halligan Helper</a></h4>
                 <h6><%- name %></h6>
             </div>
             <ul class="menu vertical">
-                <ul class="room-menu menu-heading"><a href="#">Rooms</a>
-                    <li><a href="#15">Room 1</a></li>
-                </ul>
                 <ul class="course-menu menu-heading"><a href="#">Courses</a>
                     <% _.each(courses, function(course) { %>
                         <li>

@@ -7,8 +7,6 @@ var SchoolView = require('./views/SchoolView');
 var LoginView = require('./views/LoginView');
 var User = require('./models/User');
 
-var app = typeof app !== "undefined" ? app : {};
-
 function show_notification(msg) {
     var options = {
         'body': msg,
@@ -17,24 +15,6 @@ function show_notification(msg) {
     var notification = new Notification("Halligan Helper", options);
 }
 
-function setupWebsocket() {
-    
-    var websocketProtocol = location.protocol === "http:" ? "ws:" : "wss:"; 
-    var websocketURI = websocketProtocol + "//" + location.host + "/ws/ta?subscribe-broadcast";
-
-    var ws4redis = WS4Redis({
-        uri: websocketURI,
-        heartbeat_msg: '--heartbeat--',
-        receive_message: function(msg) {
-            try {
-                var data = JSON.parse(msg);
-                app.currentCourse.handleUpdate( data );
-            } catch( err ) {
-                return;
-            }
-        }
-    });
-}
 
 (function ajaxSetup() {
    var csrftoken = $.cookie('csrftoken'); 

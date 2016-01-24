@@ -1,0 +1,46 @@
+@import "mixins/card";
+
+.dashboard-title {
+    width: 100%;
+    background-color: $primary-color;
+    text-align: center;
+    color: white;
+    margin-right: 0px;
+}
+
+.dashboard-grid {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-between;
+}
+
+.dashboard-card {
+    @include card;
+    @include breakpoint(small only) {
+        width: 100%;
+    }
+    @include breakpoint(medium down) {
+        width: 50%;
+    }
+    width: 33%;
+    float: left;
+    margin-top: 10px;
+
+    > .dashboard-card-contents {
+        display: block;
+        width: 100%;
+        padding: 5px;
+        padding-top: 0px;
+    }
+
+    > .course-name {
+        width: 100%;
+        display: block;
+        text-align: center;
+        margin-bottom: 5px;
+        background-color: #777; //$secondary-color:
+        color: white;
+    }
+}

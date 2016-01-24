@@ -1,4 +1,6 @@
 import logging
+import json
+from datetime import timedelta
 
 from django.contrib.auth import authenticate, logout, login
 from django.shortcuts import get_object_or_404
@@ -8,6 +10,9 @@ from rest_framework import views, viewsets, mixins, status
 from rest_framework.exceptions import NotFound, NotAuthenticated, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
+
+from ws4redis.publisher import RedisPublisher
+from ws4redis.redis_store import RedisMessage
 
 from ..models import (School, Course, Request,
                       Student, OfficeHour, CustomUser)
@@ -19,6 +24,7 @@ from .serializers import (SchoolSerializer, CourseSerializer,
 from .permissions import RequestPermission, OwnSchoolPermission
 
 logger = logging.getLogger(__name__)
+redis_broadcast_publisher = RedisPublisher(facility='ta', broadcast=True)
 
 
 class CreateModelWithRequestMixin(mixins.CreateModelMixin):
@@ -81,10 +87,12 @@ class RequestViewSet(CreateModelWithRequestMixin,
         serializer.save(course=course, requestor=requestor)
 
     def get_queryset(self):
+        when_asked_cutoff = timezone.now() - timedelta(hours=Request.EXPIRE_IN_HOURS)
         queryset = super(RequestViewSet, self).get_queryset()
         queryset = queryset.filter(cancelled=False,
                                    solved=False,
-                                   expired=False)
+                                   when_asked__gte=when_asked_cutoff)
+        queryset.order_by('-when_asked')
         return queryset
 
     def list(self, request, course_pk=None):
@@ -105,7 +113,43 @@ class RequestViewSet(CreateModelWithRequestMixin,
         course = get_object_or_404(Course, pk=course_pk)
         request.data['course'] = course
 
-        return super(RequestViewSet, self).create(request, course_pk)
+        created = super(RequestViewSet, self).create(request, course_pk)
+
+        redis_data = {
+            'type': 'request_created',
+            'data': {
+                'course': course.pk,
+                'id': created.data['id']
+            }
+        }
+        logger.debug('Sending websocket packet: %s', redis_data)
+        packet = RedisMessage(json.dumps(redis_data))
+        redis_broadcast_publisher.publish_message(packet)
+
+        return created
+
+    def update(self, *args, **kwargs):
+        updated = super(RequestViewSet, self).update(*args, **kwargs)
+
+        course_pk = kwargs.get('course_pk')
+        try:
+            course_pk = int(course_pk)
+        except (ValueError, TypeError):
+            logger.exception('Could not get course_pk on request update')
+            raise ParseError
+
+        redis_data = {
+            'type': 'request_updated',
+            'data': {
+                'course': course_pk,
+                'id': updated.data['id']
+            }
+        }
+        logger.debug('Sending websocket packet: %s', redis_data)
+        packet = RedisMessage(json.dumps(redis_data))
+        redis_broadcast_publisher.publish_message(packet)
+
+        return updated
 
 
 class OfficeHourViewSet(CreateModelWithRequestMixin,
@@ -153,6 +197,9 @@ class TAViewSet(viewsets.ReadOnlyModelViewSet):
 
     def list(self, request, course_pk=None):
         queryset = Course.objects.get(pk=course_pk).tas.filter(ta__active=True)
+        queryset = queryset.order_by('ta__active',
+                                     'user__last_name',
+                                     'user__first_name')
 
         serializer = RequestorSerializer(queryset, many=True)
         return Response(serializer.data)
