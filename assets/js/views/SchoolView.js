@@ -17,11 +17,12 @@ var SchoolView = Backbone.View.extend({
         this.webSocketHandler = new WebSocketHandler();
         this.school = new School();
         this.courseView = new CourseView( { 'webSocketHandler': this.webSocketHandler } );
-        this.dashboardView = new DashboardView( { 'model': this.school,
-                                                  'webSocketHandler': this.webSocketHandler
-                                                 } );
+        this.dashboardView = new DashboardView( { 'model': this.school } );
 
         this.listenTo( this.model, 'loggedIn', _.bind( this.initSchool, this ) );
+    },
+    requestAdded: function( data ) {
+        this.school.courses.get( { 'id': data.course } ).fetch();
     },
     initSchool: function() {
         this.listenTo( this.school, 'change', this.render );
@@ -36,6 +37,11 @@ var SchoolView = Backbone.View.extend({
     initRouter: function() {
         this.router = new AppRouter();
         var router = this.router;
+
+        this.listenTo( this.webSocketHandler, 
+                       'request_created', 
+                       _.bind( this.requestAdded, this )
+                     );
 
         this.router.on( 'route:course', _.bind(function( id ) {
             this.courseView.trigger( 'newCourse', Number( id ) );

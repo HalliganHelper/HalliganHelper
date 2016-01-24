@@ -33,10 +33,12 @@ var CourseView = Backbone.View.extend({
         this.listenTo( options.webSocketHandler, 
                        'request_created request_updated', 
                        this.newWebSocketRequest );
+        this.listenTo( options.webSocketHandler,
+                       'request_removed',
+                       this.removeWebSocketRequest );
         this.listenTo( this, 'newCourse', this.newCourse );
     },
     newWebSocketRequest: function( data ) {
-        console.log( data );
         if ( data.course != this.course.get('id' ) ) {
            return; 
         }
@@ -46,6 +48,15 @@ var CourseView = Backbone.View.extend({
                 this.requests.add( model, { 'merge': true } ); 
             }, this )
         } );
+    },
+    removeWebSocketRequest: function( data ) {
+        if ( data.course != this.course.get('id' ) ) {
+           return; 
+        }
+        try {
+            this.requests.get( data.id ).trigger( 'destroy' );
+        } catch ( e ) {
+        }
     },
     fetchCourse: function() {
         this.course.fetch( {
@@ -65,7 +76,6 @@ var CourseView = Backbone.View.extend({
         this.taContainer.toggleClass( 'hidden' ); 
     },
     setTACount: function() {
-        console.log( 'setting ta count' );
         var taCount = this.tas.where( { 'on_duty': true } ).length;
         this.taCountContainer.text( taCount );
     },

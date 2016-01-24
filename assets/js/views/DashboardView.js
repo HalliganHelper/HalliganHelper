@@ -8,9 +8,12 @@ var DashboardView = Backbone.View.extend({
     className: 'dashboard-view',
     template: _.template( require( './../templates/dashboard-template' ) ),
     initialize: function( options ) {
+        this.webSocketHandler = options.webSocketHandler;
     },
     renderChart: function( course ) {
-        var chartView = new DashboardChartView( { 'model': course } );
+        var chartView = new DashboardChartView( { 'model': course, 
+                                                  'webSocketHandler': this.webSocketHandler 
+                                                } );
         this.grid.append( chartView.$el );
         chartView.render();
     },

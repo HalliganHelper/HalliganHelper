@@ -23,7 +23,6 @@ var User = Backbone.Model.extend( {
                  );
     },
     logout: function( options ) {
-        console.log("logging out user");
         var logoutUrl = this.url + 'logout/';
 
         var errorFunc = _.isFunction( options.error ) ? options.error : this.noop;

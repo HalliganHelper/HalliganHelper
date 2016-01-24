@@ -138,8 +138,12 @@ class RequestViewSet(CreateModelWithRequestMixin,
             logger.exception('Could not get course_pk on request update')
             raise ParseError
 
+        packet_type = 'request_updated'
+        if updated.data['cancelled'] or updated.data['solved']:
+            packet_type = 'request_removed'
+
         redis_data = {
-            'type': 'request_updated',
+            'type': packet_type,
             'data': {
                 'course': course_pk,
                 'id': updated.data['id']

@@ -18,7 +18,6 @@ function WS4Redis( options ) {
 
     function connect(uri) {
         try {
-            console.log("Connecting to " + uri + " ...");
             deferred = $.Deferred();
             ws = new WebSocket(uri);
             ws.onopen = on_open;
@@ -40,13 +39,11 @@ function WS4Redis( options ) {
         } catch(e) {
             clearInterval(heartbeat_interval);
             heartbeat_interval = null;
-            console.warn("Closing connection. Reason: " + e.message);
             ws.close();
         }
     }
 
     function on_open() {
-        console.log('Connected!');
         // new connection, reset attemps counter
         attempts = 1;
         deferred.resolve();
@@ -57,7 +54,6 @@ function WS4Redis( options ) {
     }
 
     function on_close(evt) {
-        console.log("Connection closed!");
         if (!timer) {
             // try to reconnect
             var interval = generateInteval(attempts);
@@ -69,7 +65,6 @@ function WS4Redis( options ) {
     }
 
     function on_error(evt) {
-        console.error("Websocket connection is broken!");
         deferred.reject(new Error(evt));
     }
 

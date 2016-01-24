@@ -58,6 +58,8 @@ var MakeRequestView = Backbone.View.extend({
                 this.trigger( 'newRequest', model );
                 this.problemInput.val('');
                 this.locationInput.val('');
+                this.problemCharCount.text( 0 );
+                this.locationCharCount.text( 0 );
             }, this ),
             'error': _.bind( function( model, response, options ) {
                 this.enableSubmit();

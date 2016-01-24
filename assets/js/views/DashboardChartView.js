@@ -17,7 +17,6 @@ var DashboardChartView = Backbone.View.extend({
     renderChart: function() {
         canvasContext = this.$el.find( '.course-dashboard-canvas' )
             .get( 0 ).getContext( "2d" );
-        console.log( canvasContext );
 
         var initialData = {
             labels: ['requests', 'tas'],
@@ -46,12 +45,10 @@ var DashboardChartView = Backbone.View.extend({
         };
 
         this.chart = new Chart( canvasContext ).Line( initialData, { 'responsive': true } );
-        console.log( this.chart );
     },
     render: function() {
         this.$el.html( this.template( this.model.attributes ) );
         //this.renderChart();
-        console.log( this.model );
         return this;
     }
     

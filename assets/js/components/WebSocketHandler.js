@@ -16,8 +16,6 @@ var WebSocketHandler = Backbone.Model.extend({
     },
     receiveMessage: function( msg ) {
         msg = JSON.parse( msg );
-        console.debug( msg );
-        
         this.trigger( msg.type, msg.data );
     }
 });
