@@ -5,6 +5,7 @@ var $ = require('jquery');
 var School = require('./../models/School');
 var CourseView = require('./CourseView');
 var DashboardView = require('./DashboardView');
+var ProfileView = require('./ProfileView');
 var AppRouter = require('./../router');
 var WebSocketHandler = require('./../components/WebSocketHandler');
 
@@ -18,6 +19,7 @@ var SchoolView = Backbone.View.extend({
         this.school = new School();
         this.courseView = new CourseView( { 'webSocketHandler': this.webSocketHandler } );
         this.dashboardView = new DashboardView( { 'model': this.school } );
+        this.profileView = new ProfileView( { 'model': this.model } );
 
         this.listenTo( this.model, 'loggedIn', _.bind( this.initSchool, this ) );
     },
@@ -52,6 +54,10 @@ var SchoolView = Backbone.View.extend({
             this.mainContent.html( this.dashboardView.render().$el );
         }, this ) );
 
+        this.router.on( 'route:profile', _.bind( function() {
+            this.mainContent.html( this.profileView.render().$el );
+        }, this ) );
+
         this.router.on( 'route:logout', _.bind( function() {
             this.model.logout( {
                 'success': function() {
@@ -59,6 +65,7 @@ var SchoolView = Backbone.View.extend({
                 } 
             } ); 
         }, this) );
+
 
         Backbone.history.start();
     },
