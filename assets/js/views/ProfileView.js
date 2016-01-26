@@ -13,10 +13,8 @@ var ProfileView = Backbone.View.extend({
         'keydown .confirm-password': 'checkSubmit',
         'change .new-photo-field': 'photoChanged',
     },
-    initialize: function( options ) {
-        this.listenTo( this.model, 'change', this.render );
-    },
     photoChanged: function() {
+        console.log( 'Photo changed!' );
         var hasPhoto = Boolean( this.$el.find( '.new-photo-field' ).val() );
         this.$el.find( '.save-image' ).prop( 'disabled', ! hasPhoto );
     },
@@ -26,7 +24,6 @@ var ProfileView = Backbone.View.extend({
         }
     },
     imageUploadFailed: function( user, reason ) {
-        console.log( 'image upload failed: ', reason );
     },
     saveImage: function() {
         var newPhoto = this.$el.find( '.new-photo-field' ).get( 0 ).files[0];
@@ -41,7 +38,8 @@ var ProfileView = Backbone.View.extend({
         }
     },
     render: function() {
-        console.log( this.model.attributes );
+        /* Create the listener on the first render */
+        this.listenTo( this.model, 'change', this.render );
         this.$el.html( this.template( this.model.attributes ) );
         return this;
     }

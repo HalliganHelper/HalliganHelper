@@ -3,13 +3,15 @@ import json
 from datetime import timedelta
 
 from django.contrib.auth import authenticate, logout, login
+from django.core.files.uploadedfile import UploadedFile
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from rest_framework import views, viewsets, mixins, status
 from rest_framework.exceptions import NotFound, NotAuthenticated, ParseError
 from rest_framework.response import Response
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, parser_classes
+from rest_framework.parsers import FileUploadParser
 
 from ws4redis.publisher import RedisPublisher
 from ws4redis.redis_store import RedisMessage
@@ -254,7 +256,13 @@ class UserViewSet(viewsets.ViewSet):
     @list_route(methods=['post'])
     def upload_photo(self, request):
         photo = request.data.get('photo')
+
         if photo is None:
+            raise ParseError
+
+        if not isinstance(photo, UploadedFile):
+            logger.warning('Attempt to upload a non-file: %s user:%s',
+                           photo, request.user.pk)
             raise ParseError
 
         request.user.student.headshot = photo

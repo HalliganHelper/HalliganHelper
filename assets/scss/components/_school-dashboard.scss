@@ -1,13 +1,5 @@
 @import "mixins/card";
 
-.dashboard-title {
-    width: 100%;
-    background-color: $primary-color;
-    text-align: center;
-    color: white;
-    margin-right: 0px;
-}
-
 .dashboard-grid {
     width: 100%;
     overflow: hidden;

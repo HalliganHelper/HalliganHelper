@@ -95,7 +95,7 @@ class Student(models.Model):
         Every User object has a Student associated with it, and these Students
         are created when the user is registered.
     """
-    default_image = 'headshots/None/ming.jpg'
+    default_image = 'blank/blank.jpg'
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
     school = models.ForeignKey(School)
 
