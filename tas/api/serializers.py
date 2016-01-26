@@ -16,10 +16,12 @@ logger = logging.getLogger(__name__)
 
 
 class UserSerializer(serializers.ModelSerializer):
+    headshot_url = serializers.ImageField(source='student.headshot',
+                                          read_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name',)
+        fields = ('first_name', 'last_name', 'headshot_url',)
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -38,6 +40,7 @@ class CourseSerializer(serializers.ModelSerializer):
                                           cancelled=False,
                                           when_asked__gte=when_asked_cutoff)
         return requests.count()
+
 
 
     class Meta:

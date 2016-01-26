@@ -1,1 +1,65 @@
-<h5><%= first_name %> <%= last_name %></h5>
+<div class="row expanded">
+    <div class="columns">
+        <div class="course-title">
+            <h3>Your Profile</h3>
+        </div>
+    </div>
+</div>
+<div class="row expanded">
+    <div class="columns small-12 password-change-col">
+        <div class="row expanded">
+            <div class="columns sub-title">
+                Change your photo
+            </div>
+        </div>
+        <div class="row expanded align-middle">
+            <div class="columns shrink">
+                <img src="<%= headshot_url %>"/>
+            </div>
+            <div class="columns">
+                <div class="row expanded">
+                    <div class="columns">
+                        <input type="file" accept="image/*" class="new-photo-field">
+                    </div>
+                </div>
+                <div class="row expanded">
+                    <div class="columns">
+                        <button type="button" class="button primary save-image" disabled>Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--
+    <div class="columns small-6">
+        <div class="row expanded">
+            <div class="columns sub-title">
+                Change Your Password
+            </div>
+        </div>
+        <div class="row expanded">
+            <div class="columns">
+                <input type="password" class="password original-password">
+            </div>
+        </div>
+        <div class="row expanded">
+            <div class="columns">
+                <input type="password" class="password new-password">
+            </div>
+        </div>
+        <div class="row expanded">
+            <div class="columns">
+                <input type="password" class="password confirm-password">
+            </div>
+        </div>
+        <div class="row expanded">
+            <div class="columns text-center">
+                <button type="button" class="button primary save-password">Change Password</button>
+            </div>
+        </div>
+    </div>
+    -->
+</div>
+
+<!-- Image Change Form -->
+<!-- Password Change Form -->

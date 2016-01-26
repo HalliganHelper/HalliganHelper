@@ -1,4 +1,5 @@
 import logging
+import hashlib
 
 from django.db import models
 from django.conf import settings
@@ -6,6 +7,9 @@ from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
+
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFit
 
 from .custom_user import CustomUser
 from .utils import get_school_admin_group_name
@@ -76,6 +80,16 @@ class Course(models.Model):
         return '{}: {}'.format(self.school.name, self.name)
 
 
+def determine_headshot_name(student, filename):
+    data = {
+        'email': student.user.email,
+        'user_pk': student.user.pk
+    }
+    hash_string = '{email}-{user_pk}-headshot'.format(**data)
+
+    return 'headshots/{}'.format(hashlib.sha224(hash_string).hexdigest())
+
+
 class Student(models.Model):
     """ A Student is the base user class for the application.
         Every User object has a Student associated with it, and these Students
@@ -86,9 +100,12 @@ class Student(models.Model):
     school = models.ForeignKey(School)
 
     # TODO: Make sure these are process properly. Size, naming, etc
-    headshot = models.ImageField(upload_to='headshots',
-                                 default=default_image,
-                                 help_text='A headshot of the user')
+    headshot = ProcessedImageField(upload_to=determine_headshot_name,
+                                   default=default_image,
+                                   help_text='A headshot of the user',
+                                   processors=[ResizeToFit(width=100,
+                                                           height=100)]
+                                   )
 
     # Both of these will have to be limited to only allow Courses within the
     # same school

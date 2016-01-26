@@ -1,4 +1,5 @@
 var Backbone = require('backbone');
+var $ = require( 'jquery' );
 var _ = require( 'underscore' );
 
 var User = Backbone.Model.extend( {
@@ -39,16 +40,29 @@ var User = Backbone.Model.extend( {
                    { 'url': logoutUrl, 'success': successFunc, 'error': errorFunc } 
                  );
     },
-    setPhoto: function( photo, success, error ) {
-        var photoUrl = this.url + 'change_photo/';
+    setPhoto: function( photo, options ) {
+        options = options || {};
+        var photoUrl = this.url + 'upload_photo/';
+        var formData = new FormData();
+        formData.append( 'photo', photo );
 
-        var successFunc = _.isFunction( success ) ? success : this.noop;
-        var errorFunc = _.isFunction( error ) ? error : this.noop;
+        var successFunc = _.isFunction( options.success ) ? options.success : this.noop;
+        var errorFunc = _.isFunction( options.error ) ? options.error : this.noop;
 
-        this.save( 
-                   { 'photo': photo }, 
-                   { 'url': photoUrl, 'success': successFunc, 'error': errorFunc } 
-                 );
+        $.ajax( {
+            url: photoUrl,
+            type: 'POST',
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: _.bind( function( data ) {
+                this.set( 'headshot_url', data.headshot_url );
+            }, this ),
+            error: _.bind( function( request ) {
+                errorFunc( photo, 'network' );
+            }, this ),
+        } );
     },
 } );
 

@@ -224,6 +224,7 @@ class UserViewSet(viewsets.ViewSet):
         user = request.user
         if not user.is_authenticated() or not user.is_active:
             raise NotAuthenticated
+        logger.debug(user)
         return Response(UserSerializer(user).data)
 
     def get_queryset(self):
@@ -249,3 +250,13 @@ class UserViewSet(viewsets.ViewSet):
     def logout(self, request):
         logout(request)
         return Response({}, status=200)
+
+    @list_route(methods=['post'])
+    def upload_photo(self, request):
+        photo = request.data.get('photo')
+        if photo is None:
+            raise ParseError
+
+        request.user.student.headshot = photo
+        request.user.student.save()
+        return Response(UserSerializer(request.user).data)

@@ -1,0 +1,11 @@
+@import "mixins/card";
+
+.sub-title {
+    @include card;
+    background-color: $secondary-color;
+    margin-bottom: 5px;
+}
+
+.password-change-col {
+    width: 50%;
+}
