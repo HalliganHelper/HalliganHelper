@@ -65,9 +65,10 @@ var SchoolView = Backbone.View.extend({
                 } 
             } ); 
         }, this) );
-
-
+        
         Backbone.history.start();
+
+        this.router.navigate( 'dashboard', { 'trigger': true } );
     },
     render: function() {
         this.$el.html( this.template( this.school.attributes ) ); 

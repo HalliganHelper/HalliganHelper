@@ -35,12 +35,12 @@ var User = Backbone.Model.extend( {
         options = options || {};
 
         var errorFunc = _.isFunction( options.error ) ? options.error : this.noop;
-        function successFunc( model, response, options ) {
+        function successFunc( model, response, successOptions ) {
             model.unset( 'password' , { 'silent': true } );
             model.trigger( 'loggedIn' );
 
             if ( _.isFunction( options.success ) ) {
-                return options.success( model, response, options );
+                return options.success( model, response, successOptions );
             }
         }
         

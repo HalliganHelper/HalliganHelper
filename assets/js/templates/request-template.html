@@ -8,7 +8,7 @@
                 <%- requestor.first_name %> <%- requestor.last_name.charAt(0) %>.
             </div>
             <div class="columns shrink request-location">
-                <%- where_located %> at <%- moment( when_asked ).format( 'MM/DD hh:mm a' ) %>
+                <%- where_located %> &mdash; <%- moment( when_asked ).format( 'MM/DD hh:mm a' ) %>
             </div>
         </div>
         <div class="row expanded request-bottom-row">
