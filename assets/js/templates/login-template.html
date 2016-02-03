@@ -1,15 +1,64 @@
-<div class="row expanded align-center">
-    <div class="columns">
-        <input type="email" class="login-email-address" placeholder="Email Address"/>
+<div class="row align-center">
+    <div class="small-12 medium-6 columns login-header">
+        <div class="row">
+            <div class="columns">
+                <img src="https://placekitten.com/g/101/101/">
+            </div>
+        </div>
+        <div class="row">
+            <div class="columns">
+                <h2>Halligan Helper</h2>
+            </div>
+        </div>
     </div>
 </div>
-<div class="row expanded align-center">
-    <div class="columns">
-        <input type="password" class="login-password" placeholder="Password"/>
-    </div>
-</div>
-<div class="row expanded align-center">
-    <div class="columns">
-        <button class="button login-button" type="button">Login</button>
+<div class="row align-center">
+    <div class="small-12 medium-6 columns login-form">
+        <div class="row align-center email-row">
+            <div class="columns">
+                <label>Email Address
+                    <input type="email" class="login-email-address"/>
+                    <span class="error-message"><ul></ul></span>
+                </label>
+            </div>
+        </div>
+        <div class="row align-center password-row">
+            <div class="columns">
+                <label> Password
+                    <input type="password" class="login-password"/>
+                    <span class="error-message"><ul></ul></span>
+                </label>
+            </div>
+        </div>
+        <div class="registration-box hidden">
+            <div class="row align-center password_confirm-row">
+                <div class="columns">
+                    <label> Confirm Password
+                        <input type="password" class="confirm-password"/>
+                        <span class="error-message"><ul></ul></span>
+                    </label>
+                </div>
+            </div>
+            <div class="row align-center">
+                <div class="small-12 medium-6 columns first_name-row">
+                    <label> First Name
+                        <input type="text" class="first-name"/>
+                        <span class="error-message"><ul></ul></span>
+                    </label>
+                </div>
+                <div class="small-12 medium-6 columns last_name-row">
+                    <label> Last Name
+                        <input type="text" class="last-name"/>
+                        <span class="error-message"><ul></ul></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row align-center button-row">
+            <div class="columns">
+                <button class="button secondary register-button" type="button">Registration Form</button>
+                <button class="button primary login-button" type="button">Login</button>
+            </div>
+        </div>
     </div>
 </div>

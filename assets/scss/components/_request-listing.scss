@@ -113,21 +113,5 @@
         margin-right: 4px;
     }
 
-    .make-request-error-message {
-        float: left;
-        margin-left: 4px;
-        display: none;
-    }
-
-    .row.error {
-        label {
-            color: darkred;
-        }
-        input {
-            border-color: darkred;
-        }
-        .make-request-error-message {
-            display: inherit;
-        }
-    }
 }
+

@@ -1,0 +1,23 @@
+.error-message {
+    float: left;
+    margin-left: 4px;
+    display: none;
+}
+
+.error {
+    label {
+        color: darkred;
+    }
+    input {
+        border-color: darkred;
+        margin-top: 5px;
+        margin-bottom: 0px;
+    }
+    .error-message {
+        display: inherit;
+    }
+    ul {
+        margin-left: 0px;
+        list-style-type: none;
+    }
+}

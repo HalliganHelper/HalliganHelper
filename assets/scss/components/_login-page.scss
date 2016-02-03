@@ -1,0 +1,65 @@
+@import "mixins/card";
+
+.login-form {
+    @include card;
+    padding-top: 5px;
+    background-color: $light-gray;
+}
+
+.login-header {
+    @include card;
+    text-align: center;
+    padding-top: 10px;
+    margin-bottom: 10px;
+    background-color: $primary-color;
+
+    img {
+        @include card;
+        padding: 1px;
+    }
+
+    h2 {
+        color: white;
+    }
+}
+
+.button-row {
+    text-align: center;
+}
+
+.registration-box {
+    height: 100%;
+
+    animation-name: slide-height;
+    animation-duration: 1s;
+
+    &.hidden {
+        display: none;
+        animation-name: slide-height;
+        animation-direction: reverse;
+        animation-duration: 1s;
+    }
+}
+
+.login-form .button {
+    transition: background-color .5s;
+}
+
+@keyframes slide-height {
+    0% {
+        max-height: 0px;
+        display: none;
+        overflow: hidden;
+    }
+    
+    1% {
+        opacity: 0;
+    }
+
+    100% {
+        max-height: 300px;
+        display: inherit;
+        overflow: inherit;
+        opacity: 1;
+    }
+}

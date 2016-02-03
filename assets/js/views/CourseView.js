@@ -67,7 +67,11 @@ var CourseView = Backbone.View.extend({
         } );
     },
     newCourse: function( courseID ) {
-        this.course.set( { 'id': courseID } );
+        if( this.course.get( 'id' ) !== courseID ) {
+            this.course.set( { 'id': courseID } );
+        } else {
+            this.course.trigger( 'change:name' );
+        }
     },
     newRequest: function( request ) {
         this.requests.add( request );
@@ -95,6 +99,8 @@ var CourseView = Backbone.View.extend({
         this.makeRequestView.setElement( this.$el.find( '.make-request-container' ) );
         this.makeRequestView.render();
         this.TAsView.setElement( this.$el.find( '.ta-overlay-container' ) );
+
+        this.delegateEvents();
         return this;
     }
 });

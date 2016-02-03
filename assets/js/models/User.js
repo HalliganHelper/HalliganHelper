@@ -5,16 +5,42 @@ var _ = require( 'underscore' );
 var User = Backbone.Model.extend( {
     url: '/api/v3/user/',
     noop: function() {},
-    login: function( email, password, success, error ) {
-        var saveUrl = this.url + 'login/';
+    register: function( email, password, passwordConfirm, firstName, lastName, options ) {
+        var registerUrl = this.url + 'register/';
 
-        var errorFunc = _.isFunction( error ) ? error : this.noop;
+        options = options || {};
+
+        var successFunc = _.isFunction( options.success ) ? options.success : this.noop;
+        var errorFunc = _.isFunction( options.error ) ? options.error : this.noop;
+
+        var data = {
+            'email': email,
+            'password': password,
+            'password_confirm': passwordConfirm,
+            'first_name': firstName,
+            'last_name': lastName,
+        };
+
+        $.ajax( {
+            url: registerUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: data,
+            success: _.bind( successFunc, this ),
+            error: _.bind( errorFunc, this ),
+        } );
+    },
+    login: function( email, password, options ) {
+        var saveUrl = this.url + 'login/';
+        options = options || {};
+
+        var errorFunc = _.isFunction( options.error ) ? options.error : this.noop;
         function successFunc( model, response, options ) {
             model.unset( 'password' , { 'silent': true } );
             model.trigger( 'loggedIn' );
 
-            if ( _.isFunction( success ) ) {
-                return success( model, response, options );
+            if ( _.isFunction( options.success ) ) {
+                return options.success( model, response, options );
             }
         }
         

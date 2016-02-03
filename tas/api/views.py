@@ -1,8 +1,9 @@
 import logging
 import json
 from datetime import timedelta
+from collections import defaultdict
 
-from django.contrib.auth import authenticate, logout, login
+from django.contrib.auth import logout
 from django.core.files.uploadedfile import UploadedFile
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -21,7 +22,8 @@ from ..models import (School, Course, Request,
 
 from .serializers import (SchoolSerializer, CourseSerializer,
                           RequestSerializer, RequestorSerializer,
-                          OfficeHourSerializer, UserSerializer)
+                          OfficeHourSerializer, UserSerializer,
+                          RegistrationSerializer, LoginSerializer)
 
 from .permissions import RequestPermission, OwnSchoolPermission
 
@@ -234,19 +236,12 @@ class UserViewSet(viewsets.ViewSet):
 
     @list_route(methods=['post'])
     def login(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
+        serializer = LoginSerializer(data=request.data,
+                                     context={'request': request})
 
-        if email is None or password is None:
-            raise ParseError
+        serializer.is_valid(raise_exception=True)
 
-        user = authenticate(email=email, password=password)
-        if user is None or not user.is_active:
-            raise NotAuthenticated
-
-        login(request, user)
-
-        return Response(UserSerializer(user).data)
+        return Response(UserSerializer(request.user).data)
 
     @list_route(methods=['post'])
     def logout(self, request):
@@ -268,3 +263,12 @@ class UserViewSet(viewsets.ViewSet):
         request.user.student.headshot = photo
         request.user.student.save()
         return Response(UserSerializer(request.user).data)
+
+    @list_route(methods=['post'])
+    def register(self, request):
+        serializer = RegistrationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        data = serializer.data
+
+        return Response({})

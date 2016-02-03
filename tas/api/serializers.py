@@ -2,17 +2,82 @@ import logging
 from datetime import timedelta
 
 from django.utils.timezone import now
+from django.contrib.auth import authenticate, login
 
-from rest_framework import serializers
-from rest_framework.relations import HyperlinkedIdentityField
-from rest_framework_nested.relations import NestedHyperlinkedRelatedField
+from rest_framework import serializers, validators
 
-from ..models import (School, Course, CustomUser,
-                      Student, Request, OfficeHour, TA)
+from ..models import (School,
+                      Course,
+                      CustomUser,
+                      SchoolEmailDomain,
+                      Student,
+                      Request,
+                      OfficeHour,
+                      TA)
 
 from ..utils import get_administrators_for_school
 
 logger = logging.getLogger(__name__)
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def validate_email(self, email):
+        if not CustomUser.objects.filter(email=email).exists():
+            msg = 'There is no account for the email address {}'
+            raise serializers.ValidationError(msg.format(email))
+
+    def validate_password(self, password):
+        email = self.initial_data.get('email')
+
+        # If the email isn't valid, we don't want to bother attempting to
+        # to validate the password. But we don't want to bubble the
+        # ValidationError for the email inside the password validation,
+        # so abort password validation if email validation fails.
+        try:
+            self.validate_email(email)
+        except serializers.ValidationError:
+            return
+
+        user = authenticate(email=email, password=password)
+
+        if user is None or not user.is_active:
+            msg = 'The email/password combo is invalid'
+            raise serializers.ValidationError(msg)
+
+        request = self.context.get('request')
+        if request:
+            login(request, user)
+
+
+class RegistrationSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        validators=[
+            validators.UniqueValidator(
+                queryset=CustomUser.objects.all(),
+                message='An account with this email already exists'
+            )
+        ]
+    )
+    password = serializers.CharField(min_length=7, max_length=255)
+    password_confirm = serializers.CharField(min_length=7, max_length=255)
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+
+    def validate_email(self, email):
+        domain = email.split('@')[-1]
+        if not SchoolEmailDomain.objects.filter(domain=domain).exists():
+
+            msg = 'There is no school associated with \'{}\'. Please use your '
+            msg += 'school email address'
+
+            raise serializers.ValidationError(msg.format(domain))
+
+    def validate_password_confirm(self, password_confirm):
+        password = self.initial_data.get('password')
+        if password_confirm != password:
+            raise serializers.ValidationError('Your password does not match')
 
 
 class UserSerializer(serializers.ModelSerializer):
