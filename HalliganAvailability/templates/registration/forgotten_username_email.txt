@@ -4,4 +4,5 @@ Hey {{ user.get_full_name }},
 
     Good news! It's "{{ user.username }}".
 
--Halligan Helper Admins
+Thanks,
+The HalliganHelper Admins
