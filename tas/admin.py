@@ -10,6 +10,8 @@ from .custom_user import CustomUser
 from .models import (Student, OfficeHour, Course, Request,
                      School, SchoolEmailDomain, TA)
 
+from .utils import check_ta
+
 
 class MySchoolsOnlyModelAdminMixin(object):
     def get_queryset(self, request):
@@ -175,6 +177,8 @@ class CustomUserAdmin(SuperModelAdmin, UserAdmin):
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 
+    actions = ['check_ta_status']
+
     def change_view(self, *args, **kwargs):
         self.inlines = (RegistrationProfileInline, StudentInline,)
         return super(CustomUserAdmin, self).change_view(*args, **kwargs)
@@ -232,6 +236,23 @@ class CustomUserAdmin(SuperModelAdmin, UserAdmin):
         groups = request.user.groups.values_list('name', flat=True)
         school_names = [g.rstrip(' Admins') for g in groups]
         return qs.filter(student__school__name__in=school_names)
+
+    def check_ta_status(self, request, queryset):
+        success_count = 0
+        failure_count = 0
+        for user in queryset.all():
+            if check_ta(user):
+                success_count += 1
+            else:
+                failure_count += 1
+
+        self.message_user(request,
+                          'Successfully updated TA status for {} users. '
+                          'Failed to update for {} users. Check logs '
+                          'for errors'.format(success_count, failure_count),
+                          fail_silently=True)
+
+    check_ta_status.short_description = 'Check selected users for TA status'
 
 
 admin.site.register(Request, RequestAdmin)
