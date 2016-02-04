@@ -1,7 +1,8 @@
 require('./../scss/extend_foundation.scss');
 
 var $ = require('jquery');
-require('jquery.cookie');
+
+var Utils = require('./components/utils');
 
 var SchoolView = require('./views/SchoolView');
 var LoginView = require('./views/LoginView');
@@ -16,28 +17,15 @@ function show_notification(msg) {
 }
 
 
-(function ajaxSetup() {
-   var csrftoken = $.cookie('csrftoken'); 
 
-    function csrfSafeMethod(method) {
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
-})();
-
+Utils.ajaxSetup();
 var user = new User();
 var sv = new SchoolView( { 'model': user } );
 var lv = new LoginView( { 'model': user } );
 
 user.fetch({
     'success': function( model, response, options ) {
+        lv.remove();
         user.trigger( 'loggedIn' );
         /* Note: Intentionally not calling render here. 
          * The SchoolView renders itself once it fetches the 
@@ -45,6 +33,6 @@ user.fetch({
          */
     },
     'error': function( model, response, options ) {
-        lv.render();
+        $( 'body' ).html( lv.render().el );
     }
 });

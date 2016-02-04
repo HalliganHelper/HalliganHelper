@@ -27,6 +27,20 @@
     text-align: center;
 }
 
+.registration-success-row {
+    text-align: center;
+    margin-bottom: 15px;
+    
+    animation-name: slide-height;
+    animation-duration: 1s;
+}
+
+.registration-success {
+    @include card;
+    background-color: lightgreen;
+    padding: 10px;
+}
+
 .registration-box {
     height: 100%;
 

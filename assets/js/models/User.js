@@ -2,6 +2,8 @@ var Backbone = require('backbone');
 var $ = require( 'jquery' );
 var _ = require( 'underscore' );
 
+var Utils = require( './../components/utils' );
+
 var User = Backbone.Model.extend( {
     url: '/api/v3/user/',
     noop: function() {},
@@ -38,6 +40,8 @@ var User = Backbone.Model.extend( {
         function successFunc( model, response, successOptions ) {
             model.unset( 'password' , { 'silent': true } );
             model.trigger( 'loggedIn' );
+
+            Utils.ajaxSetup();
 
             if ( _.isFunction( options.success ) ) {
                 return options.success( model, response, successOptions );

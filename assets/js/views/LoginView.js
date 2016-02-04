@@ -3,7 +3,6 @@ var _ = require('underscore');
 var $ = require('jquery');
 
 var LoginView = Backbone.View.extend({
-    el: 'body',
     template: _.template( require( './../templates/login-template' ) ),
 
     events: {
@@ -20,10 +19,12 @@ var LoginView = Backbone.View.extend({
         var email = this.emailInput.val();
         var password = this.$el.find( '.login-password' ).val();
 
+        this.setButtonsDisabled( true );
+
         options = {
             'error': _.bind( function( model, response ) {
-                console.log( 'ERROR ON LOGIN ', response );
                 this.renderRegistrationErrors( response.responseJSON );
+                this.setButtonsDisabled( false );
             }, this ),
         };
         this.model.login( email, password, options );
@@ -39,14 +40,16 @@ var LoginView = Backbone.View.extend({
         var confirmPassword = this.confirmPasswordInput.val();
         var firstName = this.firstNameInput.val();
         var lastName = this.lastNameInput.val();
+        this.setButtonsDisabled( true );
 
         var options = {
             'error': _.bind( function( response ) {
                 this.renderRegistrationErrors( response.responseJSON );
+                this.setButtonsDisabled( false );
             }, this ),
-            'success': function( data ) {
-                console.log( 'Success!', arguments );
-            },
+            'success': _.bind( function() {
+                this.renderRegistrationSuccess();
+            }, this ),
         };
 
         this.model.register( email, 
@@ -55,14 +58,13 @@ var LoginView = Backbone.View.extend({
                              firstName, 
                              lastName,
                              options );
-
     },
 
     inputChanged: function( e ) {
         $( e.target ).parents( '.error' ).removeClass( 'error' );
 
         if ( e.keyCode == 13 ) {
-            if ( this.registerState ) {
+            if ( this.registrationBox.is( ':visible' ) ) {
                 this.register();
             } else {
                 this.login();
@@ -100,10 +102,16 @@ var LoginView = Backbone.View.extend({
     hideRegistrationErrors: function () {
         this.$el.find( '.error ').removeClass( 'error' );
     },
+    setButtonsDisabled: function( disabled ) {
+        this.registerButton.attr( 'disabled', disabled );
+        this.loginButton.attr( 'disabled', disabled );
+    },
+
+    renderRegistrationSuccess: function() {
+        this.$el.find( '.registration-success-row' ).removeClass( 'hide' ); 
+    },
     renderRegistrationErrors: function( errors ) {
-        console.log( 'rendereing registration errors: ', errors );
         for ( var errorType in errors ) { // FIXME: Is this valid?
-            console.log( 'Error for: ', errorType );
             var className = '.' + errorType + '-row';
             var row = this.$el.find( className );
             var errorList = row.find( '.error-message > ul' );
@@ -112,7 +120,6 @@ var LoginView = Backbone.View.extend({
             errorList.empty();
             for( var i = 0; i < errorStrings.length; i++ ) {
                 var error = errorStrings[ i ];
-                console.log( '    Error is: ', error );
                 errorList.append( $( '<li>' + error + '</li>' ) );
             }
 
