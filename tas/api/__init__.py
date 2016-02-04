@@ -20,12 +20,9 @@ course_router.register(r'tas', TAViewSet, base_name='ta')
 course_router.register(r'officehours', OfficeHourViewSet)
 
 
-urls = patterns('',
-                url(r'^v3/', include(v3_user_router.urls,
-                                     namespace='v3')),
-                url(r'^v3/school/$', SchoolView.as_view()),
-                url(r'^v3/school/', include(v3_school_router.urls,
-                                            namespace='v3')),
-                url(r'^v3/school/', include(course_router.urls,
-                                            namespace='v3')),
-                )
+urls = [
+    url(r'^v3/', include(v3_user_router.urls, namespace='v3')),
+    url(r'^v3/school/$', SchoolView.as_view()),
+    url(r'^v3/school/', include(v3_school_router.urls, namespace='v3')),
+    url(r'^v3/school/', include(course_router.urls, namespace='v3')),
+]

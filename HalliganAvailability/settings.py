@@ -34,19 +34,27 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.static',
-    'ws4redis.context_processors.default',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(os.path.dirname(__file__), 'templates').replace('\\', '/'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+                'ws4redis.context_processors.default',
+            ],
+        },
+    },
+]
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -64,12 +72,8 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'HalliganAvailability.urls'
 
-# Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'HalliganAvailability.wsgi.application'
-
-TEMPLATE_DIRS = (
-    os.path.join(os.path.dirname(__file__), 'templates').replace('\\', '/'),
-)
+# Using the one defined by Websocket-For-Redis below.
+# WSGI_APPLICATION = 'HalliganAvailability.wsgi.application'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -81,7 +85,6 @@ INSTALLED_APPS = (
     'super_inlines',
     'django.contrib.admin',
     # 'django.contrib.admindocs',
-    'computers',
     'tas',
     'registration',
     'django_extensions',
@@ -152,10 +155,6 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': 'DEBUG'
         },
-        'computers': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG'
-        },
         'HalliganAvailability.authentication': {
             'handlers': ['console', 'authentication_file'],
             'level': 'DEBUG',
@@ -181,9 +180,7 @@ INSTALLED_APPS += (
 
 WEBSOCKET_URL = '/ws/'
 WS4REDIS_PREFIX = 'hh'
-TEMPLATE_CONTEXT_PROCESSORS += (
-    'ws4redis.context_processors.default',
-)
+
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 WS4REDIS_HEARTBEAT = '--heartbeat--'
 
@@ -235,7 +232,6 @@ except ImportError:
         'password': ''
     }
     DEBUG = False
-    TEMPLATE_DEBUG = DEBUG
     EMAIL_HOST_PASSWORD = ''
     SECRET_KEY = 'secret_key'
     ALLOWED_HOSTS = ['*']

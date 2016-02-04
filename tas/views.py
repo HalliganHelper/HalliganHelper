@@ -1,6 +1,8 @@
 import logging
 
 from django.shortcuts import render
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 from registration.backends.default.views import RegistrationView
 from registration.signals import user_registered, user_activated
 
@@ -36,3 +38,9 @@ def login_or_register(request):
     return render(request,
                   'tas/login_or_register.html',
                   template_vars)
+
+
+# Necessary so that the csrf token can be loaded for the ajax calls on the page.
+@ensure_csrf_cookie
+def ModularHomePage(request):
+    return render(request, 'logged_in.html', {})
