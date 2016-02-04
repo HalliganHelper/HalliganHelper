@@ -1,9 +1,9 @@
+from django.conf import settings
 from django.contrib.auth.forms import (UserCreationForm,
                                        AuthenticationForm,
                                        ReadOnlyPasswordHashField)
 from django import forms
 from .custom_user import CustomUser
-from django.conf import settings
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -13,7 +13,8 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'first_name', 'last_name',)
+        fields = ('email', 'first_name', 'last_name',
+                  'first_name', 'last_name',)
 
 
 class EmailUserCreationForm(CustomUserCreationForm):

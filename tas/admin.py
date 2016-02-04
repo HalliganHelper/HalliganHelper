@@ -146,7 +146,6 @@ class RequestAdmin(admin.ModelAdmin):
 
 class TAJobInline(SuperInlineModelAdmin, admin.StackedInline):
     model = TA
-    can_delete = False
     verbose_name = 'TA Job'
     verbose_name_plural = 'TA Jobs'
     extra = 1
@@ -169,36 +168,62 @@ class RegistrationProfileInline(admin.StackedInline):
 
 
 class CustomUserAdmin(SuperModelAdmin, UserAdmin):
-    form = CustomUserChangeForm
+    # form = CustomUserChangeForm
     add_form = CustomUserCreationForm
-
-    fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal Info', {'fields': ('first_name', 'last_name')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff',
-                                    'is_superuser', 'groups',
-                                    'user_permissions')}),
-        ('Important Dates', {'fields': ('last_login', )})
-    )
-
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2')}
-         ),
-    )
 
     list_display = ('email', 'first_name', 'last_name', 'is_staff')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 
-    def add_view(self, *args, **kwargs):
-        self.inlines = (RegistrationProfileInline,)
-        return super(CustomUserAdmin, self).add_view(*args, **kwargs)
-
     def change_view(self, *args, **kwargs):
         self.inlines = (RegistrationProfileInline, StudentInline,)
         return super(CustomUserAdmin, self).change_view(*args, **kwargs)
+
+    def get_fieldsets(self, request, obj=None):
+        root_fields = (
+            None, {'fields': ('email', 'password')}
+        )
+
+        personal_fields = (
+            'Personal Info',
+            {
+                'fields': ('first_name', 'last_name')
+            }
+        )
+
+        permission_fields = (
+            'Permissions',
+            {
+                'fields': (
+                    'is_active',
+                    'is_staff',
+                    'is_superuser',
+                    'groups',
+                    # 'user_permissions',
+                )
+            }
+        )
+
+        important_dates = (
+            'Important Dates',
+            {
+                'fields': ('last_login', )
+            }
+        )
+
+        if request.user.is_superuser:
+            return (
+                root_fields,
+                personal_fields,
+                permission_fields,
+                important_dates,
+            )
+
+        return (
+            root_fields,
+            personal_fields,
+            important_dates,
+        )
 
     def get_queryset(self, request):
         qs = super(CustomUserAdmin, self).get_queryset(request)
