@@ -164,7 +164,7 @@ LOGGING = {
     }
 }
 
-LOGIN_URL = 'login_or_register'
+LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'
 BROKER_URL = 'redis://localhost:6379/0'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 10850}

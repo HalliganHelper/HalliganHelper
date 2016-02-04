@@ -4,7 +4,9 @@ from datetime import timedelta
 from collections import defaultdict
 
 from django.contrib.auth import logout
+from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
+from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
@@ -13,6 +15,8 @@ from rest_framework.exceptions import NotFound, NotAuthenticated, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import list_route, parser_classes
 from rest_framework.parsers import FileUploadParser
+
+from registration.models import RegistrationProfile
 
 from ws4redis.publisher import RedisPublisher
 from ws4redis.redis_store import RedisMessage
@@ -223,6 +227,7 @@ class TAViewSet(viewsets.ReadOnlyModelViewSet):
 class UserViewSet(viewsets.ViewSet):
     serializer_class = UserSerializer
     queryset = CustomUser.objects.none()
+    SEND_ACTIVATION_EMAIL = getattr(settings, 'SEND_ACTIVATION_EMAIL', True)
 
     def list(self, request):
         user = request.user
@@ -269,6 +274,20 @@ class UserViewSet(viewsets.ViewSet):
         serializer = RegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        data = serializer.data
+        user_data = dict(serializer.data)
+        password = serializer.data.pop('password')
+        del user_data['password_confirm']
+
+        user = CustomUser(**user_data)
+        user.set_password(password)
+        user.is_active = False
+        user.save()
+
+        RegistrationProfile.objects.create_inactive_user(
+            new_user=user,
+            site=get_current_site(request),
+            send_email=self.SEND_ACTIVATION_EMAIL,
+            request=request
+        )
 
         return Response({})

@@ -15,15 +15,6 @@ def user_confirmed(sender, user, request, **kwargs):
     check_ta(user)
     logger.info('Confirmed user: user_id=%s', user.pk)
 
-
-def user_created(sender, user, request, **kwargs):
-    form = EmailUserCreationForm(request.POST)
-    user.first_name = form.data['first_name']
-    user.last_name = form.data['last_name']
-    user.save()
-    logger.info('Created a user: user_id=%s', user.pk)
-
-user_registered.connect(user_created)
 user_activated.connect(user_confirmed)
 
 

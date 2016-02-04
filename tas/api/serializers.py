@@ -28,6 +28,8 @@ class LoginSerializer(serializers.Serializer):
             msg = 'There is no account for the email address {}'
             raise serializers.ValidationError(msg.format(email))
 
+        return email
+
     def validate_password(self, password):
         email = self.initial_data.get('email')
 
@@ -49,6 +51,8 @@ class LoginSerializer(serializers.Serializer):
         request = self.context.get('request')
         if request:
             login(request, user)
+
+        return password
 
 
 class RegistrationSerializer(serializers.Serializer):
@@ -74,10 +78,14 @@ class RegistrationSerializer(serializers.Serializer):
 
             raise serializers.ValidationError(msg.format(domain))
 
+        return email
+
     def validate_password_confirm(self, password_confirm):
         password = self.initial_data.get('password')
         if password_confirm != password:
             raise serializers.ValidationError('Your password does not match')
+
+        return password_confirm
 
 
 class UserSerializer(serializers.ModelSerializer):
