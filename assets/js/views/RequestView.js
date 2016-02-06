@@ -14,7 +14,7 @@ var RequestView = Backbone.View.extend({
     },
 
     initialize: function() {
-        this.listenTo( this.model, 'change', this.render );
+        this.listenTo( this.model, 'change', this.handleChange );
         this.listenTo( this.model, 'destroy', this.remove );
     },
 
@@ -30,7 +30,6 @@ var RequestView = Backbone.View.extend({
                 } );
             } );
     },
-
     editedRequest: function( e ) {
         if ( e.keyCode == 13 ) {
             this.$el.find( '.primary.button' ).click();
@@ -80,6 +79,23 @@ var RequestView = Backbone.View.extend({
             this.renderEdit();
         } else if ( this.model.get( 'can_ta_for' ) ) {
             this.model.save( { 'checked_out': true } );
+        }
+    },
+    handleChange: function( model ) {
+
+        if ( model.hasChanged( 'checked_out' ) ) {
+            /* If we've checked it out, we just want to toggle the class
+             * so we get the nice animation
+             */
+            this.$el.find( '.request-information' )
+                .toggleClass( 'checked-out', model.get( 'checked_out' ) );
+
+            if ( this.model.get( 'can_ta_for' ) ) {
+                this.$el.find( '.secondary.button' ).remove(); 
+            }
+        } else {
+            /* Otherwise, re-render the whole thing */
+            this.render();
         }
     },
     renderEdit: function() {

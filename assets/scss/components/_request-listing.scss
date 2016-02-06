@@ -27,6 +27,14 @@
         padding-bottom: 10px;
         padding-left: 0px;
 
+        background-size: 200% 100%;
+        transition: background-position 1s;
+        background-image: linear-gradient(to right, white 50%, $medium-gray 50%);
+
+        &.checked-out {
+            background-position: 100% 100%;
+        }
+
         &.editable {
             padding-bottom: 30px;
         }
@@ -112,6 +120,5 @@
         float: right;
         margin-right: 4px;
     }
-
 }
 

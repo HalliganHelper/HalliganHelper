@@ -28,7 +28,11 @@
 <% } else if ( can_ta_for ) { %>
     <div class="row expanded align-right request-action-bar">
         <div class="columns shrink">
-            <button type="button" class="secondary button">Checkout</button>
+            <% if ( ! checked_out ) { %>
+            <button type="button" class="secondary button" >
+                Checkout
+            </button>
+            <% } %>
             <button type="button" class="primary button">Resolve</button>
         </div>
     </div>

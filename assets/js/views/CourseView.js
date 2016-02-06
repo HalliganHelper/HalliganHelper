@@ -73,11 +73,7 @@ var CourseView = Backbone.View.extend({
         } );
     },
     newCourse: function( courseID ) {
-        if( this.course.get( 'id' ) !== courseID ) {
-            this.course.set( { 'id': courseID } );
-        } else {
-            this.course.trigger( 'change:name' );
-        }
+        this.course.set( 'id', courseID ).fetch();
     },
     newRequest: function( request ) {
         this.requests.add( request );
