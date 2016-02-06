@@ -7,6 +7,7 @@ var Utils = require( './../components/utils' );
 var User = Backbone.Model.extend( {
     url: '/api/v3/user/',
     noop: function() {},
+
     register: function( email, password, passwordConfirm, firstName, lastName, options ) {
         var registerUrl = this.url + 'register/';
 
@@ -33,6 +34,7 @@ var User = Backbone.Model.extend( {
         } );
     },
     login: function( email, password, options ) {
+        Utils.notify();
         var saveUrl = this.url + 'login/';
         options = options || {};
 

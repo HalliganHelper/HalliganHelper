@@ -108,6 +108,7 @@ var LoginView = Backbone.View.extend({
     },
 
     renderRegistrationSuccess: function() {
+        this.hideRegistrationErrors();
         this.$el.find( '.registration-success-row' ).removeClass( 'hide' ); 
     },
     renderRegistrationErrors: function( errors ) {

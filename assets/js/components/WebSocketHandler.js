@@ -6,13 +6,19 @@ var WS4Redis = require('./WS4Redis');
 
 var WebSocketHandler = Backbone.Model.extend({
     initialize: function() {
-        var websocketProtocol = location.protocol === "http:" ? "ws:" : "wss:"; 
-        var websocketURI = websocketProtocol + "//" + location.host + "/ws/ta?subscribe-broadcast";
         this.ws4redis = WS4Redis({
-            uri: websocketURI,
+            uri: this._buildWebSocketURI(),
             heartbeat_msg: '--heartbeat--',
             receive_message: _.bind( this.receiveMessage, this )
         });
+    },
+    _buildWebSocketURI: function() {
+        var webSocketProtocol = location.protocol === "http:" ? "ws:" : "wss:"; 
+        webSocketProtocol += "//";
+        var webSocketRoot = location.host + "/ws/ta";
+        var webSocketParams = "?subscribe-broadcast&subscribe-user";
+
+        return webSocketProtocol + webSocketRoot + webSocketParams;
     },
     receiveMessage: function( msg ) {
         msg = JSON.parse( msg );

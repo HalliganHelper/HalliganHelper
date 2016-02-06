@@ -181,9 +181,9 @@ INSTALLED_APPS += (
 
 WEBSOCKET_URL = '/ws/'
 WS4REDIS_PREFIX = 'hh'
-
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 WS4REDIS_HEARTBEAT = '--heartbeat--'
+WS4REDIS_EXPIRE = 0  # Don't hold messages. You see it or you don't.
 
 
 # This is a dummy database setup. You'll need to insert your own

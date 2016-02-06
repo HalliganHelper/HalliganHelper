@@ -1,5 +1,6 @@
 import logging
 import requests
+import json
 
 from django.template import Context
 from django.template.loader import get_template
@@ -8,6 +9,10 @@ from django.contrib.auth.models import Group
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
 
+
+from ws4redis.publisher import RedisPublisher
+from ws4redis.redis_store import RedisMessage
+redis_broadcast_publisher = RedisPublisher(facility='ta', broadcast=True)
 
 logger = logging.getLogger(__name__)
 
@@ -138,3 +143,23 @@ def get_administrators_for_school(school):
     group_admins = Group.objects\
         .prefetch_related('user_set').get(name=group_name).user_set.all()
     return group_admins | user_model.objects.filter(pk=school.administrator.pk)
+
+
+def publish_message(message_type, data=None, publisher=None):
+    redis_publisher = publisher
+    if redis_publisher is None:
+        redis_publisher = redis_broadcast_publisher
+
+    packet = {
+        'type': message_type
+    }
+
+    if data is not None:
+        packet['data'] = data
+
+    logger.debug('Publishing redis message. message="%s" '
+                 'default_publisher="%s"',
+                 packet, publisher is None)
+
+    message = RedisMessage(json.dumps(packet))
+    redis_publisher.publish_message(message)

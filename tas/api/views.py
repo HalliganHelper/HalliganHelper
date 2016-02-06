@@ -19,10 +19,12 @@ from rest_framework.parsers import FileUploadParser
 from registration.models import RegistrationProfile
 
 from ws4redis.publisher import RedisPublisher
-from ws4redis.redis_store import RedisMessage
+
 
 from ..models import (School, Course, Request,
                       Student, OfficeHour, CustomUser)
+
+from ..utils import publish_message
 
 from .serializers import (SchoolSerializer, CourseSerializer,
                           RequestSerializer, RequestorSerializer,
@@ -32,7 +34,6 @@ from .serializers import (SchoolSerializer, CourseSerializer,
 from .permissions import RequestPermission, OwnSchoolPermission
 
 logger = logging.getLogger(__name__)
-redis_broadcast_publisher = RedisPublisher(facility='ta', broadcast=True)
 
 
 class CreateModelWithRequestMixin(mixins.CreateModelMixin):
@@ -123,16 +124,12 @@ class RequestViewSet(CreateModelWithRequestMixin,
 
         created = super(RequestViewSet, self).create(request, course_pk)
 
-        redis_data = {
-            'type': 'request_created',
-            'data': {
-                'course': course.pk,
-                'id': created.data['id']
-            }
+        data = {
+            'course': course.pk,
+            'id': created.data['id']
         }
-        logger.debug('Sending websocket packet: %s', redis_data)
-        packet = RedisMessage(json.dumps(redis_data))
-        redis_broadcast_publisher.publish_message(packet)
+
+        publish_message('request_created', data)
 
         return created
 
@@ -150,16 +147,21 @@ class RequestViewSet(CreateModelWithRequestMixin,
         if updated.data['cancelled'] or updated.data['solved']:
             packet_type = 'request_removed'
 
-        redis_data = {
-            'type': packet_type,
-            'data': {
-                'course': course_pk,
-                'id': updated.data['id']
-            }
-        }
-        logger.debug('Sending websocket packet: %s', redis_data)
-        packet = RedisMessage(json.dumps(redis_data))
-        redis_broadcast_publisher.publish_message(packet)
+        publish_message(packet_type, {
+            'course': course_pk,
+            'id': updated.data['id'],
+        })
+
+        # If the request was checked out, tell the student
+        if updated.data['checked_out'] and not updated.data['solved']:
+            student = Student.objects.get(pk=updated.data['requestor']['id'])
+            student_username = student.user.email
+            checked_out_by = self.request.user
+
+            publish_message('checked_out', {
+                'checked_out_by': checked_out_by.get_full_name(),
+                'headshot': checked_out_by.student.headshot.url,
+            }, RedisPublisher(facility='ta', users=[student_username]))
 
         return updated
 
@@ -233,7 +235,6 @@ class UserViewSet(viewsets.ViewSet):
         user = request.user
         if not user.is_authenticated() or not user.is_active:
             raise NotAuthenticated
-        logger.debug(user)
         return Response(UserSerializer(user).data)
 
     def get_queryset(self):

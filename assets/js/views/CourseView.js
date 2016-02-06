@@ -10,6 +10,8 @@ var RequestView = require('./RequestView');
 var MakeRequestView = require('./MakeRequestView');
 var TAsView = require('./TAsView');
 
+var utils = require( './../components/utils' );
+
 var CourseView = Backbone.View.extend({
     template: _.template( require( './../templates/course-template' ) ),
     events: {
@@ -17,23 +19,27 @@ var CourseView = Backbone.View.extend({
     },
 
     initialize: function( options ) {
+        this.user = options.user;
+        this.webSocketHandler = options.webSocketHandler;
         this.course = new Course();
         this.requests = new Requests();
         this.tas = new TAs();
-        this.webSocketHandler = options.webSocketHandler;
         this.makeRequestView = new MakeRequestView( { 'course': this.course } );
         this.TAsView = new TAsView( { 'collection': this.tas } );
 
+        this.initListeners();
+    },
+    initListeners: function() {
         this.listenTo( this.course, 'change:id', this.fetchCourse );
         this.listenTo( this.course, 'change:name', this.render );
         this.listenTo( this.tas, 'reset', this.setTACount );
         this.listenTo( this.requests, 'reset', this.renderAllRequests );
         this.listenTo( this.requests, 'add', this.renderRequest );
         this.listenTo( this.makeRequestView, 'newRequest', this.newRequest );
-        this.listenTo( options.webSocketHandler, 
+        this.listenTo( this.webSocketHandler, 
                        'request_created request_updated', 
                        this.newWebSocketRequest );
-        this.listenTo( options.webSocketHandler,
+        this.listenTo( this.webSocketHandler,
                        'request_removed',
                        this.removeWebSocketRequest );
         this.listenTo( this, 'newCourse', this.newCourse );
