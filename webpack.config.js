@@ -19,6 +19,11 @@ module.exports = {
         new AppCachePlugin({
             output: 'manifest.appcache'
         }),
+        new webpack.ProvidePlugin({
+            '$': 'jquery',
+            'jQuery': 'jquery',
+            'window.jQuery': 'jquery',
+        }),
     ],
 
     module: {
@@ -51,7 +56,7 @@ module.exports = {
     },
 
     resolve: {
-        modulesDirectories: ['node_modules', 'components/bower_components'],
-        extensions: ['', '.js', '.jsx', '.html']
+        modulesDirectories: ['node_modules'],
+        extensions: ['', '.js', '.html']
     },
 };

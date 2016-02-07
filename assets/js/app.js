@@ -8,15 +8,6 @@ var SchoolView = require('./views/SchoolView');
 var LoginView = require('./views/LoginView');
 var User = require('./models/User');
 
-function show_notification(msg) {
-    var options = {
-        'body': msg,
-        'icon': '/static/tas/imgs/HH_Logo.jpg'
-    };
-    var notification = new Notification("Halligan Helper", options);
-}
-
-
 
 Utils.ajaxSetup();
 var user = new User();

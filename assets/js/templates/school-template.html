@@ -1,16 +1,24 @@
-<div class="top-bar hide-for-medium">
-    <div class="top-bar-left">
-        <ul class="dropdown menu" data-dropdown-menu>
-            <li class="menu-text">
-                <a href="#dashboard">Halligan Helper</a>
-            </li>
-            <li class="has-submenu">
-                <a href="#">Courses</a>
-                <ul class="submenu menu vertical course-menu" data-submenu>
-                    <li><a href="#15">Course 1</a></li>
-                </ul>
-            </li>
+<div class="mobile-nav">
+    <input class="menu-checkbox" id="menu-checkbox" type="checkbox">
+    <label class="overlay" for="menu-checkbox"></label>
+    <nav class="mobile-menu">
+        <ul class="menu-category"><h5>Courses</h5>
+            <% _.each(courses, function(course) { %>
+                <li class="menu-item">
+                    <a href="#course/<%= course.id %>"><%- course.identifier %></a>
+                </li>
+            <% } ); %>
         </ul>
+        <ul class="menu-category"><h5>More</h5>
+            <li class="menu-item"><a href="#profile">Profile</a></li>
+            <li class="menu-item"><a href="#logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="header">
+        <label class="menu-btn" for="menu-checkbox">
+            <span class="three-lines">&#8801;</span>
+            Halligan Helper
+        </label>
     </div>
 </div>
 <div class="row expanded">

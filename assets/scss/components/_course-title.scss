@@ -12,8 +12,13 @@
         color: white;
         font-weight: bold;
         position: relative;
-        top: 0px;
+        top: -3px;
         left: 0px;
+        margin-left: 0px;
+    }
+
+    .show-tas > i > .ta-count {
+        top: 0px;
         margin-left: -20px;
     }
 

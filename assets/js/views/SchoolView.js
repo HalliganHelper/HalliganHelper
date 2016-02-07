@@ -14,6 +14,9 @@ var utils = require( './../components/utils' );
 var SchoolView = Backbone.View.extend({
     el: 'body', /** The School is the main view of the app, so it is the root */
     template: _.template( require( './../templates/school-template' ) ),
+    events: {
+        'click .menu-item>a': 'mobileNavClick',
+    },
 
     initialize: function( options ) {
         this.webSocketHandler = new WebSocketHandler();
@@ -98,6 +101,9 @@ var SchoolView = Backbone.View.extend({
             this.router.navigate( 'dashboard', { 'trigger': true } );
         }
 
+    },
+    mobileNavClick: function() {
+        this.$el.find( '.menu-checkbox' ).attr( 'checked', false );
     },
     render: function() {
         this.$el.html( this.template( this.school.attributes ) ); 
