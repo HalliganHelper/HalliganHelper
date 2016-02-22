@@ -21,6 +21,7 @@ var RequestView = Backbone.View.extend({
     removeView: function() {
         var view = this;
         var transitionFinishedEvents = 'transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd';
+        this.model.trigger( 'destroy' );
         this.$el.addClass( 'cancelled' )
             .on( transitionFinishedEvents, function() {
                 $(this).height($(this).height());
@@ -46,8 +47,6 @@ var RequestView = Backbone.View.extend({
         }
     },
     primaryClick: function( e ) {
-        // this.remove();
-        // this.model.trigger( 'destroy' );
         if( $( e.currentTarget ).data( 'save-edit' ) ) {
             var question = this.$el.find( '.problem-input' ).val();
             var loc = this.$el.find( '.location-input' ).val();
@@ -56,16 +55,24 @@ var RequestView = Backbone.View.extend({
         else if ( this.model.get( 'owned_by_me' ) ) {
             this.model.save( { 'cancelled': true },
                              {
-                                'silent': true,
-                                'success': _.bind( this.removeView, this )   
+                                'success': _.bind( this.removeView, this ),
+                                'error': _.bind( function( model, response ) {
+                                    if ( response.status === 404 ) {
+                                        this.removeView();
+                                    }
+                                }, this ),
                              } 
                            );
             
         } else if ( this.model.get( 'can_ta_for' ) ) {
             this.model.save( { 'solved': true },
                              {
-                                'silent': true,
-                                'success': _.bind( this.removeView, this )   
+                                'success': _.bind( this.removeView, this ),
+                                'error': _.bind( function( model, response ) {
+                                    if ( response.status === 404 ) {
+                                        this.removeView();
+                                    }
+                                }, this ),
                              } 
                            );
         }

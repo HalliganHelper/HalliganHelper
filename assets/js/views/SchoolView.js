@@ -12,32 +12,32 @@ var utils = require( './../components/utils' );
 
 
 var SchoolView = Backbone.View.extend({
-    el: 'body', /** The School is the main view of the app, so it is the root */
     template: _.template( require( './../templates/school-template' ) ),
     events: {
         'click .menu-item>a': 'mobileNavClick',
     },
 
     initialize: function( options ) {
+        this.user = options.user;
         this.webSocketHandler = new WebSocketHandler();
-        this.school = new School();
+
         this.courseView = new CourseView( { 
-            'user': this.model,
+            'user': this.user,
             'webSocketHandler': this.webSocketHandler 
         } );
-        this.dashboardView = new DashboardView( { 'model': this.school } );
-        this.profileView = new ProfileView( { 'model': this.model } );
 
-        this.listenTo( this.model, 'loggedIn', _.bind( this.initSchool, this ) );
-        
+        this.dashboardView = new DashboardView( { 'model': this.model } );
+        this.profileView = new ProfileView( { 'model': this.user } );
+
+        this.router = this.initRouter();
+        this.initWebSocketListeners();
     },
     requestAdded: function( data ) {
         /* 
          * When we receive a request, update the course request count
          * so that the dashboard stays valid
          */
-        this.school.courses.get( { 'id': data.course } ).fetch();
-
+        this.model.courses.get( { 'id': data.course } ).fetch();
     },
     requestCheckedOut: function( data ) {
         console.log( data );
@@ -57,57 +57,46 @@ var SchoolView = Backbone.View.extend({
                        'checked_out',
                        _.bind( this.requestCheckedOut, this ) );
     },
-    initSchool: function() {
-        this.listenTo( this.school, 'change', this.render );
-        this.school.fetch({
-            /* 
-             * Only bind the router once we have a school, so that we only try to
-             * get a course once we have a school 
-             */
-            success: _.bind( this.initRouter, this )
-        });
-    },
     initRouter: function() {
-        this.router = new AppRouter();
-        var router = this.router;
+        var router = new AppRouter();
 
-        this.initWebSocketListeners();
-
-        this.router.on( 'route:course', _.bind(function( id ) {
+        router.on( 'route:course', _.bind(function( id ) {
             this.courseView.trigger( 'newCourse', Number( id ) );
-            this.mainContent.html( this.courseView.$el );
+            this.mainContent.html( this.courseView.render().$el );
         }, this ) );
     
-        this.router.on( 'route:dashboard', _.bind( function() {
+        router.on( 'route:dashboard', _.bind( function() {
             this.mainContent.html( this.dashboardView.render().$el );
         }, this ) );
 
-        this.router.on( 'route:profile', _.bind( function() {
+        router.on( 'route:profile', _.bind( function() {
             this.mainContent.html( this.profileView.render().$el );
         }, this ) );
 
-        this.router.on( 'route:logout', _.bind( function() {
+        router.on( 'route:logout', _.bind( function() {
             this.model.logout( {
                 'success': function() {
                     router.navigate('/'); 
                 } 
             } ); 
         }, this) );
+
+        return router;
         
+    },
+    mobileNavClick: function() {
+        this.$el.find( '.menu-checkbox' ).attr( 'checked', false );
+    },
+    render: function() {
+        this.$el.html( this.template( this.model.attributes ) ); 
+        this.mainContent = this.$el.find( '.main-content' );
+
         /* Backbone.history.start returns false if the current url doesn't 
          * match any known route. If there's no match, show them the dashboard
          */
         if( ! Backbone.history.start() ) {
             this.router.navigate( 'dashboard', { 'trigger': true } );
         }
-
-    },
-    mobileNavClick: function() {
-        this.$el.find( '.menu-checkbox' ).attr( 'checked', false );
-    },
-    render: function() {
-        this.$el.html( this.template( this.school.attributes ) ); 
-        this.mainContent = this.$el.find( '.main-content' );
         return this;
     },
 });

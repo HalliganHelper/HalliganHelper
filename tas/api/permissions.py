@@ -60,3 +60,31 @@ class RequestPermission(permissions.IsAuthenticated):
             can_edit = can_edit and is_ta
 
         return can_edit
+
+
+class OfficeHourPermission(permissions.IsAuthenticated):
+
+    def has_permission(self, request, view):
+        course_pk = view.kwargs.get('course_pk', None)
+        if course_pk is None:
+            return False
+
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        try:
+            course = Course.objects.get(pk=course_pk)
+        except Course.DoesNotExist:
+            return False
+
+        ta = TA.objects.filter(course=course, student=request.user.student)
+
+        return ta.exists()
+
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        else:
+            return request.user.student == obj.ta

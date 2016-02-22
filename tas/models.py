@@ -121,6 +121,9 @@ class Student(models.Model):
                                      help_text='The courses a '
                                                'student TAs for.')
 
+    blurb = models.CharField(max_length=255,
+                             help_text="A field for TA bios")
+
     def __str__(self):
         return self.user.get_full_name()
 

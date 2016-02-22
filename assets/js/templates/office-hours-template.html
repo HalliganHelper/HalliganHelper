@@ -1,0 +1,38 @@
+<% if ( am_a_ta ) { %>
+    <div class="oh-card go-on-duty">
+        <div>
+            <label>
+                Where are you?
+                <input type="text" class="on-duty-location">
+                <span class="input-footer error-message location-error"></span>
+            </label>
+        </div>
+        <div>
+            <label>
+                For how long?
+                <div>
+                    <select class="on-duty-hours">
+                        <option value=0>0 Hours</option>
+                        <option value=1>1 Hours</option>
+                        <option value=2>2 Hours</option>
+                        <option value=3>3 Hours</option>
+                        <option value=4>4 Hours</option>
+                        <option value=5>5 Hours</option>
+                        <option value=6>6 Hours</option>
+                    </select>
+                    <select class="on-duty-minutes">
+                        <option value=0>0 Minutes</option>
+                        <option value=15>15 Minutes</option>
+                        <option value=30>30 Minutes</option>
+                        <option value=45>45 Minutes</option>
+                    </select>
+                </div>
+                <span class="input-footer error-message hours-error"></span>
+            </label>
+        </div>
+        <div class="submission-error"></div>
+        <a class="go-on-duty button">
+            Go on Duty
+        </a>
+    </div>
+<% } %>

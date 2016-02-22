@@ -7,99 +7,62 @@
     color: white;
     background-color: $primary-color;
     margin-bottom: 5px;
-
-    .ta-count {
-        color: white;
-        font-weight: bold;
-        position: relative;
-        top: -3px;
-        left: 0px;
-        margin-left: 0px;
-    }
-
-    .show-tas > i > .ta-count {
-        top: 0px;
-        margin-left: -20px;
-    }
-
-    span {
-        position: relative;
-        margin-left: 15px;
-        top: 2px;
-        transition-property: color;
-        transition-duration: .2s;
-
-
-        &:hover {
-            color: #C1D2DE;
-            cursor: pointer;
-        }
-    }
 }
 
-.ta-overlay-container {
-    @include card;
+.ta-section-title {
+    background-color: $secondary-color;
+}
 
+.ta-grid {
     display: flex;
-    align-content: space-around;
-    flex-wrap: wrap;
+    align-content: flex-wrap;
+    justify-content: flex-start;
+    flex-flow: row wrap;
+    width: 100%;
 
-    position: absolute;
-    width: 60%;
+    margin-bottom: 5px;
+}
 
-    margin: auto;
-    margin-left: 0px;
-    padding: 10px;
-
-    z-index: 999;
+.ta-card {
+    @include card;
+    padding: 5px 10px;
     list-style: none;
-    background-color: $primary-color;
-    animation: display-tas .3s ease-in-out;
+    margin-bottom: 5px;
+    margin-right: 0px;
+    width: 100%;
 
-    &.hidden {
-        display: none;
-        animation: display-tas .3s ease-in-out reverse;
+    @include breakpoint( large up ) {
+        width: 50%;
     }
 
-    .ta-card {
-        @include card;
-        background-color: gray;
-        padding: 5px 10px;
-        margin: auto;
-        margin-top: 3px;
-        margin-left: 10px;
+    .name-info {
+        text-align: center;
+        h4 {
+            margin-bottom: 2px;
+        }
+    }
+
+    .personal-blurb {
+        margin-top: 6px;
+    }
+
+    .personal-info {
+        float: left;
+        margin-right: 5px;
+
+        .personal-blurb {
+            word-break: break-word;
+        }
 
         .name-info {
+            margin-top: 2px;
             text-align: center;
         }
 
-        .on-duty {
-            color: green;
-        }
-        
         img {
             border-radius: 50%;
             width: 100px;
             height: 100px;
         }
-    }
-
-}
-
-@keyframes display-tas {
-    0% {
-        display: none;
-        opacity: 0;
-    }
-    1% {
-        display: block;
-        opacity: 0;
-        transform: translateY(-1000px);
-        /* transform: scale(1, 0); */
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-        /* transform: scale(1); */
     }
 }

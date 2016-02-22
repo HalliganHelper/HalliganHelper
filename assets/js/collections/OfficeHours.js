@@ -1,15 +1,11 @@
-app = typeof app !== "undefined" ? app : {};
+var CourseDependentCollection = require( './CourseDependentCollection' );
+var OfficeHour = require( './../models/OfficeHour' );
 
-app.OfficeHours = Backbone.TastypieCollection.extend({
-    model: app.OfficeHour,
-    initialize: function(initialModels, options) {
-        this.coursePk = options.coursePk; 
-    },
+var OfficeHours = CourseDependentCollection.extend({
+    model: OfficeHour,
     url: function() {
-        return '/api/v2/officehour/?course=' + this.coursePk;
+        return '/api/v3/school/courses/' + this.course.get( 'id' ) + '/officehours/';
     },
-    comparator: function (collection) {
-        return collection.get('end_time');
-    }
 });
 
+module.exports = OfficeHours;

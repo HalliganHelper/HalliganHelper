@@ -1,12 +1,7 @@
-var Backbone = require('backbone');
+var DRFModel = require( './DRFModel' );
 
-var Course = Backbone.Model.extend({
-    urlRoot: '/api/v3/school/courses',
-    save: function() {
-        /* noop for courses, since they can't be changed */
-    },
-    initialize: function( attributes, options ) {},
-});
+var Course = DRFModel.extend( {
+    urlRoot: '/api/v3/school/courses/',
+} );
 
 module.exports = Course;
-

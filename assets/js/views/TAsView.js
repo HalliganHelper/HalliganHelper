@@ -2,17 +2,18 @@ var Backbone = require('backbone');
 var _ = require('underscore');
 var $ = require('jquery');
 
-var TAs = require('./../models/TA');
+var TAView = require( './TAView' );
 
 var TAsView = Backbone.View.extend({
-    className: 'ta-overlay',
-    template: _.template( require( './../templates/ta-overlay-template' ) ),
+    className: 'ta-grid',
     initialize: function( options ) {
-        this.listenTo( this.collection, 'change reset', this.render );
+        this.listenTo( this.collection, 'reset', this.render );
+        this.listenTo( this.collection, 'add', this.renderTA );
     },
     renderTA: function( ta ) {
-        this.$el.append( this.template( ta.attributes ) );
-    }, 
+        var taView = new TAView( { model: ta } );
+        this.$el.append( taView.render().$el );
+    },
     render: function() {
         this.$el.empty();
         this.collection.each( this.renderTA, this );

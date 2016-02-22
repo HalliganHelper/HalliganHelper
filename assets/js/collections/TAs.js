@@ -1,23 +1,12 @@
-var Backbone = require('backbone');
-var _ = require('underscore');
-var $ = require('jquery');
-
+var CourseDependentCollection = require( './CourseDependentCollection' );
 var TA = require('./../models/TA');
 
-var TAs = Backbone.Collection.extend({
+var TAs = CourseDependentCollection.extend({
     model: TA,
 
-    initialize: function( initialModels, options ) {
-        this.listenTo( this, 'resetCourse', this.resetCourse );
-    },
-    resetCourse: function( resetCourseID ) {
-        this.courseID = resetCourseID;
-        this.fetch( { reset: true } );
-    },
     url: function() {
-        return '/api/v3/school/courses/' + this.courseID + '/tas/';
+        return '/api/v3/school/courses/' + this.course.get( 'id' ) + '/tas/';
     }
-    
 });
 
 module.exports = TAs;

@@ -1,0 +1,70 @@
+.go-on-duty {
+    label {
+        text-align: left;
+    }
+
+    select {
+        width: 49%;
+    }
+
+    .error-message {
+        float: none;
+    }
+
+    .error input, .error select {
+        margin-bottom: 0px; 
+    }
+
+    .submission-error {
+        color: darkred;
+        margin-top: 2px;
+        margin-bottom: 2px;
+    }
+}
+
+.oh-grid {
+    display: flex;
+    align-content: flex-wrap;
+    justify-content: flex-start;
+    flex-flow: row wrap;
+    width: 100%;
+
+    margin-bottom: 5px;
+}
+
+.oh-card {
+    @include card;
+    padding: 5px 10px;
+    list-style: none;
+    margin-bottom: 5px;
+    margin-right: 0px;
+    text-align: center;
+
+    width: 100%;
+    @include breakpoint( medium up ) {
+        width: 50%;
+    }
+
+    @include breakpoint( large up ) {
+        width: 33.3%;
+    }
+
+    .headshot {
+        float: left;
+        margin-right: 5px;
+    }
+
+    .end-time {
+        margin-bottom: 5px;
+    }
+
+    img {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+    }
+
+    h4 {
+        margin-bottom: 2px;
+    }
+}

@@ -10,7 +10,12 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from rest_framework import views, viewsets, mixins, status
+from rest_framework import (
+    views,
+    viewsets,
+    mixins,
+    status,
+)
 from rest_framework.exceptions import NotFound, NotAuthenticated, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import list_route, parser_classes
@@ -26,12 +31,24 @@ from ..models import (School, Course, Request,
 
 from ..utils import publish_message
 
-from .serializers import (SchoolSerializer, CourseSerializer,
-                          RequestSerializer, RequestorSerializer,
-                          OfficeHourSerializer, UserSerializer,
-                          RegistrationSerializer, LoginSerializer)
+from .serializers import (
+    SchoolSerializer,
+    CourseSerializer,
+    RequestSerializer,
+    RequestorSerializer,
+    OfficeHourSerializer,
+    UserSerializer,
+    RegistrationSerializer,
+    LoginSerializer,
+    TASerializer,
 
-from .permissions import RequestPermission, OwnSchoolPermission
+)
+
+from .permissions import (
+    RequestPermission,
+    OwnSchoolPermission,
+    OfficeHourPermission
+)
 
 logger = logging.getLogger(__name__)
 
@@ -168,14 +185,18 @@ class RequestViewSet(CreateModelWithRequestMixin,
 
 class OfficeHourViewSet(CreateModelWithRequestMixin,
                         mixins.UpdateModelMixin,
+                        mixins.DestroyModelMixin,
                         viewsets.ReadOnlyModelViewSet):
     serializer_class = OfficeHourSerializer
     queryset = OfficeHour.objects.all()
-    permission_classes = (OwnSchoolPermission,)
+    permission_classes = (
+        OwnSchoolPermission,
+        OfficeHourPermission,
+    )
 
     def get_queryset(self):
         queryset = super(OfficeHourViewSet, self).get_queryset()
-        return queryset.filter(end_time__gte=timezone.now())
+        return queryset.filter(end_time__gt=timezone.now())
 
     def perform_create_with_request(self, serializer, request):
         course = request.data['course']
@@ -184,7 +205,7 @@ class OfficeHourViewSet(CreateModelWithRequestMixin,
 
     def list(self, request, course_pk=None):
         queryset = self.get_queryset().filter(course=course_pk)
-        serializer = OfficeHourSerializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)
 
@@ -192,7 +213,7 @@ class OfficeHourViewSet(CreateModelWithRequestMixin,
         office_hour = get_object_or_404(self.get_queryset(),
                                         pk=pk,
                                         course=course_pk)
-        serializer = OfficeHourSerializer(office_hour)
+        serializer = self.get_serializer(office_hour)
 
         return Response(serializer.data)
 
@@ -203,9 +224,19 @@ class OfficeHourViewSet(CreateModelWithRequestMixin,
         request.data['course'] = course
         return super(OfficeHourViewSet, self).create(request, course_pk)
 
+    def destroy(self, request, pk=None, course_pk=None, **kwargs):
+        office_hour = get_object_or_404(OfficeHour.objects.all(), pk=pk)
+
+        now = timezone.now()
+        if office_hour.end_time >= now:
+            office_hour.end_time = now
+            office_hour.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class TAViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = RequestorSerializer
+    serializer_class = TASerializer
     queryset = Student.objects.none()
     permission_classes = (OwnSchoolPermission,)
 
@@ -215,14 +246,14 @@ class TAViewSet(viewsets.ReadOnlyModelViewSet):
                                      'user__last_name',
                                      'user__first_name')
 
-        serializer = RequestorSerializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None, course_pk=None):
         queryset = Course.objects.get(pk=course_pk).tas.filter(ta__active=True)
         ta = get_object_or_404(queryset, pk=pk)
 
-        serializer = RequestorSerializer(ta)
+        serializer = self.get_serializer(ta)
         return Response(serializer.data)
 
 
@@ -231,14 +262,40 @@ class UserViewSet(viewsets.ViewSet):
     queryset = CustomUser.objects.none()
     SEND_ACTIVATION_EMAIL = getattr(settings, 'SEND_ACTIVATION_EMAIL', True)
 
+    def get_queryset(self):
+        return CustomUser.objects.none()
+
+    def get_serializer(self, *args, **kwargs):
+        context = {
+            'request': self.request
+        }
+
+        kwargs['context'] = context
+
+        return UserViewSet.serializer_class(*args, **kwargs)
+
     def list(self, request):
         user = request.user
         if not user.is_authenticated() or not user.is_active:
             raise NotAuthenticated
         return Response(UserSerializer(user).data)
 
-    def get_queryset(self):
-        return CustomUser.objects.none()
+    def patch(self, request):
+        user = CustomUser.objects.get(pk=request.user.pk)
+
+        user.student.blurb = request.data.get('blurb', user.student.blurb)
+        serializer = self.get_serializer(user,
+                                         data={'blurb': user.student.blurb})
+        serializer.is_valid(raise_exception=True)
+
+        user.student.save()
+        user.save()
+        user.student.refresh_from_db()
+        user.refresh_from_db()
+
+        logger.debug(user.student.blurb)
+
+        return Response(self.get_serializer(user).data)
 
     @list_route(methods=['post'])
     def login(self, request):
@@ -247,7 +304,7 @@ class UserViewSet(viewsets.ViewSet):
 
         serializer.is_valid(raise_exception=True)
 
-        return Response(UserSerializer(request.user).data)
+        return Response(self.get_serializer(request.user).data)
 
     @list_route(methods=['post'])
     def logout(self, request):
@@ -268,7 +325,7 @@ class UserViewSet(viewsets.ViewSet):
 
         request.user.student.headshot = photo
         request.user.student.save()
-        return Response(UserSerializer(request.user).data)
+        return Response(self.get_serializer(request.user).data)
 
     @list_route(methods=['post'])
     def register(self, request):

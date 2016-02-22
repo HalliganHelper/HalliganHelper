@@ -91,16 +91,47 @@ class RegistrationSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     headshot_url = serializers.ImageField(source='student.headshot',
                                           read_only=True)
+    blurb = serializers.CharField(source='student.blurb')
+    ta_jobs = serializers.SerializerMethodField()
+
+    def get_ta_jobs(self, user):
+        jobs = TA.objects.filter(student=user.student, active=True)
+        return jobs.values_list('pk', flat=True)
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'headshot_url',)
+        fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'headshot_url',
+            'ta_jobs',
+            'blurb',
+        )
+
+        read_only_fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'headshot_url',
+            'ta_jobs',
+        )
 
 
 class CourseSerializer(serializers.ModelSerializer):
     identifier = serializers.CharField(source='get_identifier')
     active_ta_count = serializers.SerializerMethodField()
     current_request_count = serializers.SerializerMethodField()
+    am_a_ta = serializers.SerializerMethodField()
+
+    def get_am_a_ta(self, course):
+        request = self.context.get('request', None)
+        if request is None:
+            return False
+
+        return TA.objects.filter(active=True,
+                                 course=course,
+                                 student=request.user.student).exists()
 
     def get_active_ta_count(self, course):
         return OfficeHour.objects.filter(course=course,
@@ -115,11 +146,16 @@ class CourseSerializer(serializers.ModelSerializer):
         return requests.count()
 
 
-
     class Meta:
         model = Course
-        fields = ('id', 'name', 'identifier',
-                  'active_ta_count', 'current_request_count',)
+        fields = (
+            'id',
+            'name',
+            'identifier',
+            'active_ta_count',
+            'current_request_count',
+            'am_a_ta',
+        )
 
 
 class RequestorSerializer(serializers.ModelSerializer):
@@ -130,15 +166,95 @@ class RequestorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = ('id', 'headshot_url', 'first_name', 'last_name',)
+        fields = (
+            'id',
+            'headshot_url',
+            'first_name',
+            'last_name',
+        )
+
+
+class TASerializer(serializers.ModelSerializer):
+    headshot_url = serializers.ImageField(source='headshot',
+                                          read_only=True)
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+
+    is_me = serializers.SerializerMethodField()
+
+    on_duty = serializers.SerializerMethodField()
+
+    def get_is_me(self, student):
+        request = self.context.get('request', None)
+        if request is None:
+            logger.error('Null context passed to RequestoSerializer')
+            return False
+
+        return request.user.pk == student.user.pk
+
+    def get_on_duty(self, student):
+        office_hours = OfficeHour.objects.filter(ta=student,
+                                                 end_time__lte=now())
+        return office_hours.exists()
+
+    class Meta:
+        model = Student
+        fields = (
+            'id',
+            'headshot_url',
+            'first_name',
+            'last_name',
+            'is_me',
+            'on_duty',
+            'blurb',
+        )
 
 
 class OfficeHourSerializer(serializers.ModelSerializer):
     ta = RequestorSerializer(read_only=True)
 
+    is_me = serializers.SerializerMethodField()
+
+    def validate(self, data):
+        request = self.context.get('request', None)
+        if request is None:
+            logger.warning('No request provided to validator')
+            return data
+
+        current_hours = OfficeHour.objects.filter(end_time__gte=now(),
+                                                  ta=request.user.student)
+        if current_hours.exists():
+            course = current_hours.first().course.get_identifier()
+            msg = "You're already on duty for {}".format(course)
+            raise serializers.ValidationError(msg)
+
+        return data
+
+
+    def validate_end_time(self, end_time):
+        if end_time <= now():
+            raise serializers.ValidationError('This needs to be in the future')
+
+        return end_time
+
+    def get_is_me(self, officehour):
+        request = self.context.get('request', None)
+        if request is None:
+            logger.warning("No request in context for officehour")
+            return False
+
+        return officehour.ta == request.user.student
+
     class Meta:
         model = OfficeHour
-        fields = ('id', 'location', 'start_time', 'end_time', 'ta',)
+        fields = (
+            'id',
+            'location',
+            'start_time',
+            'end_time',
+            'ta',
+            'is_me',
+        )
 
 
 class RequestSerializer(serializers.ModelSerializer):

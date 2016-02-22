@@ -1,11 +1,10 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
-var $ = require('jquery');
 
 var Request = require('./../models/Request');
 
 var MakeRequestView = Backbone.View.extend({
-    template: _.template( require( './../templates/make-request-template') ),
+    template: _.template( require( './../templates/make-request-template' ) ),
     events: {
         'keyup .problem-input': 'problemChanged',
         'keyup .location-input': 'locationChanged',
@@ -56,10 +55,7 @@ var MakeRequestView = Backbone.View.extend({
             'success': _.bind( function( model, response, options ) {
                 this.enableSubmit();
                 this.trigger( 'newRequest', model );
-                this.problemInput.val('');
-                this.locationInput.val('');
-                this.problemCharCount.text( 0 );
-                this.locationCharCount.text( 0 );
+                this.render();
             }, this ),
             'error': _.bind( function( model, response, options ) {
                 this.enableSubmit();
@@ -90,6 +86,8 @@ var MakeRequestView = Backbone.View.extend({
         this.locationCharCount = this.$el.find( '.location-char-count' );
 
         this.helpButton = this.$el.find( '.get-help-button' );
+
+        this.delegateEvents();
 
         return this;
     }

@@ -1,0 +1,22 @@
+<div class="headshot">
+    <img src="<%- ta.headshot_url %>" height="100" width="100"/>
+</div>
+<div class="info">
+    <div class="name-info">
+        <h4>
+            <%- ta.first_name %> <%- ta.last_name %>
+        </h4>
+    </div>
+    <div>
+        <%- location %>
+    </div>
+    <div class="end-time">
+        Off duty <%- moment(end_time).fromNow() %>
+    </div>
+
+    <% if ( is_me ) { %>
+        <div>
+            <a class="secondary button cancel-button">Cancel</a>
+        </div>
+    <% } %>
+</div>

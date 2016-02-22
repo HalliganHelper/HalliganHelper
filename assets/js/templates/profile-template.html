@@ -32,6 +32,14 @@
             </div>
         </div>
     </div>
+    <% if ( ta_jobs.length > 0 ) { %>
+    <div class="columns medium-10 small-12">
+        <textarea maxlength=255 class="user-blurb"><%- blurb %></textarea>
+    </div>
+    <div class="columns medium-2 small-12">
+        <a class="submit-blurb button">Update</a>
+    </div>
+    <% } %>
     <!--
     <div class="columns small-6">
         <div class="row expanded">

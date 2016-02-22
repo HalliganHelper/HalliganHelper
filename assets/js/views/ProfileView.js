@@ -8,6 +8,7 @@ var ProfileView = Backbone.View.extend({
     events: {
         'click .save-image': 'saveImage',
         'click .save-password': 'savePassword',
+        'click .submit-blurb': 'saveBlurb',
         'keydown .original-password': 'checkSubmit',
         'keydown .new-password': 'checkSubmit',
         'keydown .confirm-password': 'checkSubmit',
@@ -37,10 +38,15 @@ var ProfileView = Backbone.View.extend({
         if ( ! Boolean( original ) || ! Boolean( newPassword ) || ! Boolean( confirmPassword ) ) {
         }
     },
+    saveBlurb: function() {
+        var newBlurb = this.$el.find( '.user-blurb' ).val();
+        this.model.save( { 'blurb': newBlurb }, { 'patch': true, 'silent': true } );
+    },
     render: function() {
         /* Create the listener on the first render */
         this.listenTo( this.model, 'change', this.render );
         this.$el.html( this.template( this.model.attributes ) );
+        this.delegateEvents();
         return this;
     }
 });
