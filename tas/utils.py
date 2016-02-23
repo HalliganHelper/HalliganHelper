@@ -16,6 +16,14 @@ redis_broadcast_publisher = RedisPublisher(facility='ta', broadcast=True)
 
 logger = logging.getLogger(__name__)
 
+class InvalidCourseStringError(ValueError):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        msg = 'Course Strings must contain a number. You gave {}'
+        return msg.format(self.value)
+
 
 def notify(user, courses):
     subject = 'TA Status'
@@ -35,75 +43,48 @@ def notify(user, courses):
 
     msg = EmailMultiAlternatives(subject, text_content,
                                  from_email, [to_email])
+
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
 
 
-def _split_course_string(course_string):
-    course_num = ''
-    course_postfix = ''
-
-    count = 0
-    for char, indx in enumerate(course_string):
-        if not char.isdigit():
-            break
-
-        course_num += char
-        count += 1
-
-    course_num = int(course_num)
-    course_postfix = course_string[count:]
-
-    return course_num, course_postfix
-
-
 def _confirm_a_ta(user, course_strings):
     from tas.models import Course, TA
-    # Split the course strings from '150IDS 11' to
-    # [(150, 'IDS'), (11, '')]
-    course_tuples = [
-        _split_course_string(course_string)
-        for course_string in course_strings.split(' ')
-    ]
 
     # Create query objects. Basically means create a bunch of objects that
     # say "number=number AND postfix=postfix"
     #
-    # zip is dope:
-    # http://stackoverflow.com/questions/19339/a-transpose-unzip-function-in-python-inverse-of-zip
-    #
     # Q objects:
     # https://docs.djangoproject.com/es/1.9/topics/db/queries/#complex-lookups-with-q-objects
-    q_objects = [
-        Q(number=number) & Q(postfix=postfix)
-        for number, postfix in zip(*course_tuples)
-    ]
-
+    #
     # OR all of the created Q objects together
     # (number=11 AND postfix='') OR (number=150 AND postfix='IDS')
-    course_query = q_objects[0]
-    for q_object in q_objects[1:]:
-        course_query |= q_object
+    course_query = Q()
+    q_objects = []
+    for course_string in course_strings.split(' '):
+        number, postfix = _split_course_string(course_string)
+        q_obj = Q(number=number) & Q(postfix=postfix)
+        course_query |= q_obj
 
     # Run the query to get the courses
     courses = Course.objects.filter(course_query)
 
     student = user.student
     for course in courses:
-        ta_job = TA.objects.get_or_create(student, course)
+        ta_job, _ = TA.objects.get_or_create(student=student, course=course)
         ta_job.active = True
         ta_job.save()
 
     # Get any existing TA jobs that we didn't just add and set them inactive
     remove_jobs = TA.objects\
-        .filter(student=student).exclude(course__in=course)
+        .filter(student=student).exclude(course__in=courses)
     remove_jobs.update(active=False)
 
     notify(user, courses)
 
 
 def check_ta(user):
-    from tas.models import Course, TA
+    from tas.models import TA
     try:
         # Because apparently having an '@' in the email gives a 403 back from Tufts
         email = user.email.replace('@', ':')
@@ -125,16 +106,15 @@ def check_ta(user):
                 remove_jobs.update(active=False)
                 courses = [job.course for job in remove_jobs.all()]
                 notify(user, courses)
-    except:
-        logger.exception('Failed to check TA status for %s. Courses: %s',
+
+            return False
+    except Exception:
+        # intentionally catch everything. If it failed, log and continue
+        logger.exception('Failed to set status for %s. Courses: %s',
                          user.email, course_strings)
         return False
 
     return True
-
-
-def get_school_admin_group_name(school_name):
-    return '{} Admins'.format(school_name)
 
 
 def get_administrators_for_school(school):
@@ -143,6 +123,45 @@ def get_administrators_for_school(school):
     group_admins = Group.objects\
         .prefetch_related('user_set').get(name=group_name).user_set.all()
     return group_admins | user_model.objects.filter(pk=school.administrator.pk)
+
+
+def get_school_admin_group_name(school_name):
+    return '{} Admins'.format(school_name)
+
+
+def _split_course_string(course_string):
+    """ Split the course string in to a course number and a course postfix
+    Expects all strings to be in the format numpostfix. For instance,
+    '50CP' and '150IDS' are valid. The postfix is allowed to be empty: '11' is
+    a valid course string. The number, however, must be present: 'IDS' is not
+    a valid course string. Only the first numbers are parsed as the course
+    number: '11A7B12' will be parsed as course_num = 11, postfix = 'A7B12'
+
+    :param str course_string: The course string to parse
+
+    :returns: `(course_num, course_postfix)`
+
+    :raises: InvalidCourseStringError
+    """
+    course_num = ''
+    course_postfix = ''
+
+    count = 0
+    for indx, char in enumerate(course_string):
+        if not char.isdigit():
+            break
+
+        course_num += char
+        count += 1
+    try:
+        course_num = int(course_num)
+    except ValueError:
+        logger.exception('Got an invalid course string: %s', course_string)
+        raise InvalidCourseStringError(course_string)
+
+    course_postfix = course_string[count:]
+
+    return course_num, course_postfix
 
 
 def publish_message(message_type, data=None, publisher=None):
