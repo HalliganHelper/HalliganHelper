@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% load render_bundle from webpack_loader %}
+{% block styles %}
+    {% render_bundle 'main' 'css' %}
+{% endblock %}
 
 {% block endscripts %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.1/moment.min.js"></script>
-    {% render_bundle 'main' %}
+    {% render_bundle 'main' 'js' %}
 {% endblock %}

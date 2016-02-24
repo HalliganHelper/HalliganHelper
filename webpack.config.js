@@ -2,16 +2,19 @@ var path = require("path");
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var AppCachePlugin = require('appcache-webpack-plugin');
+var ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
 module.exports = {
     context: __dirname,
 
-    entry: './assets/js/app', // entry point of our app. assets/js/index.js should require other js modules and dependencies it needs
+    entry: './assets/js/app', 
 
     output: {
         path: path.resolve('./assets/bundles/'),
         filename: "[name]-[hash].js",
     },
+
+    devtool: 'source-map',
 
     plugins: [
         new BundleTracker({filename: './webpack-stats.json'}),
@@ -24,13 +27,21 @@ module.exports = {
             'jQuery': 'jquery',
             'window.jQuery': 'jquery',
         }),
+        new webpack.optimize.UglifyJsPlugin({
+            'compress': {
+                'warnings': false,    
+            },
+            'screw-ie8': true,
+            'no-copyright': true,
+        }),
+        new ExtractTextPlugin( '[name]-[hash].css' ),
     ],
 
     module: {
         loaders: [
             { test: /\.scss$/, 
               exclude: /node_modules/, 
-              loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
+              loader: ExtractTextPlugin.extract( 'style', 'css!resolve-url!sass?sourceMap' ),
             },
             { test: /\.woff$/, 
               exclude: /node_modules/, 
