@@ -3,6 +3,7 @@ var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var AppCachePlugin = require('appcache-webpack-plugin');
 var ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+var autoprefixer = require( 'autoprefixer' );
 
 module.exports = {
     context: __dirname,
@@ -41,7 +42,7 @@ module.exports = {
         loaders: [
             { test: /\.scss$/, 
               exclude: /node_modules/, 
-              loader: ExtractTextPlugin.extract( 'style', 'css!resolve-url!sass?sourceMap' ),
+              loader: ExtractTextPlugin.extract( 'style', 'css!resolve-url!sass?sourceMap!postcss' ),
             },
             { test: /\.woff$/, 
               exclude: /node_modules/, 
@@ -65,6 +66,12 @@ module.exports = {
             }
         ],
     },
+    postcss: [
+        autoprefixer({
+            'browsers': [ 'last 2 versions' ],
+            'remove': false,
+        }),
+    ],
 
     resolve: {
         modulesDirectories: ['node_modules'],
