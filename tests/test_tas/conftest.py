@@ -21,6 +21,7 @@ def test_user(django_user_model, test_school):
 
     return user
 
+
 @pytest.fixture
 def test_school(django_user_model):
     from tas.models import School, SchoolEmailDomain
@@ -36,3 +37,28 @@ def test_school(django_user_model):
     SchoolEmailDomain.objects.create(domain="sample.com", school=school)
 
     return school
+
+
+@pytest.fixture
+def test_course(test_school):
+    from tas.models import Course
+    course, _ = Course.objects.get_or_create(school=test_school,
+                                             department='TESTS',
+                                             number=1)
+
+    return course
+
+
+@pytest.fixture
+def test_user_ta(django_user_model, test_school, test_course):
+    from tas.models import Student, TA
+    user = django_user_model.objects.create(first_name='first_name',
+                                            last_name='last_name',
+                                            email=random_email(),
+                                            password='password')
+
+    TA.objects.create(student=user.student,
+                      course=test_course,
+                      active=True)
+    return user
+

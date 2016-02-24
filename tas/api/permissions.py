@@ -12,9 +12,15 @@ class OwnSchoolPermission(permissions.IsAuthenticated):
         return student.school == school
 
     def has_permission(self, request, view):
+        is_authed = super(OwnSchoolPermission, self).has_permission(request,
+                                                                    view)
+        if not is_authed:
+            return is_authed
+
         course_pk = view.kwargs.get('course_pk', None)
         if course_pk is None:
             return False
+
         try:
             course = Course.objects.get(pk=course_pk)
         except Course.DoesNotExist:
@@ -23,6 +29,12 @@ class OwnSchoolPermission(permissions.IsAuthenticated):
         return self._is_own_school(request.user.student, course.school)
 
     def has_object_permission(self, request, view, obj):
+        is_authed = super(OwnSchoolPermission, self)\
+            .has_object_permission(request, view, obj)
+
+        if not is_authed:
+            return is_authed
+
         if isinstance(obj, Request):
             return self._is_own_school(request.user.student,
                                        obj.requestor.school)

@@ -1,24 +1,7 @@
 from django.db import IntegrityError
 import pytest
 
-from tas.models import School, SchoolEmailDomain
-
-
-@pytest.fixture
-def user(django_user_model):
-    user, _ = django_user_model.objects.get_or_create(first_name='first_name',
-                                                      last_name='last_name',
-                                                      email='test@example.com',
-                                                      password='password')
-    return user
-
-
-@pytest.fixture
-def school(user):
-    school, _ = School.objects.get_or_create(name='Test School',
-                                             administrator=user,
-                                             max_course_count=10)
-    return school
+from tas.models import SchoolEmailDomain
 
 
 class TestSchoolEmailDomainModel:
@@ -32,13 +15,14 @@ class TestSchoolEmailDomainModel:
         assert str(SchoolEmailDomain._meta.verbose_name_plural) == expected_name
 
     @pytest.mark.django_db
-    def test_creation(self, school):
-        SchoolEmailDomain.objects.create(domain='example.com', school=school)
+    def test_creation(self, test_school):
+        SchoolEmailDomain.objects.create(domain='example.com',
+                                         school=test_school)
 
     @pytest.mark.django_db
-    def test_domains_are_unique(self, school):
+    def test_domains_are_unique(self, test_school):
         with pytest.raises(IntegrityError):
             SchoolEmailDomain.objects.create(domain='example.com',
-                                            school=school)
+                                             school=test_school)
             SchoolEmailDomain.objects.create(domain='example.com',
-                                            school=school)
+                                             school=test_school)
