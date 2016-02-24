@@ -12,6 +12,7 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
     "foundation-sites": "^6.1.2",
+    "git-sha-webpack-plugin": "0.0.6",
     "jquery": "^2.2.0",
     "jquery.cookie": "^1.4.1",
     "moment": "^2.11.1",
