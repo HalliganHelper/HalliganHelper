@@ -73,9 +73,9 @@ var SchoolView = Backbone.View.extend({
         }, this ) );
 
         router.on( 'route:logout', _.bind( function() {
-            this.model.logout( {
+            this.user.logout( {
                 'success': function() {
-                    router.navigate('/'); 
+                    location.replace('/');
                 } 
             } ); 
         }, this) );

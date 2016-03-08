@@ -59,18 +59,20 @@ var User = Backbone.Model.extend( {
         var logoutUrl = this.url + 'logout/';
 
         var errorFunc = _.isFunction( options.error ) ? options.error : this.noop;
-        function successFunc( model, response, options ) {
-            model.trigger( 'loggedOut' );
-
+        function successFunc() {
             if ( _.isFunction( options.success ) ) {
-                return options.success( model, response, options );
+                return options.success( arguments );
             }
         }
 
-        this.save( 
-                   {}, 
-                   { 'url': logoutUrl, 'success': successFunc, 'error': errorFunc } 
-                 );
+        this.save( {}, 
+                { 
+                    'url': logoutUrl, 
+                    'success': successFunc, 
+                    'error': errorFunc,
+                    'type': 'POST',
+                    'silent': true,
+                } );
     },
     setPhoto: function( photo, options ) {
         options = options || {};
