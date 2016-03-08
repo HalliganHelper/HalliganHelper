@@ -1,7 +1,5 @@
 import logging
-import json
 from datetime import timedelta
-from collections import defaultdict
 
 from django.contrib.auth import logout
 from django.conf import settings
@@ -16,10 +14,9 @@ from rest_framework import (
     mixins,
     status,
 )
-from rest_framework.exceptions import NotFound, NotAuthenticated, ParseError
+from rest_framework.exceptions import NotAuthenticated, ParseError
 from rest_framework.response import Response
-from rest_framework.decorators import list_route, parser_classes
-from rest_framework.parsers import FileUploadParser
+from rest_framework.decorators import list_route
 
 from registration.models import RegistrationProfile
 
@@ -35,7 +32,6 @@ from .serializers import (
     SchoolSerializer,
     CourseSerializer,
     RequestSerializer,
-    RequestorSerializer,
     OfficeHourSerializer,
     UserSerializer,
     RegistrationSerializer,
