@@ -108,7 +108,7 @@ label.overlay {
     display: none;
 }
 
-@include breakpoint( medium down ) {
+@include breakpoint( small only ) {
     .mobile-nav {
         display: inherit;
         margin-bottom: 50px;
