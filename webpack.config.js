@@ -4,7 +4,6 @@ var BundleTracker = require('webpack-bundle-tracker');
 var AppCachePlugin = require('appcache-webpack-plugin');
 var ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 var autoprefixer = require( 'autoprefixer' );
-var GitSHAPlugin = require('git-sha-webpack-plugin');
 
 module.exports = {
     context: __dirname,
@@ -13,7 +12,7 @@ module.exports = {
 
     output: {
         path: path.resolve('./assets/bundles/'),
-        filename: "[name]-[chunkgitsha].js",
+        filename: "[name]-[hash].js",
     },
 
     devtool: 'source-map',
@@ -36,8 +35,7 @@ module.exports = {
             'screw-ie8': true,
             'no-copyright': true,
         }),
-        new ExtractTextPlugin( '[name]-[chunkgitsha].css' ),
-        new GitSHAPlugin( { 'shaLength': 20 } ),
+        new ExtractTextPlugin( '[name]-[hash].css' ),
     ],
 
     module: {
