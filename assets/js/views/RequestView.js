@@ -19,7 +19,6 @@ var RequestView = Backbone.View.extend({
     },
 
     removeView: function() {
-        console.log( 'Removing view for ', this.model.get( 'id' ) );
         var transitionFinishedEvents = 'transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd';
         this.model.trigger( 'destroy' );
         /*

@@ -56,7 +56,7 @@ var CourseView = Backbone.View.extend({
         } );
     },
     initListeners: function() {
-        this.listenTo( this.course, 'change:name', this.render );
+        this.listenTo( this.course, 'sync', this.render );
         this.listenTo( this.makeRequestView, 'newRequest', this.newRequest );
         this.listenTo( this.webSocketHandler, 
                        'request_created request_updated', 
