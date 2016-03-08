@@ -15,7 +15,6 @@ var ProfileView = Backbone.View.extend({
         'change .new-photo-field': 'photoChanged',
     },
     photoChanged: function() {
-        console.log( 'Photo changed!' );
         var hasPhoto = Boolean( this.$el.find( '.new-photo-field' ).val() );
         this.$el.find( '.save-image' ).prop( 'disabled', ! hasPhoto );
     },

@@ -1,4 +1,4 @@
-var Backbone = require('backbone');
+var Backbone = require( 'backbone' );
 var _ = require('underscore');
 var $ = require('jquery');
 
@@ -18,8 +18,10 @@ var utils = require( './../components/utils' );
 
 var CourseView = Backbone.View.extend({
     template: _.template( require( './../templates/course-template' ) ),
+    loadingTemplate: _.template( require( './../templates/loading-template' ) ),
 
     initialize: function( options ) {
+
         this.user = options.user;
         this.webSocketHandler = options.webSocketHandler;
         this.course = new Course();
@@ -27,6 +29,7 @@ var CourseView = Backbone.View.extend({
         this.initCollections();
         this.initSubViews();
         this.initListeners();
+
     },
     initCollections: function() {
         this.requests = new Requests( [], { 'course': this.course } );
@@ -66,6 +69,7 @@ var CourseView = Backbone.View.extend({
             this.course.fetch( { 'reset': true } );
             this.delegateEvents();
         }, this ) );
+        this.listenTo( this.course, 'request', this.renderLoading );
     },
     newWebSocketRequest: function( data ) {
         if ( data.course != this.course.get('id' ) ) {
@@ -89,6 +93,11 @@ var CourseView = Backbone.View.extend({
     },
     newRequest: function( request ) {
         this.requests.add( request );
+    },
+    renderLoading: function( model ) {
+        /* If this event is propagated from an inner model, ignore it */
+        if ( model !== this.course ) return;
+        this.$el.html( this.loadingTemplate() );
     },
     render: function() {
         this.$el.html( this.template( this.course.attributes ) );

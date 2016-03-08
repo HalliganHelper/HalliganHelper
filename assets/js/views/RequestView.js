@@ -19,17 +19,18 @@ var RequestView = Backbone.View.extend({
     },
 
     removeView: function() {
-        var view = this;
+        console.log( 'Removing view for ', this.model.get( 'id' ) );
         var transitionFinishedEvents = 'transitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd';
         this.model.trigger( 'destroy' );
+        /*
         this.$el.addClass( 'cancelled' )
             .on( transitionFinishedEvents, function() {
                 $(this).height($(this).height());
-                $(this).height(0).css({'margin':'0'}).on( transitionFinishedEvents, function() {
-                    // $(this).css({'display': 'none'});
-                    view.remove();
-                } );
+                $(this).height(0).css({'margin':'0'}).on( transitionFinishedEvents, _.bind( function() {
+                    this.remove();
+                }, this ) );
             } );
+            */
     },
     editedRequest: function( e ) {
         if ( e.keyCode == 13 ) {

@@ -9,6 +9,7 @@ var LoginView = require('./views/LoginView');
 var User = require('./models/User');
 var School = require('./models/School');
 
+var Backbone = require( 'backbone' );
 
 Utils.ajaxSetup();
 var user = new User();

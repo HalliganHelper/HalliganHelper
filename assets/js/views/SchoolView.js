@@ -40,7 +40,6 @@ var SchoolView = Backbone.View.extend({
         this.model.courses.get( { 'id': data.course } ).fetch();
     },
     requestCheckedOut: function( data ) {
-        console.log( data );
         msg = data.checked_out_by + ' to the rescue!';
         options = {
             'icon': data.headshot,
@@ -62,7 +61,7 @@ var SchoolView = Backbone.View.extend({
 
         router.on( 'route:course', _.bind(function( id ) {
             this.courseView.trigger( 'newCourse', Number( id ) );
-            this.mainContent.html( this.courseView.render().$el );
+            this.mainContent.html( this.courseView.$el );
         }, this ) );
     
         router.on( 'route:dashboard', _.bind( function() {

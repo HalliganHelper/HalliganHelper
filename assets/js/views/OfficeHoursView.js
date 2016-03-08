@@ -1,5 +1,6 @@
-var Backbone = require('backbone');
-var _ = require('underscore');
+var Backbone = require( 'backbone' );
+var _ = require( 'underscore' );
+
 var moment = require( 'moment' );
 
 var OfficeHourView = require( './OfficeHourView' );
@@ -8,6 +9,7 @@ var OfficeHour = require( './../models/OfficeHour' );
 var OfficeHoursView = Backbone.View.extend({
     className: 'oh-grid',
     template: _.template( require( './../templates/office-hours-template' ) ),
+    loadingTemplate: _.template( require( './../templates/loading-template' ) ),
 
     events: {
         'click .button': 'goOnDuty',
@@ -19,8 +21,9 @@ var OfficeHoursView = Backbone.View.extend({
         this.course = options.course;
         this.listenTo( this.collection, 'add', this.renderOfficeHour );
         this.listenTo( this.collection, 'reset', this.render );
+        this.listenTo( this.collection, 'request', this.renderLoading );
     },
-
+    
     inputChanged: function( e ) {
         $( e.target ).parents( 'label' ).removeClass( 'error' );
         this.submitButton.removeAttr( 'disabled' );
@@ -74,6 +77,11 @@ var OfficeHoursView = Backbone.View.extend({
                 }
             }, this )
         } );
+    },
+    renderLoading: function( collection ) {
+        /* If this event is propagated from an inner model, ignore it */
+        if ( collection !== this ) return;
+        this.$el.html( this.loadingTemplate() );
     },
     renderOfficeHour: function( officeHour ) {
         var ohView = new OfficeHourView( { 'model': officeHour } );
