@@ -21,7 +21,7 @@ module.exports = {
         new BundleTracker({filename: './webpack-stats.json'}),
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
         new AppCachePlugin({
-            output: 'manifest.appcache'
+            output: 'manifest.appcache',
         }),
         new webpack.ProvidePlugin({
             '$': 'jquery',
@@ -62,8 +62,19 @@ module.exports = {
             },
             { test: /\.html$/,
               exclude: /node_modules/,
-              loader: 'raw'
-            }
+              loader: 'html'
+            },
+            /*
+            { test: /\.(jpe?g|png|gif)$/i,
+              loaders: [
+                'file?hash=sha512&digest=hex&name=[hash].[ext]',
+                'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false',
+              ],
+            },
+            */
+            { test: /\.(jpe?g|png|gif)$/i,
+                loader: 'url?limit=5000&name=img/img-[hash:6].[ext]',
+            },
         ],
     },
     postcss: [
