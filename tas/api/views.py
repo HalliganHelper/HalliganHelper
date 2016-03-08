@@ -170,7 +170,10 @@ class RequestViewSet(CreateModelWithRequestMixin,
         })
 
         # If the request was checked out, tell the student
-        if updated.data['checked_out'] and not updated.data['solved']:
+        solved = updated.data['solved']
+        checked_out = updated.data['checked_out']
+        cancelled = updated.data['cancelled']
+        if checked_out and not (cancelled or solved):
             student = Student.objects.get(pk=updated.data['requestor']['id'])
             student_username = student.user.email
             checked_out_by = self.request.user
