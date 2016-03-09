@@ -142,7 +142,10 @@ class RequestViewSet(CreateModelWithRequestMixin,
             'id': created.data['id']
         }
 
-        publish_message('request_created', data)
+        publish_message('request_created', {
+            'course': course.pk,
+            'id': created.data['id']
+        })
 
         return created
 
@@ -221,7 +224,14 @@ class OfficeHourViewSet(CreateModelWithRequestMixin,
 
         course = get_object_or_404(Course, pk=course_pk, school=school)
         request.data['course'] = course
-        return super(OfficeHourViewSet, self).create(request, course_pk)
+
+        created = super(OfficeHourViewSet, self).create(request, course_pk)
+        publish_message('on_duty', {
+            'course': course_pk,
+            'id': created.data['id'],
+        })
+
+        return created
 
     def destroy(self, request, pk=None, course_pk=None, **kwargs):
         office_hour = get_object_or_404(OfficeHour.objects.all(), pk=pk)
@@ -230,6 +240,11 @@ class OfficeHourViewSet(CreateModelWithRequestMixin,
         if office_hour.end_time >= now:
             office_hour.end_time = now
             office_hour.save()
+
+        publish_message('off_duty', {
+            'course': course_pk,
+            'id': office_hour.pk,
+        })
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

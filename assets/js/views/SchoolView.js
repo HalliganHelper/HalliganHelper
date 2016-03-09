@@ -32,7 +32,7 @@ var SchoolView = Backbone.View.extend({
         this.router = this.initRouter();
         this.initWebSocketListeners();
     },
-    requestAdded: function( data ) {
+    updateDashboard: function( data ) {
         /* 
          * When we receive a request, update the course request count
          * so that the dashboard stays valid
@@ -49,8 +49,8 @@ var SchoolView = Backbone.View.extend({
     },
     initWebSocketListeners: function() {
         this.listenTo( this.webSocketHandler, 
-                       'request_created', 
-                       _.bind( this.requestAdded, this ) );
+                       'request_created request_removed on_duty off_duty', 
+                       _.bind( this.updateDashboard, this ) );
 
         this.listenTo( this.webSocketHandler,
                        'checked_out',

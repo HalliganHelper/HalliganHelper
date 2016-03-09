@@ -4,6 +4,7 @@ var $ = require('jquery');
 
 var Course = require('./../models/Course');
 var Request = require('./../models/Request');
+var OfficeHour = require('./../models/OfficeHour');
 
 var Requests = require('./../collections/Requests');
 var TAs = require('./../collections/TAs');
@@ -64,6 +65,12 @@ var CourseView = Backbone.View.extend({
         this.listenTo( this.webSocketHandler,
                        'request_removed',
                        this.removeWebSocketRequest );
+        this.listenTo( this.webSocketHandler,
+                       'on_duty',
+                       this.newWebSocketOfficeHour );
+        this.listenTo( this.webSocketHandler,
+                       'off_duty',
+                       this.removeWebSocketOfficeHour );
         this.listenTo( this, 'newCourse', _.bind( function( courseID ) {
             this.course.set( 'id', courseID );
             this.course.fetch( { 'reset': true } );
@@ -88,6 +95,29 @@ var CourseView = Backbone.View.extend({
         }
         try {
             this.requests.get( data.id ).trigger( 'destroy' );
+        } catch ( e ) {
+        }
+    },
+    newWebSocketOfficeHour: function( data ) {
+        if ( data.course != this.course.get('id' ) ) {
+           return; 
+        }
+
+        var officeHour = new OfficeHour( { 'id': data.id }, { 'course': this.course } );
+        officeHour.fetch( {
+            'success': _.bind( function( model ) {
+                this.officeHours.add( model, { 'merge': true } );
+            }, this )
+        } );
+
+    },
+    removeWebSocketOfficeHour: function( data ) {
+        if ( data.course != this.course.get('id' ) ) {
+           return; 
+        }
+        
+        try {
+            this.officeHours.get( data.id ).trigger( 'destroy' );
         } catch ( e ) {
         }
     },
