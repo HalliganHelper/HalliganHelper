@@ -1,3 +1,6 @@
+- name: add the vassals folder to the webapps group
+  file: name="/etc/uwsgi/vassals" group=webapps
+
 - name: make directories for halliganhelper
   file: name="/webapps/{{ item }}" state=directory group=webapps owner=hh
   with_items:
