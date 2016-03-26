@@ -146,7 +146,8 @@ DATABASES = {
     }
 }
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER = 'support@halliganhelper.com'
+EMAIL_HOST_USER = 'noreply@halliganhelper.com'
+DEFAULT_FROM_EMAIL = 'support@halliganhelper.com'
 EMAIL_HOST = 'smtp.zoho.com'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
