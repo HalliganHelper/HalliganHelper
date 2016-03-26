@@ -3,10 +3,10 @@ include_ssl: true
 subdomain: dev
 
 # Passwords from vault
-email_password: email_password
-db_password: halliganhelper-pass
-redis_password: 3f4ba08b041e2cb0b4408a0b6be42c0f
-django_secret_key: secret_key
+email_password: "{{ vault_email_password }}"
+db_password: "{{ vault_db_password }}"
+redis_password: "{{ vault_redis_password }}"
+django_secret_key: "{{ vault_django_secret_key }}"
 
 static_root: /webapps/staticfiles/halliganhelper
 media_root: /webapps/mediafiles/halliganhelper
