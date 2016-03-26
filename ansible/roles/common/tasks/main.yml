@@ -18,6 +18,7 @@
     - python-dev
     - supervisor
     - htop
+    - postgresql-server-dev-9.4
   tags: apt
 
 - name: Create webapps group

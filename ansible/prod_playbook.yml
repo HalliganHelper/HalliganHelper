@@ -6,7 +6,7 @@
     - vars/default.yml
     - vars/debug.yml
   roles:
-    - role: common
+    - { role: common, tags: ['common'] }
     - role: DavidWittman.redis
     - role: gdamjan.uwsgi
     - role: ANXS.postgresql
