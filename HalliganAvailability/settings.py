@@ -4,12 +4,14 @@ import os
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), '..')
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-ADMINS = (
+DEBUG = os.environ.get('DEBUG', 'False') == 'False'  # env vars are strings
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
+ALLOWED_HOSTS = ['*']
+
+MANAGERS = ADMINS = (
     ('Tyler Lubeck', 'Tyler@tylerlubeck.com'),
     ('Tyler Lubeck', 'halliganhelper@tylerlubeck.com'),
 )
-
-MANAGERS = ADMINS
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -25,7 +27,7 @@ SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = True
+USE_I18N = False
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale.
@@ -73,9 +75,6 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'HalliganAvailability.urls'
 
-# Using the one defined by Websocket-For-Redis below.
-# WSGI_APPLICATION = 'HalliganAvailability.wsgi.application'
-
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -85,7 +84,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'super_inlines',
     'django.contrib.admin',
-    # 'django.contrib.admindocs',
     'tas',
     'registration',
     'django_extensions',
@@ -109,6 +107,96 @@ CACHES = {
 
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_OPEN = True
+
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+BROKER_URL = 'redis://localhost:6379/0'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 10850}
+
+
+ALLOWED_REGISTRATION_DOMAINS = ('tufts.edu', 'cs.tufts.edu')
+
+# Websocket-for-Redis stuff
+
+INSTALLED_APPS += (
+    'ws4redis',
+)
+
+WEBSOCKET_URL = '/ws/'
+WS4REDIS_PREFIX = 'hh'
+WSGI_APPLICATION = 'ws4redis.django_runserver.application'
+WS4REDIS_HEARTBEAT = '--heartbeat--'
+WS4REDIS_EXPIRE = 0  # Don't hold messages. You see it or you don't.
+WS4REDIS_CONNECTION = {
+    'password': os.environ.get('REDIS_PASSWORD', '')
+}
+
+
+# This is a dummy database setup. You'll need to insert your own
+# database name and passwords
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'halliganhelper',
+        'USER': 'postgres',
+        'PASSWORD': '',
+        'HOST': 'localhost'
+    }
+}
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
+
+# Static Assets
+MEDIA_URL = '/media/'
+media_root_default = os.path.join(os.path.dirname(BASE_DIR), 'mediafiles')
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', media_root_default)
+
+STATIC_URL = '/static/'
+static_root_default = os.path.join(os.path.dirname(BASE_DIR), 'staticfiles')
+STATIC_ROOT = os.environ.get('STATIC_ROOT', static_root_default)
+
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'assets'),
+)
+
+# Django Webpack Loader
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(PROJECT_ROOT, 'webpack-stats.json'),
+    },
+}
+
+INSTALLED_APPS += (
+    'webpack_loader',
+)
+
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Django Rest Framework
+INSTALLED_APPS += (
+    'rest_framework',
+)
+
+DEFAULT_RENDERER_CLASSES = (
+    'rest_framework.renderers.JSONRenderer',
+)
+
+if DEBUG:
+    DEFAULT_RENDERER_CLASSES += (
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+}
+
 
 LOG_FORMAT = '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s'
 LOGGING = {
@@ -162,104 +250,4 @@ LOGGING = {
             'propagate': False
         }
     }
-}
-
-LOGIN_URL = '/'
-LOGIN_REDIRECT_URL = '/'
-BROKER_URL = 'redis://localhost:6379/0'
-BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 10850}
-
-
-ALLOWED_REGISTRATION_DOMAINS = ('tufts.edu', 'cs.tufts.edu')
-
-
-# Websocket-for-Redis stuff
-
-INSTALLED_APPS += (
-    'ws4redis',
-)
-
-WEBSOCKET_URL = '/ws/'
-WS4REDIS_PREFIX = 'hh'
-WSGI_APPLICATION = 'ws4redis.django_runserver.application'
-WS4REDIS_HEARTBEAT = '--heartbeat--'
-WS4REDIS_EXPIRE = 0  # Don't hold messages. You see it or you don't.
-
-
-# This is a dummy database setup. You'll need to insert your own
-# database name and passwords
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'halliganhelper',
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': 'localhost'
-    }
-}
-
-EMAIL_HOST_USER = 'halliganhelper@tylerlubeck.com'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-
-# Static Assets
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = 'mediafiles/'
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'staticfiles')
-
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'assets'),
-)
-
-# Django Webpack Loader
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(PROJECT_ROOT, 'webpack-stats.json'),
-    },
-}
-
-INSTALLED_APPS += (
-    'webpack_loader',
-)
-try:
-    from secret import *
-except ImportError:
-    WS4REDIS_CONNECTION = {
-        'password': ''
-    }
-    DEBUG = False
-    EMAIL_HOST_PASSWORD = ''
-    SECRET_KEY = 'secret_key'
-    ALLOWED_HOSTS = ['*']
-
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-if DEBUG:
-    pass
-    # INSTALLED_APPS += (
-    #     'debug_toolbar',
-    # )
-
-# Django Rest Framework
-INSTALLED_APPS += (
-    'rest_framework',
-)
-
-DEFAULT_RENDERER_CLASSES = (
-    'rest_framework.renderers.JSONRenderer',
-)
-
-if DEBUG:
-    DEFAULT_RENDERER_CLASSES += (
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    )
-
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
 }
