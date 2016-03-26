@@ -1,5 +1,9 @@
-- name: make directory for virtual environments
-  file: name=/webapps/hh/envs state=directory group=webapps
+- name: make directories for halliganhelper
+  file: name="/webapps/{{ item }}" state=directory group=webapps
+  with_items:
+    - hh
+    - hh/envs
+    - hh/src
 
 - name: Make directory for HH logs
   file: name=/var/log/hh state=directory owner=hh group=webapps 
@@ -14,11 +18,6 @@
     - uwsgi-halliganhelper.ini
     - uwsgi-halliganhelper-sockets.ini
 
-- name: Make location for halliganhelper code
-  file: path="/webapps/{{ item }}" state=directory group=webapps owner=hh
-  with_items:
-    - halliganhelper
-    - halliganhelper/src
 
 - name: Make location for bare halliganhelper git repository
   file: path=~/deployable-repos/ state=directory
