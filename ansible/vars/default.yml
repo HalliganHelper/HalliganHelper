@@ -8,6 +8,9 @@ db_password: halliganhelper-pass
 redis_password: 3f4ba08b041e2cb0b4408a0b6be42c0f
 django_secret_key: secret_key
 
+static_root: /webapps/staticfiles/halliganhhelper
+media_root: /webapps/mediafiles/halliganhelper
+
 # REDIS SETTINGS
 redis_port: 6666
 redis_bind: 0.0.0.0

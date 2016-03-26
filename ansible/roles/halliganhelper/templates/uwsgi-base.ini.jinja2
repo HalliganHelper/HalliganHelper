@@ -5,8 +5,8 @@ home        = %(root)/envs/current
 plugins     = python2 
 
 env         = DEBUG=False
-env         = STATIC_ROOT=/webapps/staticfiles/halliganhelper
-env         = MEDIA_ROOT=/webapps/mediafiles/halliganhelper
+env         = STATIC_ROOT={{ static_root }}
+env         = MEDIA_ROOT={{ media_root }}
 env         = EMAIL_PASSWORD={{ email_password }}
 env         = DB_PASSWORD={{ db_password }}
 env         = REDIS_PASSWORD={{ redis_password }}
