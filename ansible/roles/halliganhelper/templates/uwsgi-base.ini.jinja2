@@ -1,0 +1,13 @@
+[uwsgi]
+set-ph      = root=/webapps/hh
+chdir       = %(root)/src
+home        = %(root)/envs/current
+plugins     = python2 
+
+env         = DEBUG=False
+env         = STATIC_ROOT=/webapps/staticfiles/halliganhelper
+env         = MEDIA_ROOT=/webapps/mediafiles/halliganhelper
+env         = EMAIL_PASSWORD={{ email_password }}
+env         = DB_PASSWORD={{ db_password }}
+env         = REDIS_PASSWORD={{ redis_password }}
+env         = SECRET_KEY={{ django_secret_key }}

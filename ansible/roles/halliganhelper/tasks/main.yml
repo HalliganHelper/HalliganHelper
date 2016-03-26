@@ -13,11 +13,17 @@
 
 - name: Install halliganhelper nginx conf
   template: src=halliganhelper.nginx.jinja2 dest=/etc/nginx/sites-enabled/halliganhelper.conf
+  register: halliganhelper_nginx_conf
   notify: reload nginx
+
+- name: Reload nginx
+  service: name=nginx state=reloaded
+  when: halliganhelper_nginx_conf | changed
 
 - name: install halliganhelper vassals
   template: dest="/etc/uwsgi/vassals/{{ item }}" src="{{ item }}.jinja2"
   with_items:
+    - uwsgi-base.ini
     - uwsgi-halliganhelper.ini
     - uwsgi-halliganhelper-sockets.ini
 
@@ -39,3 +45,7 @@
   with_items:
     - staticfiles
     - mediafiles
+
+- name: ensure uwsgi is started
+  service: name=uwsgi state=started
+  ignore_errors: yes

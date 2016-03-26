@@ -27,8 +27,8 @@ server {
 
     {% if include_ssl %}
     ssl on;
-    ssl_certificate /etc/letsencrypt/live/{{ ansible_fqdn }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ ansible_fqdn }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{{ subdomain }}.halliganhelper.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ subdomain }}.halliganhelper.com/privkey.pem;
     {% endif %}
 
     ssl_session_cache shared:SSL:10m;
@@ -53,6 +53,15 @@ server {
 
 server {
     listen 80;
-    return 301 https://www.halliganhelper.com$request_uri;
-    server_name www.halliganhelper.com;
+    server_name {{ subdomain }}.halliganhelper.com;
+
+    # location '/.well-known/acme-challenge' {
+    #     root {{ letsencrypt_webroot_path }};
+    #     index index.html index.htm index.nginx-debian.html;
+    #     allow all;
+    # }
+
+    location '/' {
+        return 301 https://$server_name$request_uri;
+    }
 }

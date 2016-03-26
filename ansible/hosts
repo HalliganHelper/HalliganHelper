@@ -6,3 +6,6 @@ DEBUG=True
 
 [devtest]
 159.203.225.94
+
+[dev]
+dev.halliganhelper.com

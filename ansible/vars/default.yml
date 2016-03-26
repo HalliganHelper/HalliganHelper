@@ -1,8 +1,14 @@
 ---
 include_ssl: true
+subdomain: dev
+
+# Passwords from vault
+email_password: email_password
+db_password: halliganhelper-pass
+redis_password: 3f4ba08b041e2cb0b4408a0b6be42c0f
+django_secret_key: secret_key
 
 # REDIS SETTINGS
-redis_password: 3f4ba08b041e2cb0b4408a0b6be42c0f
 redis_port: 6666
 redis_bind: 0.0.0.0
 
@@ -17,7 +23,7 @@ postgresql_databases:
 # List of users to be created (optional)
 postgresql_users:
   - name: halliganhelper
-    pass: halliganhelper-pass
+    pass: "{{ db_password }}"
     encrypted: no       # denotes if the password is already encrypted.
 
 # List of user privileges to be applied (optional)
@@ -31,3 +37,10 @@ postgresql_user_privileges:
 # NodeJS SETTINGS
 nodejs_version: "5.x"
 nodejs_forever: false
+
+# LetsEncrypt Settings
+letsencrypt_webroot_path: /usr/share/nginx/html
+letsencrypt_email: tyler@halliganhelper.com
+letsencrypt_cert_domains: 
+    - "{{ subdomain }}.halliganhelper.com"
+# letsencrypt_server: https://acme-staging.api.letsencrypt.org/directory

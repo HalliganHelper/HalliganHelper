@@ -38,7 +38,7 @@ echo "============ MIGRATING DATABASE ============="
 ./manage.py migrate
 
 echo "=========== RESTARTING THE EMPEROR ==========="
-find /etc/uwsgi/vassals -exec touch --no-dereference {} \;
+sudo find /etc/uwsgi/vassals -exec touch --no-dereference {} \;
 
 HOST=`hostname`
 curl https://hooks.slack.com/services/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 \

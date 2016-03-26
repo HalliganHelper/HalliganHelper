@@ -8,11 +8,11 @@
     - reload nginx
   tags: nginx
 
-- name: Make directory for the nginx ssl keys
-  file: path=/etc/ssl/nginx state=directory owner=hh group=webapps
-  tags: 
-    - nginx
-    - ssl
+- name: install conf file for letsencrypt
+  template: src=letsencrypt.conf.jinja2 dest=/etc/nginx/sites-enabled/letsencrypt.conf
+
+- name: reload nginx
+  service: name=nginx state=reloaded
 
 - name: Create 'uwsgi' user
   user: name=uwsgi groups=webapps

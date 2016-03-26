@@ -1,10 +1,7 @@
 [uwsgi]
-set-ph = root=/webapps/hh
+ini              = uwsgi-base
 
-chdir            = %(root)/src
 module           = HalliganAvailability.wsgi_websocket
-home             = %(root)/virtualenvs/current
-
 master           = true
 processes        = 4
 http-socket      = 127.0.0.1:8002

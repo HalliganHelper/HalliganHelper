@@ -1,0 +1,10 @@
+server {
+    listen 80;
+    server_name {{ subdomain }}.halliganhelper.com;
+
+    location '/.well-known/acme-challenge' {
+        root {{ letsencrypt_webroot_path }};
+        index index.html index.htm index.nginx-debian.html;
+        allow all;
+    }
+}

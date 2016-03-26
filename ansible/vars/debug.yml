@@ -1,5 +1,5 @@
 ---
 DEBUG: False
 redis_passwod: ''
-include_ssl: false
+include_ssl: true
 halliganhelper_db_password: halliganhelper
