@@ -1,13 +1,13 @@
 #!/bin/bash 
 
 dest=/webapps/hh/src
-VIRTUALENV_DIR=/webapps/hhenvs/
+VIRTUALENV_DIR=/webapps/hh/envs/
 GIT_WORK_TREE=$dest git checkout --force
 GIT_HASH=`git rev-parse --short HEAD`
 
 pushd .
 cd $dest
-echo "Deploying into $dest"
+echo "Deploying into $dest as `whoami`"
 
 echo "========== INITIALIZING NEW VIRTUALENV =========="
 cd $VIRTUALENV_DIR
