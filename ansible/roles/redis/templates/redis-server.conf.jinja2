@@ -1,0 +1,22 @@
+# If redis-server is started via init.d, it must be removed from there.
+#    sudo update-rc.d -f redis-server remove
+# http://bespokebytes.com/start-getting-up-and-running-with-upstart/
+ 
+description "redis-server"
+author "hackworth <hackworth@bespokebytes.com>"
+start on runlevel [2345]
+stop on runlevel [016]
+ 
+expect fork
+respawn
+ 
+env USER=redis
+env GROUP=redis
+env DIR=/var/redis
+env PERMS=0755
+ 
+pre-start script
+  mkdir -p -m$PERMS $DIR   || true
+  chown $USER:$GROUP $DIR  || true
+end script
+exec start-stop-daemon --start -c $USER:$GROUP --exec /usr/bin/redis-server /etc/redis/{{ redis_port }}.conf

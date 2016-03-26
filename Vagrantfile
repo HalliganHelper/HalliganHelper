@@ -5,38 +5,27 @@ Vagrant.configure(2) do |config|
 
   config.vm.box = "ubuntu/trusty64"
   config.vm.hostname = "HH"
-
-  #Load the HalliganHelper source code
-  config.vm.synced_folder ".", "/home/vagrant/HalliganHelper"
-  config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
-
-  config.vm.provision "shell", path: "vagrant/scripts/postgres.sh", name: "Postgres"
-  config.vm.provision "shell", path: "vagrant/scripts/node-setup.sh", privileged: true
-  config.vm.provision "shell", path: "vagrant/scripts/python-setup.sh", privileged: false
-  config.vm.provision "shell", path: "vagrant/scripts/redis-setup.sh", privileged: true
-
-  config.vm.provision "shell", privileged: false, inline: <<-SHELL
-    sudo apt-get install -y vim \
-                            git \
-                            build-essential \
-                            gcc \
-                            python-dev \
-                            postgresql-server-dev.9.4 \
-                            libxml2-dev \
-                            libxslt1-dev \
-                            python-dev \
-                            memcached \
-                            libmemcached-dev \
-                            lib32z1-dev \
-                            libjpeg-dev
-			
-  SHELL
-
-  config.vm.provision "shell", path: "vagrant/scripts/setup-halliganhelper.sh", privileged: false
+  config.vm.provider "virtualbox" do |vm|
+    vm.memory = 1024
+    vm.cpus = 2
+  end
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8000" will access port 8000 on the guest machine.
   config.vm.network "forwarded_port", guest: 8000, host: 8000
 
+  config.vm.synced_folder "./", "/vagrant"
+  config.vm.provision "shell", inline: "sudo apt-get update --fix-missing && sudo apt-get install -y python-pip python-dev && sudo pip install ansible==1.9.2 && sudo cp /usr/local/bin/ansible /usr/bin/ansible"
+
+  # From here:
+  # http://docs.ansible.com/ansible/guide_vagrant.html#vagrant-setup
+  config.ssh.insert_key = false
+  # config.vm.define "vagrant"
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.install = true
+    ansible.verbose = "v"
+    ansible.playbook = "ansible/local_playbook.yml"
+    # ansible.extra_vars = "ansible/vars/default.yml"
+  end
 end

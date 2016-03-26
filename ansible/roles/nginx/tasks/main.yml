@@ -1,0 +1,19 @@
+- name: ensure nginx is installed
+  apt: name=nginx state=latest
+  tags: nginx
+
+- name: delete default nginx site
+  file: path=/etc/nginx/sites-enabled/default state=absent
+  notify:
+    - reload nginx
+  tags: nginx
+
+- name: Make directory for the nginx ssl keys
+  file: path=/etc/ssl/nginx state=directory owner=hh group=webapps
+  tags: 
+    - nginx
+    - ssl
+
+- name: Create 'uwsgi' user
+  user: name=uwsgi groups=webapps
+  tags: uwsgi

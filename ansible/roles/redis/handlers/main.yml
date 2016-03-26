@@ -1,0 +1,13 @@
+- name: reload redis
+  service: name="redis_{{ redis_port }}" state=started
+
+- name: stop redis
+  service: name="redis_{{ redis_port }}" state=stopped
+
+- name: start redis
+  service: name="redis_{{ redis_port }}" state=started
+
+- name: reload redis init script
+  become: yes
+  command: "update-rc.d redis_{{ redis_port }} defaults"
+

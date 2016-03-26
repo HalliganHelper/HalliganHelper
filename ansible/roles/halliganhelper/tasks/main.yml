@@ -1,0 +1,39 @@
+- name: make directory for virtual environments
+  file: name=/webapps/hh/envs state=directory group=webapps
+
+- name: Make directory for HH logs
+  file: name=/var/log/hh state=directory owner=hh group=webapps 
+
+- name: Install halliganhelper nginx conf
+  template: src=halliganhelper.nginx.jinja2 dest=/etc/nginx/sites-enabled/halliganhelper.conf
+  notify: reload nginx
+
+- name: install halliganhelper vassals
+  template: dest="/etc/uwsgi/vassals/{{ item }}" src="{{ item }}.jinja2"
+  with_items:
+    - uwsgi-halliganhelper.ini
+    - uwsgi-halliganhelper-sockets.ini
+
+- name: Make location for halliganhelper code
+  file: path="/webapps/{{ item }}" state=directory group=webapps owner=hh
+  with_items:
+    - halliganhelper
+    - halliganhelper/src
+
+- name: Make location for bare halliganhelper git repository
+  file: path=~/deployable-repos/ state=directory
+  become: no
+
+- name: Make bare halliganhelper git repo
+  command: git init --bare halliganhelper.git chdir=~/deployable-repos
+  become: no
+
+- name: Install post-receive
+  template: src=post-receive.jinja2 dest=~/deployable-repos/halliganhelper.git/hooks/post-receive mode=u+x
+  become: no
+
+- name: Make directories for static and media files
+  file: path="/webapps/{{ item }}/halliganhelper" group=webapps owner=hh state=directory
+  with_items:
+    - staticfiles
+    - mediafiles

@@ -1,0 +1,8 @@
+[localhost]
+localhost
+
+[localhost:vars]
+DEBUG=True
+
+[devtest]
+159.203.225.94

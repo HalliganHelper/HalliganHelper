@@ -1,0 +1,3 @@
+---
+DEBUG: True
+redis_port: 666

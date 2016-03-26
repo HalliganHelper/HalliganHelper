@@ -1,0 +1,26 @@
+- name: ensure postgres is available
+  apt_repository: repo='deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main' state=present
+  tags: postgres
+
+- name: add postgres apt key
+  apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc state=present
+
+- name: ensure apt keys are updated
+  become: yes
+  command: 'apt-key update'
+
+- name: ensure apt get is updated
+  become: yes
+  apt: update_cache=yes
+
+- name: ensure postgres is installed
+  apt: name={{ item }} state=latest
+  with_items:
+    - libpq-dev
+    - python-psycopg2
+    - postgresql-9.4
+    - postgresql-contrib-9.4
+
+- name: ensure postgres is running
+  service: name=postgresql state=started
+  tags: postgres

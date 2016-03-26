@@ -1,0 +1,84 @@
+- name: check if default redis exists
+  stat: path=/etc/init.d/redis-server
+  register: default_redis_status
+
+- name: stop default redis
+  service: name=redis-server state=stopped
+  when: default_redis_status.stat.exists
+
+  # - name: check if redis exists on port
+  #   stat: path="/etc/init.d/redis_{{ redis_port }}"
+  #   register: redis_on_port_status
+  # 
+  # - name: stop redis on port
+  #   service: name="redis_{{ redis_port }}" state=stopped
+  #   when: redis_on_port_status.stat.exists
+
+- name: ensure redis is installed
+  apt: name=redis-server
+  tags: redis
+
+- name: make redis group
+  group: name=redis state=present
+  tags: redis
+
+- name: remove existing redis user
+  user: name=redis state=absent remove=yes
+  tags: redis
+
+- name: ensure redis is available
+  apt_repository: repo='ppa:chris-lea/redis-server' state=present
+  tags: redis
+
+- name: ensure there is an /etc/redis folder
+  file: dest="/etc/redis" state=directory group=webapps
+
+- name: ensure there is a home for redis files
+  file: dest="/var/run/redis_{{ redis_port }}" state=directory group=webapps
+  tags: redis
+
+- name: ensure there is a redis log file
+  file: dest="/var/log/redis_{{ redis_port }}.log" state=touch group=webapps mode=0777
+  tags: redis
+
+- name: ensure there is a home for redis data
+  file: dest="/var/redis/{{ redis_port }}" state=directory group=webapps
+  tags: redis
+
+- name: ensure redis config is transferred
+  template: src=redis.conf.jinja2 dest="/etc/redis/{{ redis_port }}.conf" backup=yes
+  notify: 
+    - start redis
+  tags: redis
+
+- name: ensure redis socket lives somewhere
+  file: dest="/var/run/redis_{{ redis_port }}.sock" state=touch group=webapps
+  tags: redis
+
+- name: remove redis from init.d
+  become: true
+  command: "update-rc.d -f redis-server remove"
+  tags: redis
+
+- name: add new redis init file
+  become: true
+  template: src=redis_init_script.jinja2 dest="/etc/init.d/redis_{{ redis_port }}" mode=u+x
+  tags: redis
+  notify: 
+    - start redis
+    - reload redis init script
+
+- name: reload redis
+  become: yes
+  command: "update-rc.d redis_{{ redis_port }} defaults"
+
+- name: restart machine
+  shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+  async: 1
+  poll: 0
+  sudo: true
+  ignore_errors: true
+
+- name: waiting for server to come back
+  local_action: wait_for host={{ inventory_hostname }} state=started delay=30 timeout=300
+  sudo: false

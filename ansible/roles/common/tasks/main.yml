@@ -1,0 +1,36 @@
+- name: ensure apt has latest cache
+  apt: update_cache=yes
+  tags: apt
+
+- name: ensure package dependencies are installed
+  apt: name={{ item }} state=latest
+  with_items:
+    - libjpeg-dev
+    - libssl-dev
+    - silversearcher-ag
+    - curl
+    - python
+    - python-pip
+    - vim
+    - git
+    - build-essential
+    - gcc
+    - python-dev
+    - supervisor
+    - htop
+  tags: apt
+
+- name: Create webapps group
+  group: name=webapps state=present
+
+- name: Create hh user
+  user: name=hh groups=webapps
+
+- name: Create log directory
+  file: name='/var/log/hh' owner=hh group=webapps state=directory
+
+- name: Add c -> clear alias
+  lineinfile: dest=/home/hh/.bash_aliases line="alias c=clear" create=yes
+
+- name: Ensure virtualenvwrapper is installed
+  pip: name=virtualenvwrapper

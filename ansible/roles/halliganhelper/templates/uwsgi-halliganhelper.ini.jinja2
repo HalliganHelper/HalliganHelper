@@ -1,0 +1,13 @@
+[uwsgi]
+set-ph = root=/webapps/hh
+
+chdir       = %(root)/src
+module      = HalliganAvailability.wsgi
+home        = %(root)/virtualenvs/current
+
+master      = true
+processes   = 4
+socket      = 127.0.0.1:8001
+vacuum      = true
+
+logto       = /var/log/hh/uwsgi-main.log

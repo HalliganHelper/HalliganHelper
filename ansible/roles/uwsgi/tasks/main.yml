@@ -1,0 +1,25 @@
+- name: install uwsgi
+  become: yes
+  apt: name=uwsgi state=latest
+
+- name: create uwsgi user
+  user: name=uwsgi groups=webapps
+
+- name: make directory for uwsgi files
+  file: name=/webapps/run state=directory group=webapps
+
+- name: create location for uwsgi vassal files
+  file: path=/webapps/vassals group=webapps state=directory
+
+- name: make a directory for the staticfiles
+  file: path=/webapps/staticfiles/ group=webapps state=directory
+
+- name: copy systemd file to start uwsgi on startup
+  copy: src=uwsgi.service dest=/etc/systemd/system/uwsgi.service mode=0755
+  notify: 'reload systemctl daemon'
+
+- name: ensure uwsgi starts at boot
+  command: 'systemctl enable uwsgi.service'
+
+- name: start uwsgi
+  service: name=uwsgi state=restarted

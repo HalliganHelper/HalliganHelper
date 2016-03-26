@@ -1,0 +1,15 @@
+---
+- hosts: devtest
+  remote_user: hh
+  become: yes
+  vars_files:
+    - vars/default.yml
+    - vars/debug.yml
+  roles:
+    - role: common
+    - role: DavidWittman.redis
+    - role: gdamjan.uwsgi
+    - role: ANXS.postgresql
+    - role: geerlingguy.nodejs
+    - role: nginx
+    - { role: halliganhelper, tags: ['halliganhelper'] }

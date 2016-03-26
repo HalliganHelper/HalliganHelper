@@ -1,0 +1,33 @@
+---
+include_ssl: true
+
+# REDIS SETTINGS
+redis_password: 3f4ba08b041e2cb0b4408a0b6be42c0f
+redis_port: 6666
+redis_bind: 0.0.0.0
+
+# POSTGRES SETTINGS
+postgresql_databases:
+  - name: halliganhelper
+    owner: halliganhelper          # optional; specify the owner of the database
+    hstore: yes         # flag to install the hstore extension on this database (yes/no)
+    uuid_ossp: yes      # flag to install the uuid-ossp extension on this database (yes/no)
+    citext: yes         # flag to install the citext extension on this database (yes/no)
+
+# List of users to be created (optional)
+postgresql_users:
+  - name: halliganhelper
+    pass: halliganhelper-pass
+    encrypted: no       # denotes if the password is already encrypted.
+
+# List of user privileges to be applied (optional)
+postgresql_user_privileges:
+  - name: halliganhelper                   # user name
+    db: halliganhelper                  # database
+    priv: "ALL"                 # privilege string format: example: INSERT,UPDATE/table:SELECT/anothertable:ALL
+    role_attr_flags: "CREATEDB" # role attribute flags
+
+
+# NodeJS SETTINGS
+nodejs_version: "5.x"
+nodejs_forever: false
