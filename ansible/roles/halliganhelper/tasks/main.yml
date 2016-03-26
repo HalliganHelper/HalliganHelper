@@ -1,5 +1,5 @@
 - name: make directories for halliganhelper
-  file: name="/webapps/{{ item }}" state=directory group=webapps
+  file: name="/webapps/{{ item }}" state=directory group=webapps owner=hh
   with_items:
     - hh
     - hh/envs
