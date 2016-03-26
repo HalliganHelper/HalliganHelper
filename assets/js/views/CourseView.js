@@ -73,7 +73,12 @@ var CourseView = Backbone.View.extend({
                        this.removeWebSocketOfficeHour );
         this.listenTo( this, 'newCourse', _.bind( function( courseID ) {
             this.course.set( 'id', courseID );
-            this.course.fetch( { 'reset': true } );
+            this.course.fetch( { 
+                'reset': true,
+                'success': _.bind( function() {
+                    this.requests.fetch( { 'reset': true } );
+                }, this )
+            } );
             this.delegateEvents();
         }, this ) );
         this.listenTo( this.course, 'request', this.renderLoading );
