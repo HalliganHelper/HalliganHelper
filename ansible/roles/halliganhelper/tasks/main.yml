@@ -49,3 +49,15 @@
 - name: ensure uwsgi is started
   service: name=uwsgi state=started
   ignore_errors: yes
+
+- name: set environment variables for user
+  become: yes
+  become_user: hh
+  lineinfile: dest=~/.profile create=yes owner=hh line="export {{ item.key }}={{ item.value }}"
+  with_dict:
+    STATIC_ROOT: "{{ static_root }}"
+    MEDIA_ROOT: "{{ media_root }}"
+    EMAIL_PASSWORD: "{{ email_password }}"
+    DB_PASSWORD: "{{ db_password }}"
+    REDIS_PASSWORD: "{{ redis_password }}"
+    SECRET_KEY: "{{ django_secret_key }}"

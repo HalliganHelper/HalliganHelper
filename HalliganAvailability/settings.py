@@ -128,7 +128,9 @@ WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 WS4REDIS_HEARTBEAT = '--heartbeat--'
 WS4REDIS_EXPIRE = 0  # Don't hold messages. You see it or you don't.
 WS4REDIS_CONNECTION = {
-    'password': os.environ.get('REDIS_PASSWORD', '')
+    'password': os.environ.get('REDIS_PASSWORD', ''),
+    'port': 6666,
+    'host': 'localhost',
 }
 
 
