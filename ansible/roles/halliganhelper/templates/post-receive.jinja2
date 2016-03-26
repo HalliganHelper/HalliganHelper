@@ -5,6 +5,10 @@ VIRTUALENV_DIR=/webapps/hh/envs/
 GIT_WORK_TREE=$dest git checkout --force
 GIT_HASH=`git rev-parse --short HEAD`
 
+# This will make it slower to compile static assets, 
+# but also massively reduce the memory footprint
+npm config set jobs 1
+
 pushd .
 cd $dest
 echo "Deploying into $dest as `whoami`"
