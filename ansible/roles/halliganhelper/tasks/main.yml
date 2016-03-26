@@ -21,7 +21,7 @@
   when: halliganhelper_nginx_conf | changed
 
 - name: install halliganhelper vassals
-  template: dest="/etc/uwsgi/vassals/{{ item }}" src="{{ item }}.jinja2"
+  template: dest="/etc/uwsgi/vassals/{{ item }}" src="{{ item }}.jinja2" group=webapps
   with_items:
     - uwsgi-base.ini
     - uwsgi-halliganhelper.ini
