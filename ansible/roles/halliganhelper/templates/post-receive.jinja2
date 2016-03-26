@@ -4,10 +4,10 @@ dest=/webapps/hh/src
 VIRTUALENV_DIR=/webapps/hh/envs/
 GIT_WORK_TREE=$dest git checkout --force
 GIT_HASH=`git rev-parse --short HEAD`
-EMAIL_PASSWORD={{ email_password }}
-DB_PASSWORD={{ db_password }}
-REDIS_PASSWORD={{ redis_password }}
-SECRET_KEY={{ django_secret_key }}
+export EMAIL_PASSWORD={{ email_password }}
+export DB_PASSWORD={{ db_password }}
+export REDIS_PASSWORD={{ redis_password }}
+export SECRET_KEY={{ django_secret_key }}
 
 
 # This will make it slower to compile static assets, 
