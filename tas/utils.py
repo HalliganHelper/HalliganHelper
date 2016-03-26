@@ -16,6 +16,7 @@ redis_broadcast_publisher = RedisPublisher(facility='ta', broadcast=True)
 
 logger = logging.getLogger(__name__)
 
+
 class InvalidCourseStringError(ValueError):
     def __init__(self, value):
         self.value = value
@@ -60,7 +61,6 @@ def _confirm_a_ta(user, course_strings):
     # OR all of the created Q objects together
     # (number=11 AND postfix='') OR (number=150 AND postfix='IDS')
     course_query = Q()
-    q_objects = []
     for course_string in course_strings.split(' '):
         number, postfix = _split_course_string(course_string)
         q_obj = Q(number=number) & Q(postfix=postfix)
@@ -92,6 +92,8 @@ def check_ta(user):
         r = requests.get(url.format(email))
         r.raise_for_status()
         course_strings = r.text.strip()
+        logger.info('Checked TA status for user. user="%s" status="%s"',
+                    user.email, course_strings)
     except:
         logger.exception('Failed to get TA status for %s', user.email)
         return False

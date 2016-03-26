@@ -4,7 +4,7 @@ import os
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), '..')
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-DEBUG = os.environ.get('DEBUG', 'False') == 'False'  # env vars are strings
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'  # env vars are strings
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
 ALLOWED_HOSTS = ['*']
 
