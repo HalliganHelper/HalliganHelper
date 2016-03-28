@@ -1,0 +1,12 @@
+---
+include_ssl: false
+DEBUG: True
+subdomain: ''
+
+email_password: wrong_password
+db_password: halliganhelper
+redis_password: redis_password
+django_secret_key: secret_key
+
+static_root: /webapps/staticfiles/halliganhelper
+media_root: /webapps/mediafiles/halliganhelper

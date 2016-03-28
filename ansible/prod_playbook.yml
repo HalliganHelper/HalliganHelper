@@ -1,11 +1,11 @@
 ---
-- hosts: dev
+- hosts: prod
   remote_user: hh
   become: yes
   vars_files:
     - vars/vault.yml
     - vars/default.yml
-    - vars/debug.yml
+    - vars/prod.yml
   roles:
     - { role: common, tags: ['common'] }
     - role: DavidWittman.redis

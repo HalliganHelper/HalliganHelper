@@ -1,0 +1,38 @@
+- name: Make directory for HH logs
+  file: name=/var/log/hh state=directory owner=hh group=webapps 
+
+- name: Add vagrant user to webapps group
+  user: name=vagrant group=webapps
+
+- name: set environment variables for user
+  become: yes
+  become_user: vagrant
+  lineinfile: dest=~/.profile create=yes owner=vagrant line="export {{ item.key }}={{ item.value }}"
+  with_dict:
+    STATIC_ROOT: "{{ static_root }}"
+    MEDIA_ROOT: "{{ media_root }}"
+    EMAIL_PASSWORD: "{{ email_password }}"
+    DB_PASSWORD: "{{ db_password }}"
+    REDIS_PASSWORD: "{{ redis_password }}"
+    SECRET_KEY: "{{ django_secret_key }}"
+
+- name: install virtualenvwrapper
+  pip: name=virtualenvwrapper
+
+- name: Add virtualenvwrapper settings to bashrc
+  become: yes
+  become_user: vagrant
+  lineinfile: dest=~/.profile create=yes line="export WORKOKN_HOME=$HOME" 
+
+- name: Add virtualenvwrapper source to bashrc
+  become: yes
+  become_user: vagrant
+  lineinfile: dest=~/.profile create=yes line="source /usr/local/bin/virtualenvwrapper.sh"
+
+
+- name: Make virtualenv for hh
+  become: yes
+  become_user: vagrant
+  shell: "source /usr/local/bin/virtualenvwrapper && mkvirtualenv hh -a ~/HH"
+  args:
+    executable: /bin/bash

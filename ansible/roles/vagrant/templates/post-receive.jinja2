@@ -1,0 +1,58 @@
+#!/bin/bash 
+
+dest=/webapps/hh/src
+VIRTUALENV_DIR=/webapps/hh/envs/
+GIT_WORK_TREE=$dest git checkout --force
+GIT_HASH=`git rev-parse --short HEAD`
+export STATIC_ROOT={{ static_root }}
+export MEDIA_ROOT={{ media_root }}
+export EMAIL_PASSWORD={{ email_password }}
+export DB_PASSWORD={{ db_password }}
+export REDIS_PASSWORD={{ redis_password }}
+export SECRET_KEY={{ django_secret_key }}
+
+
+# This will make it slower to compile static assets, 
+# but also massively reduce the memory footprint
+npm config set jobs 1
+
+
+pushd .
+cd $dest
+echo "Deploying into $dest as `whoami`"
+
+echo "=============== CREATING SWAPFILE ==============="
+sudo dd if=/dev/zero of=/swapfile bs=1024 count=512k
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+echo "========== INITIALIZING NEW VIRTUALENV =========="
+cd $VIRTUALENV_DIR
+virtualenv $GIT_HASH
+ln -sfn  $GIT_HASH current
+source ./current/bin/activate
+
+cd $dest
+echo "========== INSTALLING REQUIREMENTS =========="
+pip install -r requirements.txt
+
+echo "=============== STATIC ASSETS ==============="
+npm install
+npm run webpack
+./manage.py collectstatic --noinput
+
+echo "============ MIGRATING DATABASE ============="
+./manage.py migrate
+
+echo "=========== RESTARTING THE EMPEROR ==========="
+sudo find /etc/uwsgi/vassals -exec touch --no-dereference {} \;
+
+HOST=`hostname`
+curl https://hooks.slack.com/services/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 \
+    -d '{"text": "Commit <https://github.com/TylerLubeck/HalliganHelper/commit/'$GIT_HASH'> deployed to '$HOST'", "username": "deploymenthelper", "channel": "#deployments", "icon_emoji": ":taco:"}'
+
+echo "============== REMOVING SWAPFILE ============="
+sudo swapoff /swapfile
+sudo rm /swapfile
+
+echo "Deployed"

@@ -4,10 +4,10 @@
   become: yes
   vars_files:
     - vars/default.yml
-    - vars/debug.yml
+    - vars/vagrant.yml
   roles:
-    - role: common
-    - role: nginx
-    - role: postgres
-    - { role: redis, tags: ['redis'] }
-    - { role: halliganhelper, tags: ['halliganhelper'] }
+    - { role: common, tags: ['common'] }
+    - role: DavidWittman.redis
+    - role: ANXS.postgresql
+    - role: geerlingguy.nodejs
+    - { role: vagrant, tags: ['halliganhelper'] }

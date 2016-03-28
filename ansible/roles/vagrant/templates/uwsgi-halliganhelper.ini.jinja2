@@ -1,0 +1,10 @@
+[uwsgi]
+ini         = /etc/uwsgi/vassals/uwsgi-base.ini
+
+module      = HalliganAvailability.wsgi
+master      = true
+processes   = 4
+socket      = 127.0.0.1:8001
+vacuum      = true
+
+logto       = /var/log/hh/uwsgi-main.log
