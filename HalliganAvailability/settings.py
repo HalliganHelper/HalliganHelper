@@ -36,6 +36,15 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
+
+# Use redis for session management
+
+SESSION_ENGINE = 'redis_sessions.session'
+SESSION_REDIS_HOST = REDIS_HOST = 'localhost'
+SESSION_REDIS_PORT = REDIS_PORT = 6666
+SESSION_REDIS_PASSWORD = REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
+SESSION_REDIS_PREFIX = 'session'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -128,9 +137,9 @@ WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 WS4REDIS_HEARTBEAT = '--heartbeat--'
 WS4REDIS_EXPIRE = 0  # Don't hold messages. You see it or you don't.
 WS4REDIS_CONNECTION = {
-    'password': os.environ.get('REDIS_PASSWORD', ''),
-    'port': 6666,
-    'host': 'localhost',
+    'password': REDIS_PASSWORD,
+    'port': REDIS_PORT,
+    'host': REDIS_HOST,
 }
 
 

@@ -1,8 +1,8 @@
 import os
-import gevent.socket
-import redis.connection
+import gevent.monkey
 
-redis.connection.socket = gevent.socket
+
+gevent.monkey.patch_thread()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "HalliganAvailability.settings")
 
 from ws4redis.uwsgi_runserver import uWSGIWebsocketServer
