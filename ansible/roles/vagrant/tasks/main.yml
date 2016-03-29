@@ -9,6 +9,7 @@
   become_user: vagrant
   lineinfile: dest=~/.profile create=yes owner=vagrant line="export {{ item.key }}={{ item.value }}"
   with_dict:
+    DEBUG: "{{ DEBUG }}"
     STATIC_ROOT: "{{ static_root }}"
     MEDIA_ROOT: "{{ media_root }}"
     EMAIL_PASSWORD: "{{ email_password }}"
@@ -19,10 +20,10 @@
 - name: install virtualenvwrapper
   pip: name=virtualenvwrapper
 
-- name: Add virtualenvwrapper settings to bashrc
-  become: yes
-  become_user: vagrant
-  lineinfile: dest=~/.profile create=yes line="export WORKOKN_HOME=$HOME" 
+# - name: Add virtualenvwrapper settings to bashrc
+#   become: yes
+#   become_user: vagrant
+#   lineinfile: dest=~/.profile create=yes line="export WORKON_HOME=$HOME" 
 
 - name: Add virtualenvwrapper source to bashrc
   become: yes
@@ -33,6 +34,6 @@
 - name: Make virtualenv for hh
   become: yes
   become_user: vagrant
-  shell: "source /usr/local/bin/virtualenvwrapper && mkvirtualenv hh -a ~/HH"
+  shell: "source /usr/local/bin/virtualenvwrapper.sh && mkvirtualenv hh -a ~/HH"
   args:
     executable: /bin/bash
