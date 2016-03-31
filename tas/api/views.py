@@ -163,19 +163,21 @@ class RequestViewSet(CreateModelWithRequestMixin,
             'id': updated.data['id'],
         })
 
-        # If the request was checked out, tell the student
-        solved = updated.data['solved']
-        checked_out = updated.data['checked_out']
-        cancelled = updated.data['cancelled']
-        if checked_out and not (cancelled or solved):
-            student = Student.objects.get(pk=updated.data['requestor']['id'])
-            student_username = student.user.email
-            checked_out_by = self.request.user
+        # Commented out to see if the user-specific sockets are the
+        # sockets that are blocking
 
-            publish_message('checked_out', {
-                'checked_out_by': checked_out_by.get_full_name(),
-                'headshot': checked_out_by.student.headshot.url,
-            }, RedisPublisher(facility='ta', users=[student_username]))
+        # If the request was checked out, tell the student
+        # solved = updated.data['solved']
+        # checked_out = updated.data['checked_out']
+        # cancelled = updated.data['cancelled']
+        # if checked_out and not (cancelled or solved):
+        #     student = Student.objects.get(pk=updated.data['requestor']['id'])
+        #     student_username = student.user.email
+        #     checked_out_by = self.request.user
+        #     publish_message('checked_out', {
+        #         'checked_out_by': checked_out_by.get_full_name(),
+        #         'headshot': checked_out_by.student.headshot.url,
+        #     }, RedisPublisher(facility='ta', users=[student_username]))
 
         return updated
 
