@@ -137,11 +137,6 @@ class RequestViewSet(CreateModelWithRequestMixin,
 
         created = super(RequestViewSet, self).create(request, course_pk)
 
-        data = {
-            'course': course.pk,
-            'id': created.data['id']
-        }
-
         publish_message('request_created', {
             'course': course.pk,
             'id': created.data['id']
@@ -306,8 +301,6 @@ class UserViewSet(viewsets.ViewSet):
         user.save()
         user.student.refresh_from_db()
         user.refresh_from_db()
-
-        logger.debug(user.student.blurb)
 
         return Response(self.get_serializer(user).data)
 
