@@ -162,6 +162,9 @@ EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # Static Assets
 MEDIA_URL = '/media/'
 media_root_default = os.path.join(os.path.dirname(BASE_DIR), 'mediafiles')
@@ -187,9 +190,6 @@ INSTALLED_APPS += (
     'webpack_loader',
 )
 
-
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Django Rest Framework
 INSTALLED_APPS += (
