@@ -217,8 +217,8 @@ LOGGING = {
     'formatters': {
         'verbose': {
             'format': LOG_FORMAT,
-            'datefmt': '%d/%b/%Y %H:%M:%S'
-        }
+            'datefmt': '%d/%b/%Y %H:%M:%S',
+        },
     },
     'handlers': {
         'null': {
@@ -228,38 +228,29 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
+            'formatter': 'verbose',
         },
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'halliganhelper.log',
-            'formatter': 'verbose'
+            'formatter': 'verbose',
         },
         'authentication_file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'halliganhelper-auth.log',
-            'formatter': 'verbose'
-        }
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django.security.DisallowedHost': {
             'handlers': ['null'],
-            'propagate': False
+            'propagate': False,
         },
-        'HalliganAvailability': {
+        '': {
             'handlers': ['console', 'file'],
-            'level': 'DEBUG'
-        },
-        'tas': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG'
-        },
-        'HalliganAvailability.authentication': {
-            'handlers': ['console', 'authentication_file'],
             'level': 'DEBUG',
-            'propagate': False
-        }
-    }
+        },
+    },
 }

@@ -16,7 +16,8 @@ var WebSocketHandler = Backbone.Model.extend({
         var webSocketProtocol = location.protocol === "http:" ? "ws:" : "wss:"; 
         webSocketProtocol += "//";
         var webSocketRoot = location.host + "/ws/ta";
-        var webSocketParams = "?subscribe-broadcast&subscribe-user";
+        // var webSocketParams = "?subscribe-broadcast&subscribe-user";
+        var webSocketParams = "?subscribe-broadcast";
 
         return webSocketProtocol + webSocketRoot + webSocketParams;
     },
