@@ -1,10 +1,14 @@
+import logging
+
 from django.db import models
+from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.contrib.auth.models import (AbstractBaseUser,
                                         PermissionsMixin,
                                         BaseUserManager)
 
+logger = logging.getLogger(__name__)
 
 class CustomUserManager(BaseUserManager):
     def _create_user(self, email, password, is_staff, is_superuser, **kwargs):
@@ -63,8 +67,21 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return '{} {}.'.format(self.first_name, self.last_name[0])
 
-    def email_user(self, subject, message, from_email=None):
-        send_mail(subject, message, from_email, [self.email])
+    def email_user(self, subject, message, html_message=None, from_email=None):
+        if from_email is None:
+            from_email = settings.DEFAULT_FROM_EMAIL
+
+        kwargs = {
+            'subject': subject,
+            'message': message,
+            'from_email': from_email,
+            'recipient_list': [self.email],
+        }
+
+        if html_message is not None:
+            kwargs['html_message'] = html_message
+
+        send_mail(**kwargs)
 
     def __str__(self):
         return '{} ({})'.format(self.get_full_name(), self.email)

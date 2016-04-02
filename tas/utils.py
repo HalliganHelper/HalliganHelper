@@ -6,7 +6,6 @@ from django.template import Context
 from django.template.loader import get_template
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
 
 
@@ -28,8 +27,6 @@ class InvalidCourseStringError(ValueError):
 
 def notify(user, courses):
     subject = 'TA Status'
-    from_email = 'halliganhelper@tylerlubeck.com'
-    to_email = user.email
 
     if courses:
         plaintext = get_template('tas/ta_activation.txt')
@@ -42,11 +39,7 @@ def notify(user, courses):
     text_content = plaintext.render(d)
     html_content = htmly.render(d)
 
-    msg = EmailMultiAlternatives(subject, text_content,
-                                 from_email, [to_email])
-
-    msg.attach_alternative(html_content, 'text/html')
-    msg.send()
+    user.email_user(subject, text_content, html_message=html_content)
 
 
 def _confirm_a_ta(user, course_strings):
