@@ -6,6 +6,7 @@ var Utils = require( './../components/utils' );
 
 var User = Backbone.Model.extend( {
     url: '/api/v3/user/',
+    passwordResetUrl: '/api/v3/password/reset/',
     noop: function() {},
 
     register: function( email, password, passwordConfirm, firstName, lastName, options ) {
@@ -97,6 +98,19 @@ var User = Backbone.Model.extend( {
                 errorFunc( photo, 'network' );
             }, this ),
         } );
+    },
+    resetPassword: function( email, options ) {
+        options = options || {};
+        var success = _.isFunction( options.success ) ? options.success : this.noop;
+        var error = _.isFunction( options.error ) ? options.error : this.noop;
+
+        $.post( this.passwordResetUrl, {
+            'email': email,
+        } )
+        .fail( function( jqxhr ) {
+            error( jqxhr.responseJSON );   
+        } )
+        .success( success );
     },
 } );
 
