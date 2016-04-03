@@ -17,6 +17,7 @@ from rest_framework import (
 from rest_framework.exceptions import NotAuthenticated, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
+from djoser.views import PasswordResetView as DjoserPasswordResetView
 
 from registration.models import RegistrationProfile
 
@@ -48,6 +49,10 @@ from .permissions import (
 
 logger = logging.getLogger(__name__)
 
+class PasswordResetView(DjoserPasswordResetView):
+    subject_template_name = 'registration/password_reset_subject.txt'
+    plain_body_template_name = 'registration/password_reset_email.txt'
+    html_body_template_name = 'registration/password_reset_email.html'
 
 class CreateModelWithRequestMixin(mixins.CreateModelMixin):
 
