@@ -28,6 +28,7 @@
 @import "components/office-hours";
 @import "components/nav-menu";
 @import "components/loading-spinner";
+@import "components/reset-password";
 
 body {
     background-color: #FAFAFA;
@@ -36,5 +37,9 @@ body {
 
 .main-content {
     margin-top: 5px;
+}
+
+.align-center-fix {
+    justify-content: center;
 }
 
