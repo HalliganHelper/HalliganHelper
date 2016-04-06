@@ -194,7 +194,12 @@ INSTALLED_APPS += (
 # Django Rest Framework
 INSTALLED_APPS += (
     'rest_framework',
+    'djoser',  # DRF app for password resets
 )
+
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': '/password/reset/confirm/{uid}/{token}',
+}
 
 DEFAULT_RENDERER_CLASSES = (
     'rest_framework.renderers.JSONRenderer',

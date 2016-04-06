@@ -6,8 +6,8 @@
 4. run ```vagrant up```
 6. There's one last setup piece that I didn't automate:
    ```bash
-    vagrant ssh
-    # In the ssh shell:
+   vagrant ssh
+   # In the ssh shell:
    mkdir -p ~/HH/node_modules
    mkdir -p ~/vagrant_node_modules
    sudo mount --bind ~/vagrant_node_modules ~/HH/node_modules

@@ -24,7 +24,7 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate_email(self, email):
-        if not CustomUser.objects.filter(email=email).exists():
+        if not CustomUser.objects.filter(email__iexact=email).exists():
             msg = 'There is no account for the email address {}'
             raise serializers.ValidationError(msg.format(email))
 
@@ -42,6 +42,8 @@ class LoginSerializer(serializers.Serializer):
         except serializers.ValidationError:
             return
 
+        # Get the case-sensitive version of the email that the user used.
+        email = CustomUser.objects.get(email__iexact=email).email
         user = authenticate(email=email, password=password)
 
         if user is None or not user.is_active:
@@ -77,6 +79,10 @@ class RegistrationSerializer(serializers.Serializer):
             msg += 'school email address'
 
             raise serializers.ValidationError(msg.format(domain))
+
+        if CustomUser.objects.filter(email__iexact=email).filter():
+            msg = 'An account with this email already exists'
+            raise serializers.ValidationError(msg)
 
         return email
 
