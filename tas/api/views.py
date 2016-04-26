@@ -49,10 +49,12 @@ from .permissions import (
 
 logger = logging.getLogger(__name__)
 
+
 class PasswordResetView(DjoserPasswordResetView):
     subject_template_name = 'registration/password_reset_subject.txt'
     plain_body_template_name = 'registration/password_reset_email.txt'
     html_body_template_name = 'registration/password_reset_email.html'
+
 
 class CreateModelWithRequestMixin(mixins.CreateModelMixin):
 
@@ -114,16 +116,21 @@ class RequestViewSet(CreateModelWithRequestMixin,
         serializer.save(course=course, requestor=requestor)
 
     def get_queryset(self):
-        when_asked_cutoff = timezone.now() - timedelta(hours=Request.EXPIRE_IN_HOURS)
         queryset = super(RequestViewSet, self).get_queryset()
-        queryset = queryset.filter(cancelled=False,
-                                   solved=False,
-                                   when_asked__gte=when_asked_cutoff)
+        queryset = queryset.filter(cancelled=False, solved=False)
         queryset.order_by('-when_asked')
         return queryset
 
     def list(self, request, course_pk=None):
+        course = Course.objects.get(pk=course_pk)
         queryset = self.get_queryset().filter(course=course_pk)
+
+        # If there's a TTL, filter by it.
+        if course.request_time_to_live > 0:
+            when_asked_cutoff = timedelta(hours=course.request_time_to_live)
+            queryset = queryset.filter(
+                when_asked__gte=(timezone.now() - when_asked_cutoff)
+            )
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

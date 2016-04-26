@@ -70,6 +70,10 @@ class Course(models.Model):
                                default='',
                                help_text='The CP of COMP 150CP')
     date_created = models.DateTimeField(auto_now_add=True)
+    request_time_to_live = models.IntegerField(
+        default=3,
+        help_text='The time until a request for a course times out'
+    )
 
     def get_identifier(self):
         return '{} {}{}'.format(self.department.title(),
@@ -172,7 +176,6 @@ class Request(models.Model):
     """ Requests are the corner stone of this whole shebang.
         They keep track of when a Student requests a TA for a course
     """
-    EXPIRE_IN_HOURS = 3
     # Required Relations
     course = models.ForeignKey(Course,
                                help_text='The course the request is for')

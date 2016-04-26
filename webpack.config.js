@@ -18,9 +18,11 @@ module.exports = {
     },
 
     devtool: 'source-map',
+    /*
     watchOptions: {
         poll: 500,  // To make webpack-watch work on vagrant
     },
+    */
 
     plugins: [
         new BundleTracker({filename: './webpack-stats.json'}),
