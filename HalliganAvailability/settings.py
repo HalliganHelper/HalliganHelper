@@ -44,6 +44,11 @@ SESSION_REDIS_HOST = REDIS_HOST = 'localhost'
 SESSION_REDIS_PORT = REDIS_PORT = 6666
 SESSION_REDIS_PASSWORD = REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
 SESSION_REDIS_PREFIX = 'session'
+REDIS_URL = 'redis://:{password}@{host}:{port}'.format(
+    password=REDIS_PASSWORD,
+    host=REDIS_HOST,
+    port=REDIS_PORT
+)
 
 TEMPLATES = [
     {
@@ -62,7 +67,6 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                'ws4redis.context_processors.default',
             ],
         },
     },
@@ -119,29 +123,11 @@ REGISTRATION_OPEN = True
 
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'
-BROKER_URL = 'redis://localhost:6379/0'
+BROKER_URL = REDIS_URL
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 10850}
 
 
 ALLOWED_REGISTRATION_DOMAINS = ('tufts.edu', 'cs.tufts.edu')
-
-# Websocket-for-Redis stuff
-
-INSTALLED_APPS += (
-    'ws4redis',
-)
-
-WEBSOCKET_URL = '/ws/'
-WS4REDIS_PREFIX = 'hh'
-WSGI_APPLICATION = 'ws4redis.django_runserver.application'
-WS4REDIS_HEARTBEAT = '--heartbeat--'
-WS4REDIS_EXPIRE = 0  # Don't hold messages. You see it or you don't.
-WS4REDIS_CONNECTION = {
-    'password': REDIS_PASSWORD,
-    'port': REDIS_PORT,
-    'host': REDIS_HOST,
-}
-
 
 # This is a dummy database setup. You'll need to insert your own
 # database name and passwords
@@ -212,6 +198,23 @@ if DEBUG:
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+}
+
+# Django Channels
+INSTALLED_APPS += (
+    'channels',
+)
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [
+                REDIS_URL,
+            ],
+        },
+        'ROUTING': 'HalliganAvailability.routing.channel_routing',
+    },
 }
 
 
