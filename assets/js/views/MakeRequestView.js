@@ -75,7 +75,7 @@ var MakeRequestView = Backbone.View.extend({
         } );
     },
     render: function() {
-        this.$el.html( this.template() );
+        this.$el.html( this.template( this.course.attributes ) );
 
         this.problemInput = this.$el.find( '.problem-input' );
         this.problemInputRow = this.$el.find( '.problem-input-row' );

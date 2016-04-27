@@ -19,6 +19,7 @@ from ..utils import get_administrators_for_school
 
 logger = logging.getLogger(__name__)
 
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
@@ -144,13 +145,20 @@ class CourseSerializer(serializers.ModelSerializer):
                                          end_time__gte=now()).count()
 
     def get_current_request_count(self, course):
-        when_asked_cutoff = now() - timedelta(hours=Request.EXPIRE_IN_HOURS)
-        requests = Request.objects.filter(course=course,
-                                          solved=False,
-                                          cancelled=False,
-                                          when_asked__gte=when_asked_cutoff)
-        return requests.count()
+        requests = Request.objects.filter(
+            course=course,
+            solved=False,
+            cancelled=False
+        )
 
+        # If there's a TTL, filter by it.
+        if course.request_time_to_live > 0:
+            when_asked_cutoff = timedelta(hours=course.request_time_to_live)
+            requests = requests.filter(
+                when_asked__gte=(now() - when_asked_cutoff)
+            )
+
+        return requests.count()
 
     class Meta:
         model = Course
@@ -158,9 +166,10 @@ class CourseSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'identifier',
+            'request_time_to_live',
+            'am_a_ta',
             'active_ta_count',
             'current_request_count',
-            'am_a_ta',
         )
 
 
@@ -235,7 +244,6 @@ class OfficeHourSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
 
         return data
-
 
     def validate_end_time(self, end_time):
         if end_time <= now():
