@@ -1,6 +1,3 @@
-- name: add the vassals folder to the webapps group
-  file: name="/etc/uwsgi/vassals" group=webapps
-
 - name: make directories for halliganhelper
   file: name="/webapps/{{ item }}" state=directory group=webapps owner=hh
   with_items:
@@ -20,14 +17,6 @@
   service: name=nginx state=reloaded
   when: halliganhelper_nginx_conf | changed
 
-- name: install halliganhelper vassals
-  template: dest="/etc/uwsgi/vassals/{{ item }}" src="{{ item }}.jinja2" group=webapps
-  with_items:
-    - uwsgi-base.ini
-    - uwsgi-halliganhelper.ini
-    - uwsgi-halliganhelper-sockets.ini
-
-
 - name: Make location for bare halliganhelper git repository
   file: path=~/deployable-repos/ state=directory
   become: no
@@ -45,10 +34,6 @@
   with_items:
     - staticfiles
     - mediafiles
-
-- name: ensure uwsgi is started
-  service: name=uwsgi state=started
-  ignore_errors: yes
 
 - name: set environment variables for user
   become: yes

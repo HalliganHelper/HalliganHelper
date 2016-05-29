@@ -9,7 +9,6 @@
   roles:
     - { role: common, tags: ['common'] }
     - role: DavidWittman.redis
-    - role: gdamjan.uwsgi
     - role: ANXS.postgresql
     - role: geerlingguy.nodejs
     - role: nginx

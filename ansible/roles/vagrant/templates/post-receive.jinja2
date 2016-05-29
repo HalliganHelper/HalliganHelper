@@ -44,9 +44,6 @@ npm run webpack
 echo "============ MIGRATING DATABASE ============="
 ./manage.py migrate
 
-echo "=========== RESTARTING THE EMPEROR ==========="
-sudo find /etc/uwsgi/vassals -exec touch --no-dereference {} \;
-
 HOST=`hostname`
 curl https://hooks.slack.com/services/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 \
     -d '{"text": "Commit <https://github.com/TylerLubeck/HalliganHelper/commit/'$GIT_HASH'> deployed to '$HOST'", "username": "deploymenthelper", "channel": "#deployments", "icon_emoji": ":taco:"}'

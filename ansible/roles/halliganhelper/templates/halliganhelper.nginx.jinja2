@@ -46,8 +46,7 @@ server {
     }
 
     location / {
-        uwsgi_pass halliganhelper;
-        include uwsgi_params;
+        proxy_pass halliganhelper;
     }
 }
 

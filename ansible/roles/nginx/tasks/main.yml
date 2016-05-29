@@ -13,7 +13,3 @@
 
 - name: reload nginx
   service: name=nginx state=reloaded
-
-- name: Create 'uwsgi' user
-  user: name=uwsgi groups=webapps
-  tags: uwsgi
