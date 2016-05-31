@@ -46,3 +46,8 @@
     DB_PASSWORD: "{{ db_password }}"
     REDIS_PASSWORD: "{{ redis_password }}"
     SECRET_KEY: "{{ django_secret_key }}"
+
+- name: Create supervisor configs
+  become: yes
+  become_user: hh
+  template:
