@@ -8,6 +8,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
+from channels import Group as ChannelGroup
+
 from rest_framework import (
     views,
     viewsets,
@@ -21,13 +23,8 @@ from djoser.views import PasswordResetView as DjoserPasswordResetView
 
 from registration.models import RegistrationProfile
 
-from ws4redis.publisher import RedisPublisher
-
-
 from ..models import (School, Course, Request,
                       Student, OfficeHour, CustomUser)
-
-from ..utils import publish_message
 
 from .serializers import (
     SchoolSerializer,
@@ -39,6 +36,10 @@ from .serializers import (
     LoginSerializer,
     TASerializer,
 
+)
+
+from ..utils import (
+    get_ta_queue_name,
 )
 
 from .permissions import (
@@ -146,38 +147,11 @@ class RequestViewSet(CreateModelWithRequestMixin,
     def create(self, request, course_pk=None):
         course = get_object_or_404(Course, pk=course_pk)
         request.data['course'] = course
-
-        created = super(RequestViewSet, self).create(request, course_pk)
-
-        publish_message('request_created', {
-            'course': course.pk,
-            'id': created.data['id']
-        })
-
-        return created
+        return super(RequestViewSet, self).create(request, course_pk)
 
     def update(self, *args, **kwargs):
-        updated = super(RequestViewSet, self).update(*args, **kwargs)
-
-        course_pk = kwargs.get('course_pk')
-        try:
-            course_pk = int(course_pk)
-        except (ValueError, TypeError):
-            logger.exception('Could not get course_pk on request update')
-            raise ParseError
-
-        packet_type = 'request_updated'
-        if updated.data['cancelled'] or updated.data['solved']:
-            packet_type = 'request_removed'
-
-        publish_message(packet_type, {
-            'course': course_pk,
-            'id': updated.data['id'],
-        })
-
         # Commented out to see if the user-specific sockets are the
         # sockets that are blocking
-
         # If the request was checked out, tell the student
         # solved = updated.data['solved']
         # checked_out = updated.data['checked_out']
@@ -191,7 +165,7 @@ class RequestViewSet(CreateModelWithRequestMixin,
         #         'headshot': checked_out_by.student.headshot.url,
         #     }, RedisPublisher(facility='ta', users=[student_username]))
 
-        return updated
+        return super(RequestViewSet, self).update(*args, **kwargs)
 
 
 class OfficeHourViewSet(CreateModelWithRequestMixin,
@@ -230,30 +204,27 @@ class OfficeHourViewSet(CreateModelWithRequestMixin,
 
     def create(self, request, course_pk=None):
         school = request.user.student.school
-
         course = get_object_or_404(Course, pk=course_pk, school=school)
         request.data['course'] = course
 
-        created = super(OfficeHourViewSet, self).create(request, course_pk)
-        publish_message('on_duty', {
-            'course': course_pk,
-            'id': created.data['id'],
-        })
-
-        return created
+        return super(OfficeHourViewSet, self).create(request, course_pk)
 
     def destroy(self, request, pk=None, course_pk=None, **kwargs):
         office_hour = get_object_or_404(OfficeHour.objects.all(), pk=pk)
+
+        # if the user has any TA channels open, close them.
+        ta_queue_name = get_ta_queue_name(
+            office_hour.course.school,
+            office_hour.course
+        )
+        ta_channels = request.session.get('ta_channels', [])
+        for ta_channel in ta_channels:
+            ChannelGroup(ta_queue_name).discard(ta_channel)
 
         now = timezone.now()
         if office_hour.end_time >= now:
             office_hour.end_time = now
             office_hour.save()
-
-        publish_message('off_duty', {
-            'course': course_pk,
-            'id': office_hour.pk,
-        })
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

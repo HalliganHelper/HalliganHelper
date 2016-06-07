@@ -7,11 +7,7 @@ from django.template.loader import get_template
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
-
-
-from ws4redis.publisher import RedisPublisher
-from ws4redis.redis_store import RedisMessage
-redis_broadcast_publisher = RedisPublisher(facility='ta', broadcast=True)
+from channels import Group as ChannelsGroup
 
 logger = logging.getLogger(__name__)
 
@@ -159,21 +155,37 @@ def _split_course_string(course_string):
     return course_num, course_postfix
 
 
-def publish_message(message_type, data=None, publisher=None):
-    redis_publisher = publisher
-    if redis_publisher is None:
-        redis_publisher = redis_broadcast_publisher
+def get_school_name(obj):
+    # type: (Union[Request, OfficeHour, School]) -> str
+    # This nasty trick is to get around circular imports
+    class_name = obj.__class__.__name__
 
-    packet = {
-        'type': message_type
+    name = ''
+    if class_name in ('Request', 'OfficeHour'):
+        name = obj.course.school.name
+    elif class_name == 'School':
+        name = obj.name
+    else:
+        raise NotImplementedError(
+            "Can't get school name for instance of {}"
+            "".format(obj.__class__.__name__)
+        )
+    return name
+
+def get_ta_queue_name(school, course):
+    # type: (School, Course) -> str
+    return '{school_name}-ta-{course_id}'.format(
+        school_name=school.name,
+        course_id=course.pk
+    )
+
+
+def broadcast_message(channel_name, message_type, data_packet):
+    # type: (str, str, Dict[str,Union[str,int]]) -> None
+    message_packet = {
+        'type': message_type,
+        'data': data_packet,
     }
-
-    if data is not None:
-        packet['data'] = data
-
-    logger.debug('Publishing redis message. message="%s" '
-                 'default_publisher="%s"',
-                 packet, publisher is None)
-
-    message = RedisMessage(json.dumps(packet))
-    redis_publisher.publish_message(message)
+    ChannelsGroup(channel_name).send({
+        'text': json.dumps(message_packet),
+    })

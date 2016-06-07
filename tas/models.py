@@ -2,17 +2,20 @@ import logging
 import hashlib
 
 from django.db import models
+from django.db.models.signals import post_save
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.contrib.auth.models import Group
 
 from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFit
 
 from .custom_user import CustomUser
-from .utils import get_school_admin_group_name
+from .signals import (
+    create_school_admin_group,
+    create_student_profile_for_user,
+    request_modified,
+    office_hour_modified,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -32,13 +35,6 @@ class School(models.Model):
 
     def __str__(self):
         return self.name
-
-
-@receiver(post_save, sender=School)
-def create_school_admin_group(instance, created, **kwargs):
-    if created:
-        group_name = get_school_admin_group_name(instance.name)
-        Group.objects.get_or_create(name=group_name)
 
 
 class SchoolEmailDomain(models.Model):
@@ -136,19 +132,6 @@ class Student(models.Model):
                                              id(self))
 
 
-@receiver(post_save, sender=CustomUser)
-def create_student_profile_for_user(instance, created, **kwargs):
-    if created:
-        domain = instance.email.split('@')[-1]
-        try:
-            sed = SchoolEmailDomain.objects.get(domain=domain)
-            Student.objects.get_or_create(user=instance, school=sed.school)
-
-        except SchoolEmailDomain.DoesNotExist:
-            logger.error('Tried to create a student for the '
-                         'non existent email domain: %s', domain)
-
-
 class TA(models.Model):
     """ A representation of TA.
         TAs have the ability to resolve requests and are
@@ -236,3 +219,11 @@ class OfficeHour(models.Model):
                            help_text='The TA on duty')
     location = models.CharField(max_length=255,
                                 help_text='The home base of the TA')
+
+
+
+# Hook up all of the signals
+post_save.connect(office_hour_modified, sender=OfficeHour)
+post_save.connect(request_modified, sender=Request)
+post_save.connect(create_student_profile_for_user, sender=CustomUser)
+post_save.connect(create_school_admin_group, School)

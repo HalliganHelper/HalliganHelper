@@ -5,10 +5,17 @@ from super_inlines.admin import SuperInlineModelAdmin, SuperModelAdmin
 
 from registration.models import RegistrationProfile
 
-from .custom_user_forms import CustomUserChangeForm, CustomUserCreationForm
-from .custom_user import CustomUser
-from .models import (Student, OfficeHour, Course, Request,
-                     School, SchoolEmailDomain, TA)
+from tas.custom_user_forms import CustomUserCreationForm
+from tas.custom_user import CustomUser
+from tas.models import (
+    Student,
+    OfficeHour,
+    Course,
+    Request,
+    School,
+    SchoolEmailDomain,
+    TA,
+)
 
 from .utils import check_ta
 
