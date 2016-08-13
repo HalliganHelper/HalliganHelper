@@ -4,8 +4,7 @@
 
 - name: delete default nginx site
   file: path=/etc/nginx/sites-enabled/default state=absent
-  notify:
-    - reload nginx
+  notify: reload nginx
   tags: nginx
 
 - name: remove old letsencrypt site
@@ -14,9 +13,7 @@
 
 - name: install conf file for ssl redirect, including letsencrypt exception
   template: src=ssl-redirect.conf.jinja2 dest=/etc/nginx/sites-enabled/ssl-redirect.conf
-
-- name: reload nginx
-  service: name=nginx state=reloaded
+  notify: reload nginx
 
 - name: Create 'uwsgi' user
   user: name=uwsgi groups=webapps
