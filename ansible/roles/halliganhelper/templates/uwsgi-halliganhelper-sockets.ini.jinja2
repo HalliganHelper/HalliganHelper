@@ -3,11 +3,12 @@ ini              = /etc/uwsgi/vassals/uwsgi-base.ini
 
 module           = HalliganAvailability.wsgi_websocket
 master           = true
-processes        = 4
 http-socket      = 127.0.0.1:8002
 vacuum           = true
+plugins          = python,gevent2
 gevent           = 1000
-workers          = 2
+processes        = 1
+threads          = 1
 http-websockets  = true
 
 logto       = /var/log/hh/uwsgi-sockets.log
