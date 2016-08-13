@@ -12,7 +12,17 @@
   file: name=/var/log/hh state=directory owner=hh group=webapps 
 
 - name: Install halliganhelper nginx conf
-  template: src=halliganhelper.nginx.jinja2 dest=/etc/nginx/sites-enabled/halliganhelper.conf
+  template:
+    src: halliganhelper.nginx.jinja2
+    dest: /etc/nginx/sites-available/halliganhelper.conf
+  notify: reload nginx
+
+- name: enable halliganhelper site
+  file:
+    path: /etc/nginx/sites-enabled/halliganhelper.conf
+    state: link
+    src: /etc/nginx/sites-available/halliganhelper.conf
+    force: yes # there used to be a file here, so we need to force
   notify: reload nginx
 
 - name: install halliganhelper vassals
