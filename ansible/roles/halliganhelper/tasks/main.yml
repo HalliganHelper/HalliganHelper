@@ -20,10 +20,13 @@
   service: name=nginx state=reloaded
   when: halliganhelper_nginx_conf | changed
 
+- name: remove old uwsgi-base.ini file
+  file: path=/etc/uwsgi/vassals/uwsgi-base.ini state=absent
+
 - name: install halliganhelper vassals
   template: dest="/etc/uwsgi/vassals/{{ item }}" src="{{ item }}.jinja2" group=webapps
   with_items:
-    - uwsgi-base.ini
+    - uwsgi-base.skel
     - uwsgi-halliganhelper.ini
     - uwsgi-halliganhelper-sockets.ini
 
