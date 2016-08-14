@@ -12,13 +12,18 @@
   file: name=/var/log/hh state=directory owner=hh group=webapps 
 
 - name: Install halliganhelper nginx conf
-  template: src=halliganhelper.nginx.jinja2 dest=/etc/nginx/sites-enabled/halliganhelper.conf
-  register: halliganhelper_nginx_conf
+  template:
+    src: halliganhelper.nginx.jinja2
+    dest: /etc/nginx/sites-available/halliganhelper.conf
   notify: reload nginx
 
-- name: Reload nginx
-  service: name=nginx state=reloaded
-  when: halliganhelper_nginx_conf | changed
+- name: enable halliganhelper site
+  file:
+    path: /etc/nginx/sites-enabled/halliganhelper.conf
+    state: link
+    src: /etc/nginx/sites-available/halliganhelper.conf
+    force: yes # there used to be a file here, so we need to force
+  notify: reload nginx
 
 - name: remove old uwsgi-base.ini file
   file: path=/etc/uwsgi/vassals/uwsgi-base.ini state=absent
