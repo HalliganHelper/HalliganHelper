@@ -1,11 +1,13 @@
 __author__ = 'tyler'
 from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth import get_user_model
-from tas.models import Course, TA
+from tas.models import Course, Student, TA
 import requests
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
+
+# Don't mess with anyone from other schools
+SCHOOL = 'Tufts University'
 
 
 class Command(BaseCommand):
@@ -14,7 +16,7 @@ class Command(BaseCommand):
 
     def notify(self, user, courses=None, adding_ta=True):
         subject = 'Halligan Helper TA status'
-        from_email = 'halliganhelper@tylerlubeck.com'
+        from_email = 'noreply@halliganhelper.com'
         to_email = user.email
         if adding_ta:
             plaintext = get_template('tas/ta_activation.txt')
@@ -30,40 +32,63 @@ class Command(BaseCommand):
         msg = EmailMultiAlternatives(subject, text_content,
                                      from_email, [to_email])
         msg.attach_alternative(html_content, 'text/html')
+        print("Sending email: %s" % text_content)
         msg.send()
 
     def handle(self, *args, **options):
 
-        User = get_user_model()
-        users = User.objects.all()
+        students = Student.objects.filter(school__name=SCHOOL)
 
-        for user in users:
+        for student in students:
+            user = student.user
             print("Checking {0}: {1}".format(user.get_full_name(), user))
             email = user.email.replace('@', ':')
             url = "http://www.cs.tufts.edu/~molay/compta/isata.cgi/{0}"
             r = requests.get(url.format(email))
-            is_ta = r.text.strip() != 'NONE'
-            if is_ta:
-                course_nums = r.text.strip().split(' ')
-                try:
-                    courses = Course.objects.filter(number__in=course_nums)
-                except:
-                    print("\n\nError handling {0} as TA for {1}\n\n".format(user.get_full_name(),
-                                                                            r.text.strip()))
-                else:
-                    print("{0} is a TA for {1}".format(user.get_full_name(),
-                                                       map(str, courses)))
-                    ta, created = TA.objects.get_or_create(user=user)
-                    ta.active = True
-                    ta.course = courses
-                    ta.save()
-                    self.notify(user, courses)
 
-            else:
-                if TA.objects.filter(user__email=email).exists():
-                    ta = TA.objects.get(user__email=email)
-                    ta.active = False
-                    ta.courses = []
-                    ta.save()
-                    self.notify(user, None, False)
-            # Email TA based on activated or removed as TA
+            courses = []
+            if r.text.strip() != 'NONE':
+                for course_name in r.text.strip().split(' '):
+                    number = ''
+                    postfix = ''
+                    for index, char in enumerate(course_name):
+                        try:
+                            int(char)
+                            number += char
+                        except ValueError:
+                            postfix = course_name[index:]
+                            break
+
+                    if not number:
+                        print("Malformed course name %s" % course_name)
+                        continue
+
+                    try:
+                        courses.append(Course.objects.get(number=int(number),
+                                                          postfix=postfix,
+                                                          school__name=SCHOOL))
+                    except Course.DoesNotExist:
+                        print("Don't know about course %s" % course_name)
+
+            old_course_list = map(str, student.ta_jobs.all())
+            new_course_list = map(str, courses)
+            print("{0}: {1} -> {2}".format(user.get_full_name(),
+                                           old_course_list,
+                                           new_course_list))
+
+            TA.objects.filter(student=student).update(active=False)
+            for course in courses:
+                try:
+                    ta_job = TA.objects.get(student=student,
+                                            course=course)
+
+                    ta_job.active = True
+                    ta_job.save()
+                except TA.DoesNotExist:
+                    ta_job = TA.objects.create(student=student,
+                                               course=course,
+                                               active=True)
+
+            # Don't notify students who aren't and weren't a TA.
+            if old_course_list or new_course_list:
+                self.notify(user, courses, len(courses) > 0)

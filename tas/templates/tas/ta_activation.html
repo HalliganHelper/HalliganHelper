@@ -4,7 +4,7 @@ Hello {{ user.get_full_name.title }},
 <br> You now have the ability to resolve requests for the following courses:
 <ul>
     {% for course in courses %}
-        <li> {{ course }} </li>
+        <li> {{ course.department }} {{ course.number }}: {{ course.name }} </li>
     {% endfor %}
 </ul>
 <br>
