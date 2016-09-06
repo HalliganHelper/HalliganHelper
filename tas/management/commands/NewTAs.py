@@ -1,4 +1,6 @@
 __author__ = 'tyler'
+import smtplib
+import time
 from django.core.management.base import BaseCommand, CommandError
 from tas.models import Course, Student, TA
 import requests
@@ -33,7 +35,16 @@ class Command(BaseCommand):
                                      from_email, [to_email])
         msg.attach_alternative(html_content, 'text/html')
         print("Sending email: %s" % text_content)
-        msg.send()
+
+        while True:
+            try:
+                msg.send()
+                break
+            except smtplib.SMTPDataError as e:
+                if e.args[0] == 550:
+                    print("Exceeded mail rate limit, sleeping for a minute")
+                    time.sleep(60)
+
 
     def handle(self, *args, **options):
 
