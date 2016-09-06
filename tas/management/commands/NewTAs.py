@@ -33,6 +33,8 @@ class Command(BaseCommand):
         msg.send()
 
     def handle(self, *args, **options):
+
+        User = get_user_model()
         users = User.objects.all()
 
         for user in users:
@@ -43,14 +45,20 @@ class Command(BaseCommand):
             is_ta = r.text.strip() != 'NONE'
             if is_ta:
                 course_nums = r.text.strip().split(' ')
-                courses = Course.objects.filter(number__in=course_nums)
-                print("{0} is a TA for {1}".format(user.get_full_name(),
-                                                   map(str, courses)))
-                ta, created = TA.objects.get_or_create(user=user)
-                ta.active = True
-                ta.course = courses
-                ta.save()
-                self.notify(user, courses)
+                try:
+                    courses = Course.objects.filter(number__in=course_nums)
+                except:
+                    print("\n\nError handling {0} as TA for {1}\n\n".format(user.get_full_name(),
+                                                                            r.text.strip()))
+                else:
+                    print("{0} is a TA for {1}".format(user.get_full_name(),
+                                                       map(str, courses)))
+                    ta, created = TA.objects.get_or_create(user=user)
+                    ta.active = True
+                    ta.course = courses
+                    ta.save()
+                    self.notify(user, courses)
+
             else:
                 if TA.objects.filter(user__email=email).exists():
                     ta = TA.objects.get(user__email=email)
