@@ -1,0 +1,11 @@
+{% extends "tas/email/base.txt" %}
+{% block content %}
+We have created a Halligan Helper account for you so that you can TA
+{{ course.name }}.
+
+Your new account has email address <b>{{ user.email }}</b>. In order
+to log in, please set your password by clicking the "Forgot?" link on
+https://www.halliganhelper.com/ and entering your email address.
+
+If you need any help, shoot us an email!
+{% endblock %}

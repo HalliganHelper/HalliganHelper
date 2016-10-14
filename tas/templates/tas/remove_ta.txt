@@ -1,8 +1,0 @@
-Hello {{ user.get_full_name.title }},
-
-    Your TA Status on Halligan Helper has been removed.
-    If you believe this is an error, please respond to this email and let us know.
-
-Thanks,
-The HalliganHelper Team
-halliganhelper@tylerlubeck.com

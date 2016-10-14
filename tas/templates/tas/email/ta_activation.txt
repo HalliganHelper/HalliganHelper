@@ -1,0 +1,12 @@
+{% extends "tas/email/base.txt" %}
+{% block content %}
+Your TA status on HalliganHelper has changed.
+
+You can currently resolve requests for the following courses:
+
+{% for course in courses %}
+    {{ course.department }} {{ course.number }}: {{ course.name }}
+{% endfor %}
+
+If you need any help, shoot us an email!
+{% endblock %}

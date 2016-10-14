@@ -1,0 +1,12 @@
+{% extends "tas/email/base.html" %}
+{% block content %}
+<p>We have created a Halligan Helper account for you so that you can TA
+<b>{{ course.name }}</b>.</p>
+
+<p>Your new account has email address <b>{{ user.email }}</b>. In order to log
+in, please set your password by clicking the "Forgot?" link on
+<a href="https://www.halliganhelper.com/">the home page</a> and entering your
+email address.</p>
+
+<p>If you need any help, shoot us an email!</p>
+{% endblock %}

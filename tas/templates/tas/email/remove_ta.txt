@@ -1,0 +1,7 @@
+{% extends "tas/email/base.txt" %}
+{% block content %}
+Your TA status on Halligan Helper has changed. You can no longer resolve
+requests for any courses.
+
+If you believe this is an error, please email us and let us know.
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "tas/email/base.html" %}
+{% block content %}
+<p>Your TA status on HalliganHelper has changed.</p>
+
+<p>You can currently resolve requests for the following courses:</p>
+<ul>
+    {% for course in courses %}
+        <li>{{ course.department }} {{ course.number }}: {{ course.name }}</li>
+    {% endfor %}
+</ul>
+
+<p>If you need any help, shoot us an email!</p>
+{% endblock %}

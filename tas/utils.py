@@ -2,12 +2,10 @@ import logging
 import requests
 import json
 
-from django.template import Context
 from django.template.loader import get_template
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
-
 
 from ws4redis.publisher import RedisPublisher
 from ws4redis.redis_store import RedisMessage
@@ -26,24 +24,34 @@ class InvalidCourseStringError(ValueError):
 
 
 def notify(user, courses):
-    subject = 'TA Status'
+    subject = 'Halligan Helper TA Status'
 
     if courses:
-        plaintext = get_template('tas/ta_activation.txt')
-        htmly = get_template('tas/ta_activation.html')
+        plaintext = get_template('tas/email/ta_activation.txt')
+        htmly = get_template('tas/email/ta_activation.html')
     else:
-        plaintext = get_template('tas/remove_ta.txt')
-        htmly = get_template('tas/remove_ta.html')
+        plaintext = get_template('tas/email/remove_ta.txt')
+        htmly = get_template('tas/email/remove_ta.html')
 
-    d = Context({'user': user, 'courses': courses})
+    d = {'user': user, 'courses': courses}
     text_content = plaintext.render(d)
     html_content = htmly.render(d)
 
     user.email_user(subject, text_content, html_message=html_content)
 
 
-def _confirm_a_ta(user, course_strings):
-    from tas.models import Course, TA
+def _get_ta_courses(user):
+    from tas.models import Course
+
+    # Because apparently having an '@' in the email gives a 403 back from Tufts
+    email = user.email.replace('@', ':')
+    url = "http://www.cs.tufts.edu/~molay/compta/isata.cgi/{0}"
+    r = requests.get(url.format(email))
+    r.raise_for_status()
+    course_strings = r.text.strip()
+
+    logger.info('Got TA status for user. user="%s" status="%s"',
+                user.email, course_strings)
 
     # Create query objects. Basically means create a bunch of objects that
     # say "number=number AND postfix=postfix"
@@ -60,53 +68,43 @@ def _confirm_a_ta(user, course_strings):
         course_query |= q_obj
 
     # Run the query to get the courses
-    courses = Course.objects.filter(course_query)
-
-    student = user.student
-    for course in courses:
-        ta_job, _ = TA.objects.get_or_create(student=student, course=course)
-        ta_job.active = True
-        ta_job.save()
-
-    # Get any existing TA jobs that we didn't just add and set them inactive
-    remove_jobs = TA.objects\
-        .filter(student=student).exclude(course__in=courses)
-    remove_jobs.update(active=False)
-
-    notify(user, courses)
+    return Course.objects.filter(course_query)
 
 
 def check_ta(user):
     from tas.models import TA
+
+    student = user.student
+
     try:
-        # Because apparently having an '@' in the email gives a 403 back from Tufts
-        email = user.email.replace('@', ':')
-        url = "http://www.cs.tufts.edu/~molay/compta/isata.cgi/{0}"
-        r = requests.get(url.format(email))
-        r.raise_for_status()
-        course_strings = r.text.strip()
-        logger.info('Checked TA status for user. user="%s" status="%s"',
-                    user.email, course_strings)
-    except:
+        courses = _get_ta_courses(student)
+    except Exception:
         logger.exception('Failed to get TA status for %s', user.email)
         return False
 
     try:
-        if course_strings != 'NONE':
-            _confirm_a_ta(user, course_strings)
+        old_course_list = map(str, student.ta_jobs.filter(active=True))
+        new_course_list = map(str, courses)
 
-        else:
-            remove_jobs = TA.objects.filter(student=user.student, active=True)
-            if remove_jobs.exists():
-                remove_jobs.update(active=False)
-                courses = [job.course for job in remove_jobs.all()]
-                notify(user, courses)
+        TA.objects.filter(student=student).update(active=False)
+        for course in courses:
+            ta_job, _ = TA.objects.get_or_create(student=student, course=course)
+            ta_job.active = True
+            ta_job.save()
 
-            return False
+        # Get any existing TA jobs that we didn't just add and set them inactive
+        remove_jobs = (
+            TA.objects.filter(student=student).exclude(course__in=courses)
+        )
+        remove_jobs.update(active=False)
+
+        # Don't notify students whose course lists haven't changed.
+        if old_course_list != new_course_list:
+            notify(user, courses)
     except Exception:
-        # intentionally catch everything. If it failed, log and continue
-        logger.exception('Failed to set status for %s. Courses: %s',
-                         user.email, course_strings)
+        # Intentionally catch everything. If it failed, log and continue.
+        logger.exception('Failed to set TA status for %s. Courses: %s',
+                         user.email, new_course_list)
         return False
 
     return True
@@ -138,25 +136,22 @@ def _split_course_string(course_string):
 
     :raises: InvalidCourseStringError
     """
-    course_num = ''
-    course_postfix = ''
+    number = ''
+    postfix = ''
 
-    count = 0
-    for indx, char in enumerate(course_string):
-        if not char.isdigit():
+    for index, char in enumerate(course_string):
+        try:
+            int(char)
+            number += char
+        except ValueError:
+            postfix = course_string[index:]
             break
 
-        course_num += char
-        count += 1
-    try:
-        course_num = int(course_num)
-    except ValueError:
+    if not number:
         logger.exception('Got an invalid course string: %s', course_string)
         raise InvalidCourseStringError(course_string)
 
-    course_postfix = course_string[count:]
-
-    return course_num, course_postfix
+    return number, postfix
 
 
 def publish_message(message_type, data=None, publisher=None):
