@@ -1,3 +1,5 @@
 [run]
-omit = */migrations/*
+omit = 
+    */migrations/*
+    */tests/*
 

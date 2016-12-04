@@ -25,6 +25,7 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate_email(self, email):
+        # TODO: Base this off of the django settings module
         if not CustomUser.objects.filter(email__iexact=email).exists():
             msg = 'There is no account for the email address {}'
             raise serializers.ValidationError(msg.format(email))
@@ -208,9 +209,10 @@ class TASerializer(serializers.ModelSerializer):
         return request.user.pk == student.user.pk
 
     def get_on_duty(self, student):
-        office_hours = OfficeHour.objects.filter(ta=student,
-                                                 end_time__lte=now())
-        return office_hours.exists()
+        return OfficeHour.objects.filter(
+            ta=student,
+            end_time__gt=now()
+        ).exists()
 
     class Meta:
         model = Student
@@ -276,19 +278,19 @@ class RequestSerializer(serializers.ModelSerializer):
     owned_by_me = serializers.SerializerMethodField()
     can_ta_for = serializers.SerializerMethodField()
 
-    def get_owned_by_me(self, student_request):
+    def get_owned_by_me(self, help_request):
         web_request = self.context.get('request', None)
         if web_request is None:
             return False
 
-        return web_request.user.student == student_request.requestor
+        return web_request.user.student == help_request.requestor
 
-    def get_can_ta_for(self, student_request):
+    def get_can_ta_for(self, help_request):
         web_request = self.context.get('request', None)
         if web_request is None:
             return False
 
-        course = student_request.course
+        course = help_request.course
         student = web_request.user.student
 
         return TA.objects.filter(student=student,
