@@ -10,6 +10,7 @@ from django.contrib.auth.models import (AbstractBaseUser,
 
 logger = logging.getLogger(__name__)
 
+
 class CustomUserManager(BaseUserManager):
     def _create_user(self, email, password, is_staff, is_superuser, **kwargs):
         now = timezone.now()
@@ -28,10 +29,22 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_user(self, email, password=None, **kwargs):
-        return self._create_user(email, password, False, False, **kwargs)
+        return self._create_user(
+            email,
+            password,
+            is_staff=False,
+            is_superuser=False,
+            **kwargs
+        )
 
     def create_superuser(self, email, password=None, **kwargs):
-        return self._create_user(email, password, True, True, **kwargs)
+        return self._create_user(
+            email,
+            password,
+            is_staff=True,
+            is_superuser=True,
+            **kwargs
+        )
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -65,7 +78,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return '{} {}'.format(self.first_name, self.last_name)
 
     def get_short_name(self):
-        return '{} {}.'.format(self.first_name, self.last_name[0])
+        return '{} {}.'.format(
+            self.first_name.title(),
+            self.last_name[0].upper()
+        )
 
     def email_user(self, subject, message, html_message=None, from_email=None):
         if from_email is None:
