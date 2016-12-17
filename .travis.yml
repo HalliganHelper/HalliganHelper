@@ -4,7 +4,7 @@ python:
 install: "pip install -r requirements.txt; pip install -r test-requirements.txt"
 before_script:
     - psql -c 'create database halliganhelper;' -U postgres
-script: "py.test"
+script: "pytest"
 
 
 

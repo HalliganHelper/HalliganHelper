@@ -6,6 +6,14 @@ TAs can know when they'll be helped.
 
 It's written in [python][python], [django][django], and [backbone][backbone].
 
+| Branch  | Test Status |
+| ------  | ----------- |
+| Develop | [![Build Status](https://travis-ci.org/HalliganHelper/HalliganHelper.svg?branch=develop)](https://travis-ci.org/HalliganHelper/HalliganHelper)
+| Master  | [![Build Status](https://travis-ci.org/HalliganHelper/HalliganHelper.svg?branch=master)](https://travis-ci.org/HalliganHelper/HalliganHelper)
+
+
+
+
 
 ## Organization Rules
 
