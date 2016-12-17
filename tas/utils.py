@@ -41,17 +41,36 @@ def notify(user, courses):
 
 
 def _get_ta_courses(user):
+    """Returns a QuerySet of Course objects representing which courses a user
+    is a TA for.
+    """
     from tas.models import Course
 
     # Because apparently having an '@' in the email gives a 403 back from Tufts
     email = user.email.replace('@', ':')
     url = "http://www.cs.tufts.edu/~molay/compta/isata.cgi/{0}"
     r = requests.get(url.format(email))
-    r.raise_for_status()
+
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError:
+        logger.exception(
+            'Failed to get courses from %s for user %s',
+            url.format(email),
+            user.email
+        )
+        return Course.objects.none()
+
     course_strings = r.text.strip()
 
-    logger.info('Got TA status for user. user="%s" status="%s"',
-                user.email, course_strings)
+    if course_strings == 'NONE':
+        return Course.objects.none()
+
+    logger.info(
+        'Got TA status for user. user="%s" courses="%s"',
+        user.email,
+        course_strings
+    )
 
     # Create query objects. Basically means create a bunch of objects that
     # say "number=number AND postfix=postfix"
@@ -62,37 +81,56 @@ def _get_ta_courses(user):
     # OR all of the created Q objects together
     # (number=11 AND postfix='') OR (number=150 AND postfix='IDS')
     course_query = Q()
-    for course_string in course_strings.split(' '):
+    course_strings = course_strings.split(' ')
+    for course_string in course_strings:
         number, postfix = _split_course_string(course_string)
-        q_obj = Q(number=number) & Q(postfix=postfix)
+        q_obj = Q(number=number) & Q(postfix__iexact=postfix)
         course_query |= q_obj
 
     # Run the query to get the courses
-    return Course.objects.filter(course_query)
+    courses = Course.objects.filter(course_query)
+
+    if courses.count() != len(course_strings):
+        logger.warning(
+            'User %s is TA for courses not in our database. '
+            'their_courses="%s" our_courses="%s"',
+            course_strings,
+            ' '.join(
+                map(lambda x: '{}{}'.format(x.number, x.postfix), courses)
+            )
+        )
+
+    return courses
 
 
 def check_ta(user):
+    """
+        Get the users current TA jobs
+        If the user is marked as a TA for a course not in that list, remove the mark
+        If the user is not marked as a TA for a course in that list, add the mark
+
+        return true if a ta, false otherwise
+    """
     from tas.models import TA
 
     student = user.student
 
-    try:
-        courses = _get_ta_courses(student)
-    except Exception:
-        logger.exception('Failed to get TA status for %s', user.email)
-        return False
+    courses = _get_ta_courses(user)
+    new_course_list = map(str, courses)
 
     try:
-        old_course_list = map(str, student.ta_jobs.filter(active=True))
-        new_course_list = map(str, courses)
+        old_course_list = map(str, student.ta_jobs.filter(ta__active=True))
 
         TA.objects.filter(student=student).update(active=False)
         for course in courses:
-            ta_job, _ = TA.objects.get_or_create(student=student, course=course)
+            ta_job, _ = TA.objects.get_or_create(
+                student=student,
+                course=course
+            )
             ta_job.active = True
             ta_job.save()
 
-        # Get any existing TA jobs that we didn't just add and set them inactive
+        # Get any existing TA jobs that we didn't just add and deactivate them
         remove_jobs = (
             TA.objects.filter(student=student).exclude(course__in=courses)
         )
@@ -107,7 +145,7 @@ def check_ta(user):
                          user.email, new_course_list)
         return False
 
-    return True
+    return TA.objects.filter(student=student, active=True).exists()
 
 
 def get_administrators_for_school(school):

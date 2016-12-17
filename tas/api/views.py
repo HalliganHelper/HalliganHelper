@@ -9,10 +9,11 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from rest_framework import (
-    views,
     viewsets,
     mixins,
     status,
+    generics,
+    permissions,
 )
 from rest_framework.exceptions import NotAuthenticated, ParseError
 from rest_framework.response import Response
@@ -71,21 +72,31 @@ class CreateModelWithRequestMixin(mixins.CreateModelMixin):
         serializer.save()
 
 
-class SchoolView(views.APIView):
-    """Information about the current user's school."""
+class SchoolView(generics.ListAPIView):
+    """Returns information about the users school.
+
+    Only responds to safe methods (GET, HEAD, OPTIONS)
+
+    Returns information based on who is authenticated, so user A
+        can not see the school of user B (unless they have the same school)
+    """
     serializer_class = SchoolSerializer
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = School.objects.none()
 
     def get(self, request):
         school = request.user.student.school
         return Response(SchoolSerializer(school).data)
 
-    def get_queryset(self):
-        return School.objects.filter(student=self.request.user.student)
-
 
 class CourseViewSet(viewsets.ReadOnlyModelViewSet):
-    """Information about a course"""
+    """Returns information about a course or list of courses.
+
+    Only responds to safe methods (GET, HEAD, OPTIONS)
+
+    Based off of a users school, so a user will only be allowed to see
+    a course that belongs to their school.
+    """
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
 
@@ -304,6 +315,7 @@ class UserViewSet(viewsets.ViewSet):
         return Response(UserSerializer(user).data)
 
     def patch(self, request):
+        logger.debug('about to patch for user %s', request.user.pk)
         user = CustomUser.objects.get(pk=request.user.pk)
 
         user.student.blurb = request.data.get('blurb', user.student.blurb)
@@ -320,6 +332,7 @@ class UserViewSet(viewsets.ViewSet):
 
     @list_route(methods=['post'])
     def login(self, request):
+        logger.debug('about to login')
         serializer = LoginSerializer(data=request.data,
                                      context={'request': request})
 

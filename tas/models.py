@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 def not_empty_string(value):
+    """ Validate that a string is not empty.
+    Raises a ValidationError if a string is empty, returns None otherwise.
+    """
     if len(value) == 0:
         raise ValidationError("No value for field")
 
