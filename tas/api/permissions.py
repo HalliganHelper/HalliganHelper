@@ -12,8 +12,11 @@ class OwnSchoolPermission(permissions.IsAuthenticated):
         return student.school == school
 
     def has_permission(self, request, view):
-        is_authed = super(OwnSchoolPermission, self).has_permission(request,
-                                                                    view)
+        is_authed = super(OwnSchoolPermission, self).has_permission(
+            request,
+            view
+        )
+
         if not is_authed:
             return is_authed
 
@@ -29,8 +32,11 @@ class OwnSchoolPermission(permissions.IsAuthenticated):
         return self._is_own_school(request.user.student, course.school)
 
     def has_object_permission(self, request, view, obj):
-        is_authed = super(OwnSchoolPermission, self)\
-            .has_object_permission(request, view, obj)
+        is_authed = super(OwnSchoolPermission, self).has_object_permission(
+            request,
+            view,
+            obj
+        )
 
         if not is_authed:
             return is_authed
@@ -54,9 +60,12 @@ class OwnSchoolPermission(permissions.IsAuthenticated):
 class RequestPermission(permissions.IsAuthenticated):
 
     def has_object_permission(self, request, view, obj):
-        can_edit = super(RequestPermission, self).has_object_permission(request,
-                                                                        view,
-                                                                        obj)
+        can_edit = super(RequestPermission, self).has_object_permission(
+            request,
+            view,
+            obj
+        )
+
         requesting_student = getattr(request.user, 'student', None)
         if not can_edit or requesting_student is None:
             return can_edit
@@ -78,23 +87,31 @@ class OfficeHourPermission(permissions.IsAuthenticated):
 
     def has_permission(self, request, view):
         course_pk = view.kwargs.get('course_pk', None)
+        logger.debug('Got course_pk: %s', course_pk)
         if course_pk is None:
             return False
-
-        if request.method in permissions.SAFE_METHODS:
-            return True
 
         try:
             course = Course.objects.get(pk=course_pk)
         except Course.DoesNotExist:
             return False
 
-        ta = TA.objects.filter(course=course, student=request.user.student)
+        if course.school.pk != request.user.student.school.pk:
+            return False
+
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        ta = TA.objects.filter(
+            course=course,
+            student=request.user.student,
+            active=True
+        )
 
         return ta.exists()
 
-
     def has_object_permission(self, request, view, obj):
+        # TODO: Check the school as well?
         if request.method in permissions.SAFE_METHODS:
             return True
 

@@ -1,5 +1,10 @@
 import mock
 import pytest
+from django_dynamic_fixture import G
+
+from rest_framework import permissions
+
+UNSAFE_METHODS = ('PUT', 'PATCH', 'POST', 'DELETE',)
 
 
 @pytest.fixture
@@ -263,5 +268,222 @@ class TestRequestPermission:
                                                     obj)
 
 
-class TestOfficeHourPermission:
-    pass
+class TestOfficeHourPermissionsSingleObject(object):
+
+    def test_no_course_pk(self):
+        from tas.api.permissions import OfficeHourPermission
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': None}
+
+        ohp = OfficeHourPermission()
+
+        assert not ohp.has_permission(mock.Mock(), view)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize('method', permissions.SAFE_METHODS)
+    def test_always_granted_for_safe_methods_with_same_school(self, method):
+        from tas.api.permissions import OfficeHourPermission
+        from tas.models import Course, Student
+        course = G(Course)
+        student = G(Student, school=course.school)
+
+        request = mock.Mock()
+        request.method = method
+        request.user.student = student
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': course.pk}
+
+        ohp = OfficeHourPermission()
+
+        assert ohp.has_permission(request, view)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize('method', permissions.SAFE_METHODS)
+    def test_never_granted_for_different_schools(self, method):
+        from tas.api.permissions import OfficeHourPermission
+        from tas.models import Course, Student, School
+        school_one = G(School)
+        school_two = G(School)
+
+        course = G(Course, school=school_one)
+        student = G(Student, school=school_two)
+
+        request = mock.Mock()
+        request.method = method
+        request.user.student = student
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': course.pk}
+
+        ohp = OfficeHourPermission()
+
+        assert not ohp.has_permission(request, view)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize('method', UNSAFE_METHODS)
+    def test_must_be_ta_for_unsafe_methods(self, method):
+        from tas.api.permissions import OfficeHourPermission
+        from tas.models import Course, Student
+        course = G(Course)
+        student = G(Student, school=course.school)
+
+        request = mock.Mock()
+        request.method = method
+        request.user.student = student
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': course.pk}
+
+        ohp = OfficeHourPermission()
+
+        assert not ohp.has_permission(request, view)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize('method', UNSAFE_METHODS)
+    def test_is_ta_for_course(self, method):
+        from tas.api.permissions import OfficeHourPermission
+        from tas.models import Course, Student, TA
+        course = G(Course)
+        student = G(Student, school=course.school)
+        G(TA, course=course, student=student, active=True)
+
+        request = mock.Mock()
+        request.method = method
+        request.user.student = student
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': course.pk}
+
+        ohp = OfficeHourPermission()
+
+        assert ohp.has_permission(request, view)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize('method', UNSAFE_METHODS)
+    def test_is_not_ta_for_course(self, method):
+        from tas.api.permissions import OfficeHourPermission
+        from tas.models import Course, Student, TA
+        course = G(Course)
+        other_course = G(Course)
+        student = G(Student, school=course.school)
+        G(TA, course=other_course, student=student, active=True)
+
+        request = mock.Mock()
+        request.method = method
+        request.user.student = student
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': course.pk}
+
+        ohp = OfficeHourPermission()
+
+        assert not ohp.has_permission(request, view)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize('method', UNSAFE_METHODS)
+    def test_is_not_active_ta_for_course(self, method):
+        from tas.api.permissions import OfficeHourPermission
+        from tas.models import Course, Student, TA
+        course = G(Course)
+        student = G(Student, school=course.school)
+        G(TA, course=course, student=student, active=False)
+
+        request = mock.Mock()
+        request.method = method
+        request.user.student = student
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': course.pk}
+
+        ohp = OfficeHourPermission()
+
+        assert not ohp.has_permission(request, view)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        'method',
+        permissions.SAFE_METHODS + UNSAFE_METHODS
+    )
+    def test_course_must_exist(self, method):
+        from tas.api.permissions import OfficeHourPermission
+        from tas.models import Course, Student, TA
+        course = G(Course)
+        student = G(Student, school=course.school)
+        G(TA, course=course, student=student, active=False)
+
+        request = mock.Mock()
+        request.method = method
+        request.user.student = student
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': course.pk + 1}
+
+        ohp = OfficeHourPermission()
+
+        assert not ohp.has_permission(request, view)
+
+
+class TestOfficeHourPermissionsList(object):
+
+    @pytest.mark.xfail(reason='See comment in code')
+    @pytest.mark.parametrize(
+        'method',
+        permissions.SAFE_METHODS + UNSAFE_METHODS
+    )
+    def test_no_course_pk(self, method):
+        from tas.api.permissions import OfficeHourPermission
+
+        # We shouldn't need to look at the user for this one.
+        request = mock.Mock()
+        request.user = AttributeError
+        request.method = method
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': None}
+
+        ohp = OfficeHourPermission()
+
+        assert not ohp.has_object_permission(request, view, mock.Mock())
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize('method', permissions.SAFE_METHODS)
+    def test_always_granted_for_safe_methods_with_same_school(self, method):
+        from tas.api.permissions import OfficeHourPermission
+        from tas.models import Course, Student, OfficeHour
+        course = G(Course)
+        student = G(Student, school=course.school)
+        office_hour = G(OfficeHour, ta=student, course=course)
+
+        request = mock.Mock()
+        request.method = method
+        request.user.student = student
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': course.pk}
+
+        ohp = OfficeHourPermission()
+
+        assert ohp.has_object_permission(request, view, office_hour)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize('method', UNSAFE_METHODS)
+    def test_not_my_office_hour(self, method):
+        from tas.api.permissions import OfficeHourPermission
+        from tas.models import Course, Student, OfficeHour
+        course = G(Course)
+        student = G(Student, school=course.school)
+        other_student = G(Student, school=course.school)
+        office_hour = G(OfficeHour, ta=other_student, course=course)
+
+        request = mock.Mock()
+        request.method = method
+        request.user.student = student
+
+        view = mock.Mock()
+        view.kwargs = {'course_pk': course.pk}
+
+        ohp = OfficeHourPermission()
+
+        assert not ohp.has_object_permission(request, view, office_hour)
