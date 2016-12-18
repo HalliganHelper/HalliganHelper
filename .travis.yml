@@ -8,6 +8,5 @@ before_script:
     - psql -c 'create database halliganhelper;' -U postgres
     - sudo redis-server /etc/redis/redis.conf --port 6666
 script: "pytest"
-
-
-
+after_success:
+    - bash <(curl -s https://codecov.io/bash)
