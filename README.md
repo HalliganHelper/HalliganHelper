@@ -6,10 +6,10 @@ TAs can know when they'll be helped.
 
 It's written in [python][python], [django][django], and [backbone][backbone].
 
-| Branch  | Test Status |
-| ------  | ----------- |
-| Develop | [![Build Status](https://travis-ci.org/HalliganHelper/HalliganHelper.svg?branch=develop)](https://travis-ci.org/HalliganHelper/HalliganHelper)
-| Master  | [![Build Status](https://travis-ci.org/HalliganHelper/HalliganHelper.svg?branch=master)](https://travis-ci.org/HalliganHelper/HalliganHelper)
+| Branch  | Test Status | Coverage |
+| ------  | ----------- | -------- |
+| Develop | [![Build Status](https://travis-ci.org/HalliganHelper/HalliganHelper.svg?branch=develop)](https://travis-ci.org/HalliganHelper/HalliganHelper) | [![Codecov branch](https://img.shields.io/codecov/c/github/HalliganHelper/HalliganHelper/develop.svg)](https://codecov.io/gh/HalliganHelper/HalliganHelper/branch/develop) |
+| Master  | [![Build Status](https://travis-ci.org/HalliganHelper/HalliganHelper.svg?branch=master)](https://travis-ci.org/HalliganHelper/HalliganHelper) | [![Codecov branch](https://img.shields.io/codecov/c/github/HalliganHelper/HalliganHelper/master.svg)](https://codecov.io/gh/HalliganHelper/HalliganHelper/branch/master) |
 
 
 
