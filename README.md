@@ -1,4 +1,5 @@
 # HalliganHelper
+[![Gitter chat](https://badges.gitter.im/HalliganHelper/HalliganHelper.png)](https://gitter.im/HalliganHelper/)
 
 Welcome! HalliganHelper is a system for managing Teacher's Assistants and the
 students who need them. It offers real-time queuing so that both students and
