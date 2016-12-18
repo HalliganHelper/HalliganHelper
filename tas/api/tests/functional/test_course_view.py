@@ -42,7 +42,7 @@ class TestCourseView(object):
         'method,response_code',
         (
             ('GET', 200,),
-            ('HEAD', MethodNotAllowed.status_code,),
+            ('HEAD', 200,),
             ('OPTIONS', 200,),
             ('PUT', MethodNotAllowed.status_code,),
             ('PATCH', MethodNotAllowed.status_code,),
