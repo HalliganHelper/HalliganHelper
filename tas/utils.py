@@ -94,6 +94,7 @@ def _get_ta_courses(user):
         logger.warning(
             'User %s is TA for courses not in our database. '
             'their_courses="%s" our_courses="%s"',
+            user.email,
             course_strings,
             ' '.join(
                 map(lambda x: '{}{}'.format(x.number, x.postfix), courses)
