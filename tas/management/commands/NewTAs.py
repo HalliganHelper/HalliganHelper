@@ -12,4 +12,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for student in Student.objects.filter(school__name=SCHOOL):
+            self.stdout.write('Processing {}...'.format(student.user.email))
             check_ta(student.user)
