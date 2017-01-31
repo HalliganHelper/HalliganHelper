@@ -63,14 +63,14 @@ def _get_ta_courses(user):
 
     course_strings = r.text.strip()
 
-    if course_strings == 'NONE':
-        return Course.objects.none()
-
     logger.info(
         'Got TA status for user. user="%s" courses="%s"',
         user.email,
         course_strings
     )
+
+    if course_strings == 'NONE':
+        return Course.objects.none()
 
     # Create query objects. Basically means create a bunch of objects that
     # say "number=number AND postfix=postfix"
@@ -94,6 +94,7 @@ def _get_ta_courses(user):
         logger.warning(
             'User %s is TA for courses not in our database. '
             'their_courses="%s" our_courses="%s"',
+            user.email,
             course_strings,
             ' '.join(
                 map(lambda x: '{}{}'.format(x.number, x.postfix), courses)
