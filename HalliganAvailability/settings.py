@@ -2,15 +2,22 @@
 import os
 import errno
 import logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def get_secret_from_file(secret_name, path_prefix):
-    path = os.path.join(path_prefix, secret_name)
+def get_secret_from_file(secret_name):
+    """Fetch a secret from the file, return None if it doesn't exist
+
+    Args:
+        secret_name (str): the name of the file to read
+        path_prefix (str): the directory the file lives in
+
+    Returns:
+        str or None: the secret, or None if not found
+    """
     val = None
     try:
-        with open(path, 'r') as f:
+        with open(secret_name, 'r') as f:
             val = f.read().strip()
     except (OSError, IOError):
         logger.error('Failed to get secret from %s', path, exc_info=True)
@@ -19,23 +26,41 @@ def get_secret_from_file(secret_name, path_prefix):
 
 
 def get_secret_from_env(secret_name):
+    """Fetch a secret from an environment var, return None if it doesn't exist
+
+    Args:
+        secret_name (str): the name of the environment variable to read from
+
+    Returns:
+        str or None: the secret, or None if not found
+    """
     val = os.environ.get(secret_name)
     if val is None:
         logger.error('Failed to find environment variable %s', secret_name)
     return val
 
 
-def get_secret(
-    secrets,
-    path_prefix='/run/secrets',
-    convert_to_type=str,
-):
+def get_secret(secrets):
+    """Fetch a secret from the first available location in `secrets`
+    Args:
+        secrets (List[str]): a list of places to look for secrets. 
+            The secret is returned from the first place it is found.
+
+            Entries in this list must be in one of the following forms:
+                `file:<path_to_file>` - to look up the secret from a file
+                `env:<env_var_name>` - to look up the secret from an env var
+    Returns:
+        str: The found secret
+
+    Raises:
+        Exception: If the secret isn't found in any of the locations
+    """
     _secrets = secrets[:]
     val = None
     while val is None and len(_secrets):
         secret = _secrets.pop()
         if secret.startswith('file:'):
-            val = get_secret_from_file(secret[5:], path_prefix)
+            val = get_secret_from_file(secret[5:])
         if secret.startswith('env:'):
             val = get_secret_from_env(secret[4:])
 
@@ -56,7 +81,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'  # env vars are strings
 ALLOWED_HOSTS = ['*']
 
-SECRET_KEY = get_secret(['file:secret_key', 'env:SECRET_KEY'])
+SECRET_KEY = get_secret(['file:/var/secrets/secret_key', 'env:SECRET_KEY'])
 
 MANAGERS = ADMINS = (
     ('Tyler Lubeck', 'Tyler@tylerlubeck.com'),
@@ -93,7 +118,7 @@ SESSION_ENGINE = 'redis_sessions.session'
 SESSION_REDIS_HOST = REDIS_HOST = os.environ.get('REDIS_HOST', 'redis')
 SESSION_REDIS_PORT = REDIS_PORT = 6379
 SESSION_REDIS_PASSWORD = REDIS_PASSWORD = get_secret(
-    ['file:redis_password', 'env:REDIS_PASSWORD']
+    ['file:/var/secrets/redis_password', 'env:REDIS_PASSWORD']
 )
 SESSION_REDIS_PREFIX = 'session'
 
@@ -202,7 +227,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.environ.get('DB_NAME', ''),
         'USER': os.environ.get('DB_USER', ''),
-        'PASSWORD': get_secret(['file:db_password', 'env:DB_PASSWORD']),
+        'PASSWORD': get_secret(['file:/var/secrets/db_password', 'env:DB_PASSWORD']),
         'HOST': 'db'
     }
 }
@@ -212,7 +237,7 @@ DEFAULT_FROM_EMAIL = 'support@halliganhelper.com'
 EMAIL_HOST = 'smtp.zoho.com'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
-EMAIL_HOST_PASSWORD = get_secret(['file:email_password', 'env:EMAIL_PASSWORD'])
+EMAIL_HOST_PASSWORD = get_secret(['file:/var/secrets/email_password', 'env:EMAIL_PASSWORD'])
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
