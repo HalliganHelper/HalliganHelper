@@ -1,3 +1,7 @@
+# This script is run when the postgres container starts up. It'll create the 
+# halliganhelper user, the halliganhelper database, and configure the proper
+# permissions.
+
 HH_PW=$(cat /run/secrets/db_password)
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
