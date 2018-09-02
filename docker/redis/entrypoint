@@ -1,0 +1,2 @@
+PW=$(cat /run/secrets/redis_password)
+redis-server --requirepass $PW --appendonly yes $@

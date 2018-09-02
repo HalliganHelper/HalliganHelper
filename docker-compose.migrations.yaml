@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  db-migrations:
+    build:
+      context: .
+      dockerfile: docker/hh-python-core
+    depends_on:
+      - db
+    command: "python manage.py migrate --no-input"
+    secrets:
+      - db_password
+      - redis_password
+      - email_password
+      - secret_key
+    environment:
+      - "DEBUG=True"
+      - "DJANGO_SETTINGS_MODULE=HalliganAvailability.settings"
+      - "REDIS_HOST=redis"
+      - "DB_NAME=halliganhelper"
+      - "DB_USER=halliganhelper"
+    volumes:
+      - './:/code'
