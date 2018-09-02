@@ -1,3 +1,6 @@
+# This compose file is set up for development. It needs to be used alongside
+# the docker-compose.yaml file
+
 version: '3.7'
 services:
 
